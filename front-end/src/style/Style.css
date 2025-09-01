@@ -4,7 +4,12 @@
 @custom-variant dark (&:is(.dark *));
 
 * {
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out,
+    color 0.2s ease-in-out, color 0.2s ease-in-out, shadow 0.2s ease-in-out;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 :root {
