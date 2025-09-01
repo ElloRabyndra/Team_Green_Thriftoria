@@ -1,13 +1,11 @@
-import React, { useContext } from "react";
-import { ThemeContext } from "@/context/ThemeContext";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import ToggleButton from "@/components/theme/ToggleButton";
 
 const App = () => {
-  const { theme } = useContext(ThemeContext);
   return (
     <div
-      className={`${theme} min-h-screen flex flex-col items-center justify-center gap-4`}
+      className={`min-h-screen flex flex-col items-center justify-center gap-4`}
     >
       <div className="fixed top-4 right-4">
         <ToggleButton />
