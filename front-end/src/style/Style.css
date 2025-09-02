@@ -4,16 +4,15 @@
 @custom-variant dark (&:is(.dark *));
 
 * {
-  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out,
-    color 0.2s ease-in-out, color 0.2s ease-in-out, shadow 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
+
 
 html {
   scroll-behavior: smooth;
 }
 
 :root {
-   transition: all 0.2s ease-in-out;
   --background: oklch(0.9751 0.0127 244.2507);
   --foreground: oklch(0.3729 0.0306 259.7328);
   --card: oklch(1.0000 0 0);
@@ -125,8 +124,8 @@ html {
 }
 
 .dark {
-  background-color: oklch(0.2285 0.0368 260.031);
-  color: oklch(96.7% 0.003 264.542);
+  /* background-color: oklch(0.2285 0.0368 260.031);
+  color: oklch(96.7% 0.003 264.542); */
   --background: oklch(0.2077 0.0398 265.7549);
   --foreground: oklch(0.8717 0.0093 258.3382);
   --card: oklch(0.2795 0.0368 260.0310);
