@@ -1,15 +1,35 @@
 import { Routes, Route, Navigate } from "react-router";
 import { useContext } from "react";
 import { ThemeContext } from "@/context/ThemeContext";
+import AuthRedirect from "@/components/auth/AuthRedirect";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import AuthPage from "@/pages/AuthPage";
+import MainPage from "@/pages/MainPage";
+import Register from "@/components/auth/Register";
+import Login from "@/components/auth/Login";
+import Profile from "@/components/auth/Profile";
+import ProductList from "@/components/product/ProductList";
+import ProductDetail from "@/components/product/ProductDetail";
+import CartList from "@/components/cart/CartList";
 import App from "@/pages/App";
 import "@/style/Style.css";
 
 const Routing = () => {
   const { theme } = useContext(ThemeContext);
   return (
-    <section className={`${theme} font-[Poppins] min-h-screen`}>
+    <section className={`${theme} bg-background text-foreground font-[Poppins] min-h-screen`}>
       <Routes>
-        <Route path="/" element={<App />} />
+        {/* <Route path="/" element={<App />} /> */}
+        <Route element={<AuthPage />}>
+          <Route path="/register" element={<AuthRedirect><Register/></AuthRedirect>} />
+          <Route path="/login" element={<AuthRedirect><Login/></AuthRedirect>} />
+        </Route>
+        <Route path="/" element={<MainPage/>}>
+          <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
+          <Route index element={<ProtectedRoute><ProductList/></ProtectedRoute>} />
+          <Route path="/product/:id" element={<ProtectedRoute><ProductDetail/></ProtectedRoute>} />
+          <Route path="/cart" element={<ProtectedRoute><CartList/></ProtectedRoute>} />
+        </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </section>
