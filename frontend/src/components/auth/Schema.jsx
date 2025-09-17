@@ -12,6 +12,15 @@ export const registerSchema = z.object({
         "Email must be a valid Gmail address"
       )
       .transform((email) => email.toLowerCase()),
+    phone: z
+      .string()
+      .min(1, "Phone number is required")
+      .regex(/^[0-9]+$/, "Phone number must contain only digits")
+      .min(10, "Phone number must be at least 10 digits"),
+    address: z
+      .string()
+      .min(1, "Address is required")
+      .min(5, "Address must be at least 5 characters"),
     password: z
       .string()
       .min(1, "Password is required")
@@ -53,20 +62,45 @@ export const profileSchema = z.object({
         "Email must be a valid Gmail address"
       )
       .transform((email) => email.toLowerCase()),
-    old_password: z
+    phone: z
       .string()
-      .min(1, "Old password is required")
-      .min(5, "Old password must be at least 5 characters"),
-    new_password: z
+      .min(1, "Phone number is required")
+      .regex(/^[0-9]+$/, "Phone number must contain only digits")
+      .min(10, "Phone number must be at least 10 digits"),
+    address: z
       .string()
-      .min(1, "New password is required")
-      .min(5, "New password must be at least 5 characters"),
-    new_password_confirm: z
-      .string()
-      .min(1, "New password confirmation is required")
-      .min(5, "New password confirmation must be at least 5 characters")
+      .min(1, "Address is required")
+      .min(5, "Address must be at least 5 characters"),
+    old_password: z.string().optional().or(z.literal("")),
+    new_password: z.string().optional().or(z.literal("")),
+    new_password_confirm: z.string().optional().or(z.literal("")),
   })
-  .refine(data => data.new_password === data.new_password_confirm, {
-    message: "New passwords do not match",
-    path: ["new_password_confirm"]
-  });
+  .refine(
+    (data) => {
+      // Kalau salah satu password diisi, semua wajib diisi
+      if (data.old_password || data.new_password || data.new_password_confirm) {
+        return (
+          data.old_password.trim() !== "" &&
+          data.new_password.trim() !== "" &&
+          data.new_password_confirm.trim() !== ""
+        );
+      }
+      return true;
+    },
+    {
+      message: "All password fields are required when changing password",
+      path: ["old_password"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.new_password && data.new_password_confirm) {
+        return data.new_password === data.new_password_confirm;
+      }
+      return true;
+    },
+    {
+      message: "New passwords do not match",
+      path: ["new_password_confirm"],
+    }
+  );

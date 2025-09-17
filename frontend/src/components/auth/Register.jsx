@@ -22,7 +22,7 @@ import EyeButton from "../ui/eyeButton";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register: registerUser, isEmailRegistered } = useAuth();
+  const { registerUser, isEmailRegistered } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
@@ -83,6 +83,7 @@ export default function Register() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-6">
+            {/* Email */}
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -97,6 +98,37 @@ export default function Register() {
                 <ErrorMessage ErrorMessage={errors.email.message} />
               )}
             </div>
+            {/* Phone */}
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                {...register("phone")}
+                id="phone"
+                type="text"
+                placeholder="Insert phone Number..."
+                autoComplete="off"
+                disabled={isSubmitting}
+              />
+              {errors.phone && (
+                <ErrorMessage ErrorMessage={errors.phone.message} />
+              )}
+            </div>
+            {/* Address */}
+            <div className="grid gap-2">
+              <Label htmlFor="address">Address</Label>
+              <Input
+                {...register("address")}
+                id="address"
+                type="text"
+                placeholder="Insert Address..."
+                autoComplete="off"
+                disabled={isSubmitting}
+              />
+              {errors.address && (
+                <ErrorMessage ErrorMessage={errors.address.message} />
+              )}
+            </div>
+            {/* Password */}
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
@@ -120,6 +152,7 @@ export default function Register() {
                 <ErrorMessage ErrorMessage={errors.password.message} />
               )}
             </div>
+            {/* Password Confirmation */}
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="passwordConfirmation">
@@ -147,6 +180,7 @@ export default function Register() {
                 />
               )}
             </div>
+            {/* Button */}
             <Button 
               type="submit" 
               className="w-full cursor-pointer" 
