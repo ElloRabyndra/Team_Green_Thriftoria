@@ -40,8 +40,10 @@ export default function Profile() {
 
   // Set default value email dari user yang sedang login
   useEffect(() => {
-    if (user?.email) {
-      setValue("email", user.email);
+    if(user) {
+      if(user.email) setValue("email", user.email);
+      if(user.phone) setValue("phone", user.phone);
+      if(user.address) setValue("address", user.address);
     }
   }, [user, setValue]);
 
@@ -54,7 +56,14 @@ export default function Profile() {
 
       if (result.success) {
         // Reset form
-        reset();
+        reset({
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          old_password: "",
+          new_password: "",
+          new_password_confirm: ""
+        });
         
         // Set email kembali setelah reset
         setValue("email", data.email);
@@ -107,6 +116,7 @@ export default function Profile() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
+              {/* Email */}
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -121,7 +131,37 @@ export default function Profile() {
                   <ErrorMessage ErrorMessage={errors.email.message} />
                 )}
               </div>
-              
+              {/* Phone */}
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  {...register("phone")}
+                  id="phone"
+                  type="text"
+                  placeholder="Insert phone Number..."
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
+                {errors.phone && (
+                  <ErrorMessage ErrorMessage={errors.phone.message} />
+                )}
+              </div>
+              {/* Address */}
+              <div className="grid gap-2">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  {...register("address")}
+                  id="address"
+                  type="text"
+                  placeholder="Insert Address..."
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
+                {errors.address && (
+                  <ErrorMessage ErrorMessage={errors.address.message} />
+                )}
+              </div>
+              {/* Old Password */}
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="old_password">Old Password</Label>
@@ -145,7 +185,7 @@ export default function Profile() {
                   <ErrorMessage ErrorMessage={errors.old_password.message} />
                 )}
               </div>
-              
+              {/* New Password */}
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="new_password">New Password</Label>
@@ -169,7 +209,7 @@ export default function Profile() {
                   <ErrorMessage ErrorMessage={errors.new_password.message} />
                 )}
               </div>
-              
+              {/* New Password Confirm */}
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="new_password_confirm">New Password Confirm</Label>
@@ -193,7 +233,7 @@ export default function Profile() {
                   <ErrorMessage ErrorMessage={errors.new_password_confirm.message} />
                 )}
               </div>
-              
+              {/* Button */}
               <Button
                 type="submit"
                 className="w-full cursor-pointer"
