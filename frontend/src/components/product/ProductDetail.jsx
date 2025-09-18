@@ -16,6 +16,7 @@ import Empty from "../ui/Empty";
 
 export default function ProductDetail() {
   const { id } = useParams();
+  const userRole = id % 2 !== 0 ? "seller" : "buyer"; // Sementara
   const navigate = useNavigate();
   const { products, loading, addToCart } = useOutletContext();
   const [product, setProduct] = useState(null);
@@ -75,7 +76,7 @@ export default function ProductDetail() {
           variant="ghost"
           onClick={() => navigate("/")}
           className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
-        >
+        > 
           <ArrowLeft className="h-4 w-4" />
           Back to Products
         </Button>
@@ -129,17 +130,19 @@ export default function ProductDetail() {
               {product.description}
             </p>
           </div>
-
+          
           {/* Action Buttons */}
-          <div className="space-y-3 mt-5">
-            <Button
-              onClick={() => addToCart(product)}
-              className="w-full flex items-center justify-center gap-2 h-12 text-base cursor-pointer"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              Add to Cart
-            </Button>
-          </div>
+          {userRole === "buyer" && (
+            <div className="space-y-3 mt-5">
+              <Button
+                onClick={() => addToCart(product)}
+                className="w-full flex items-center justify-center gap-2 h-12 text-base cursor-pointer"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                Add to Cart
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
