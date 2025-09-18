@@ -18,6 +18,7 @@ export default function ProductList() {
             key={product.id}
             product={product}
             onAddToCart={addToCart}
+            userRole={product.id % 2 === 0 ? "buyer" : "seller"} // Sementara
           />
         ))}
       </div>
