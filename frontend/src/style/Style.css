@@ -263,3 +263,16 @@ html {
     opacity: 1;
   }
 }
+
+/* input number untuk chrome */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* input number Untuk Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
