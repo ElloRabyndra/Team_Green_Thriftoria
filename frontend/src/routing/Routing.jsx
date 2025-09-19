@@ -13,6 +13,7 @@ import ProductDetail from "@/components/product/ProductDetail";
 import CartList from "@/components/cart/CartList";
 import App from "@/pages/App";
 import "@/style/Style.css";
+import EditProduct from "@/components/product/EditProduct";
 
 const Routing = () => {
   const { theme } = useContext(ThemeContext);
@@ -28,6 +29,7 @@ const Routing = () => {
           <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
           <Route index element={<ProtectedRoute><ProductList/></ProtectedRoute>} />
           <Route path="/product/:id" element={<ProtectedRoute><ProductDetail/></ProtectedRoute>} />
+          <Route path="/edit-product/:id" element={<ProtectedRoute><EditProduct/></ProtectedRoute>} />
           <Route path="/cart" element={<ProtectedRoute><CartList/></ProtectedRoute>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
