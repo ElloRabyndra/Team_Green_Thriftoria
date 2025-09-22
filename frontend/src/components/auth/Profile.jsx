@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "./Schema";
-import { Link, useNavigate, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,8 +19,7 @@ import { Avatar } from "../ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
 export default function Profile() {
-  const navigate = useNavigate();
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, isLoading, logout } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -37,6 +35,11 @@ export default function Profile() {
   } = useForm({
     resolver: zodResolver(profileSchema),
   });
+  
+  // Redirect ke login jika tidak ada user setelah loading selesai
+  useEffect(() => {
+    if(!isLoading && !user) logout();
+  }, [isLoading, user]);
 
   // Set default value email dari user yang sedang login
   useEffect(() => {
@@ -46,6 +49,7 @@ export default function Profile() {
       if(user.address) setValue("address", user.address);
     }
   }, [user, setValue]);
+
 
   const onSubmit = (data) => {
     setIsSubmitting(true);
@@ -97,8 +101,23 @@ export default function Profile() {
     }
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <section className="space-y-6 md:ml-4">
+        <div className="flex justify-center items-center min-h-[200px]">
+          <div>Loading profile...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 md:ml-4">
       {/* My Profile */}
       <h1 className="text-lg font-semibold">My Profile</h1>
       <Card className={"w-full -mt-4 min-w-80 md:min-w-md px-4 flex-row items-center gap-0"}>
@@ -131,35 +150,37 @@ export default function Profile() {
                   <ErrorMessage ErrorMessage={errors.email.message} />
                 )}
               </div>
-              {/* Phone */}
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  {...register("phone")}
-                  id="phone"
-                  type="text"
-                  placeholder="Insert phone Number..."
-                  autoComplete="off"
-                  disabled={isSubmitting}
-                />
-                {errors.phone && (
-                  <ErrorMessage ErrorMessage={errors.phone.message} />
-                )}
-              </div>
-              {/* Address */}
-              <div className="grid gap-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  {...register("address")}
-                  id="address"
-                  type="text"
-                  placeholder="Insert Address..."
-                  autoComplete="off"
-                  disabled={isSubmitting}
-                />
-                {errors.address && (
-                  <ErrorMessage ErrorMessage={errors.address.message} />
-                )}
+              <div className="space-y-6 lg:flex lg:gap-4 lg:space-y-0">
+                {/* Phone */}
+                <div className="grid gap-2 w-full">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    {...register("phone")}
+                    id="phone"
+                    type="text"
+                    placeholder="Insert phone Number..."
+                    autoComplete="off"
+                    disabled={isSubmitting}
+                  />
+                  {errors.phone && (
+                    <ErrorMessage ErrorMessage={errors.phone.message} />
+                  )}
+                </div>
+                {/* Address */}
+                <div className="grid gap-2 w-full">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    {...register("address")}
+                    id="address"
+                    type="text"
+                    placeholder="Insert Address..."
+                    autoComplete="off"
+                    disabled={isSubmitting}
+                  />
+                  {errors.address && (
+                    <ErrorMessage ErrorMessage={errors.address.message} />
+                  )}
+                </div>
               </div>
               {/* Old Password */}
               <div className="grid gap-2">
@@ -185,53 +206,55 @@ export default function Profile() {
                   <ErrorMessage ErrorMessage={errors.old_password.message} />
                 )}
               </div>
-              {/* New Password */}
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="new_password">New Password</Label>
+              <div className="space-y-6 lg:flex lg:gap-4 lg:space-y-0">
+                {/* New Password */}
+                <div className="grid gap-2 w-full">
+                  <div className="flex items-center">
+                    <Label htmlFor="new_password">New Password</Label>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      {...register("new_password")}
+                      id="new_password"
+                      type={`${showNewPassword ? "text" : "password"}`}
+                      placeholder="Insert New Password..."
+                      autoComplete="off"
+                      disabled={isSubmitting}
+                    />
+                    <EyeButton
+                      isSubmitting={isSubmitting}
+                      showPassword={showNewPassword}
+                      setShowPassword={setShowNewPassword}
+                    />
+                  </div>
+                  {errors.new_password && (
+                    <ErrorMessage ErrorMessage={errors.new_password.message} />
+                  )}
                 </div>
-                <div className="relative">
-                  <Input
-                    {...register("new_password")}
-                    id="new_password"
-                    type={`${showNewPassword ? "text" : "password"}`}
-                    placeholder="Insert New Password..."
-                    autoComplete="off"
-                    disabled={isSubmitting}
-                  />
-                  <EyeButton
-                    isSubmitting={isSubmitting}
-                    showPassword={showNewPassword}
-                    setShowPassword={setShowNewPassword}
-                  />
+                {/* New Password Confirm */}
+                <div className="grid gap-2 w-full">
+                  <div className="flex items-center">
+                    <Label htmlFor="new_password_confirm">New Password Confirm</Label>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      {...register("new_password_confirm")}
+                      id="new_password_confirm"
+                      type={`${showNewPasswordConfirm ? "text" : "password"}`}
+                      placeholder="Insert New Password Confirm..."
+                      autoComplete="off"
+                      disabled={isSubmitting}
+                    />
+                    <EyeButton
+                      isSubmitting={isSubmitting}
+                      showPassword={showNewPasswordConfirm}
+                      setShowPassword={setShowNewPasswordConfirm}
+                    />
+                  </div>
+                  {errors.new_password_confirm && (
+                    <ErrorMessage ErrorMessage={errors.new_password_confirm.message} />
+                  )}
                 </div>
-                {errors.new_password && (
-                  <ErrorMessage ErrorMessage={errors.new_password.message} />
-                )}
-              </div>
-              {/* New Password Confirm */}
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="new_password_confirm">New Password Confirm</Label>
-                </div>
-                <div className="relative">
-                  <Input
-                    {...register("new_password_confirm")}
-                    id="new_password_confirm"
-                    type={`${showNewPasswordConfirm ? "text" : "password"}`}
-                    placeholder="Insert New Password Confirm..."
-                    autoComplete="off"
-                    disabled={isSubmitting}
-                  />
-                  <EyeButton
-                    isSubmitting={isSubmitting}
-                    showPassword={showNewPasswordConfirm}
-                    setShowPassword={setShowNewPasswordConfirm}
-                  />
-                </div>
-                {errors.new_password_confirm && (
-                  <ErrorMessage ErrorMessage={errors.new_password_confirm.message} />
-                )}
               </div>
               {/* Button */}
               <Button

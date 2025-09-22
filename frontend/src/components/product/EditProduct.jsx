@@ -3,22 +3,29 @@ import { useParams, useNavigate, useOutletContext } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { editProductSchema } from "./Schema";
-import { ArrowLeft, Save, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Edit3, Save } from "lucide-react";
 import { Button } from "../ui/button";
 import Loading from "../ui/loading";
 import Empty from "../ui/Empty";
+import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const userRole = id % 2 !== 0 ? "seller" : "buyer"; // Sementara
+  const { user, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const { products, loading, addToCart } = useOutletContext();
   const [product, setProduct] = useState(null);
+
+  // State untuk menyimpan nilai yang diformat untuk tampilan
+  const [formattedPrice, setFormattedPrice] = useState("");
+  const [formattedStock, setFormattedStock] = useState("");
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     setError,
     formState: { errors },
   } = useForm({
@@ -27,6 +34,12 @@ export default function ProductDetail() {
 
   const nameInputRef = useRef(null);
 
+  // Redirect ke login jika tidak ada user setelah loading selesai
+  useEffect(() => {
+    if (!isLoading && !user) logout();
+  }, [isLoading, user]);
+
+  // Set product ketika id berubah
   useEffect(() => {
     if (products.length > 0) {
       const foundProduct = products.find(
@@ -34,7 +47,26 @@ export default function ProductDetail() {
       );
       if (foundProduct) {
         setProduct(foundProduct);
+
+        // Set form values setelah product ditemukan
+        setValue("label", foundProduct.category.replace("-", " "));
+        setValue("title", foundProduct.title);
+
+        // Set nilai asli untuk form (tanpa format)
+        const originalPrice = (foundProduct.price * 15000).toString();
+        const originalStock = (foundProduct.stock || 0).toString();
+
+        setValue("price", originalPrice);
+        setValue("stock", originalStock);
+        setValue("description", foundProduct.description);
+
+        // Set nilai yang diformat untuk tampilan
+        setFormattedPrice(formatPrice(originalPrice));
+        setFormattedStock(formatPrice(originalStock));
+
         setTimeout(() => {
+          // set defaut value title
+          nameInputRef.current.value = foundProduct.title;
           nameInputRef.current?.focus();
         }, 100);
       }
@@ -54,12 +86,38 @@ export default function ProductDetail() {
     return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  const handlePriceChange = (e) => {
-    const formattedValue = formatPrice(e.target.value);
-    e.target.value = formattedValue;
+  // Fungsi untuk menghapus format (titik) dan mendapatkan nilai asli
+  const removeFormat = (value) => {
+    if (!value) return "";
+    return value.toString().replace(/\./g, "");
   };
 
-  const onSubmit = (data) => {};
+  const handlePriceChange = (e) => {
+    const inputValue = e.target.value;
+    const numericValue = removeFormat(inputValue);
+    const formattedValue = formatPrice(numericValue);
+
+    // Update tampilan
+    setFormattedPrice(formattedValue);
+    // Update nilai form dengan nilai asli (tanpa format)
+    setValue("price", numericValue);
+  };
+
+  const handleStockChange = (e) => {
+    const inputValue = e.target.value;
+    const numericValue = removeFormat(inputValue);
+    const formattedValue = formatPrice(numericValue);
+
+    // Update tampilan
+    setFormattedStock(formattedValue);
+    // Update nilai form dengan nilai asli (tanpa format)
+    setValue("stock", numericValue);
+  };
+
+  const onSubmit = (data) => {
+    console.log("Submitted data:", data);
+    toast.success("Product updated successfully!");
+  };
 
   if (loading) {
     return (
@@ -108,16 +166,45 @@ export default function ProductDetail() {
         className="flex flex-col lg:flex-row lg:justify-center gap-6 lg:mt-12"
       >
         {/* Product Images */}
-        <div className="flex justify-center">
+        <div className="relative group flex justify-center">
           {/* Main Image */}
-          <div className="overflow-hidden w-full max-w-sm sm:w-80 lg:w-96">
+          <div className="overflow-hidden w-full max-w-sm max-h-96 sm:w-80 lg:w-96 rounded-2xl">
             <img
-              src={product.thumbnail}
+              src={
+                product.previewImage || product.thumbnail // jika ada preview baru, pakai itu
+              }
               alt={product.title}
               className="w-full h-full object-cover rounded-lg"
               onError={(e) => {
                 e.target.src =
                   "https://via.placeholder.com/500x500?text=No+Image";
+              }}
+            />
+          </div>
+
+          {/* Overlay untuk role penjual dengan tombol edit (input file) */}
+          <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-2xl">
+            <label
+              htmlFor="thumbnail"
+              className="bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-200 hover:shadow-xl cursor-pointer"
+              title="Edit Product Image"
+            >
+              <Edit3 className="h-5 w-5" />
+            </label>
+            <input
+              {...register("thumbnail")}
+              id="thumbnail"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  const file = e.target.files[0];
+                  setProduct((prev) => ({
+                    ...prev,
+                    previewImage: URL.createObjectURL(file), // preview sementara
+                  }));
+                }
               }}
             />
           </div>
@@ -133,17 +220,15 @@ export default function ProductDetail() {
               type="text"
               placeholder="Insert Label..."
               autoComplete="off"
-              defaultValue={product.category.replace("-", " ")}
               className="text-sm text-gray-500 uppercase font-medium border-none outline-none w-full bg-transparent"
             />
             <input
-              {...register("name")}
+              {...register("title")}
               ref={nameInputRef}
-              id="name"
+              id="title"
               type="text"
-              placeholder="Insert Name..."
+              placeholder="Insert Title..."
               autoComplete="off"
-              defaultValue={product.title}
               className="text-xl sm:text-2xl font-bold mt-1 border-none outline-none w-full bg-transparent"
             />
           </div>
@@ -155,12 +240,11 @@ export default function ProductDetail() {
                 Rp
               </span>
               <input
-                {...register("price")}
-                id="price"
+                id="price-display"
                 type="text"
                 placeholder="Insert Price..."
                 autoComplete="off"
-                defaultValue={formatPrice(product.price * 15000)}
+                value={formattedPrice}
                 onChange={handlePriceChange}
                 className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary border-none outline-none flex-1 bg-transparent min-w-0"
               />
@@ -168,13 +252,12 @@ export default function ProductDetail() {
             <div className="flex items-center gap-1 text-sm text-gray-600">
               <span className="font-medium whitespace-nowrap">Stock:</span>
               <input
-                {...register("stock")}
-                id="stock"
+                id="stock-display"
                 type="text"
                 placeholder="Insert Stock..."
                 autoComplete="off"
-                defaultValue={formatPrice(product.price * 15000)}
-                onChange={handlePriceChange}
+                value={formattedStock}
+                onChange={handleStockChange}
                 className="border-none outline-none flex-1 bg-transparent min-w-0"
               />
             </div>
@@ -188,14 +271,13 @@ export default function ProductDetail() {
               id="description"
               placeholder="Insert Description..."
               autoComplete="off"
-              defaultValue={product.description}
               className="w-full text-gray-500 leading-relaxed border-none outline-none resize-none"
               rows="4"
             />
           </div>
 
           {/* Action Buttons */}
-          {userRole === "seller" && (
+          {user.userRole === "seller" && (
             <div className="space-y-3 mt-6 w-full">
               <Button
                 type="submit"

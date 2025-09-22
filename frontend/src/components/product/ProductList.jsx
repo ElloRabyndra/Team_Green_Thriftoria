@@ -1,9 +1,18 @@
+import { useEffect } from "react";
 import { useOutletContext } from "react-router";
 import ProductCard from "./ProductCard";
 import RenderProduct from "./RenderProduct";
 import Empty from "../ui/Empty";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProductList() {
+  const { user, isLoading, logout } = useAuth();
+
+  // Redirect ke login jika tidak ada user setelah loading selesai
+  useEffect(() => {
+    if (!isLoading && !user) logout();
+  }, [isLoading, user]);
+
   const { products, loading, addToCart } = useOutletContext();
   if (loading) {
     return <RenderProduct />;
@@ -18,7 +27,7 @@ export default function ProductList() {
             key={product.id}
             product={product}
             onAddToCart={addToCart}
-            userRole={product.id % 2 === 0 ? "buyer" : "seller"} // Sementara
+            userRole={user.userRole} // Sementara
           />
         ))}
       </div>
