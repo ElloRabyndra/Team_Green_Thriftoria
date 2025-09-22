@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "./Schema";
-import { Link, useNavigate, useLocation } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,8 +19,7 @@ import { Avatar } from "../ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
 export default function Profile() {
-  const navigate = useNavigate();
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, isLoading, logout } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -37,6 +35,11 @@ export default function Profile() {
   } = useForm({
     resolver: zodResolver(profileSchema),
   });
+  
+  // Redirect ke login jika tidak ada user setelah loading selesai
+  useEffect(() => {
+    if(!isLoading && !user) logout();
+  }, [isLoading, user]);
 
   // Set default value email dari user yang sedang login
   useEffect(() => {
@@ -46,6 +49,7 @@ export default function Profile() {
       if(user.address) setValue("address", user.address);
     }
   }, [user, setValue]);
+
 
   const onSubmit = (data) => {
     setIsSubmitting(true);
@@ -96,6 +100,21 @@ export default function Profile() {
       setIsSubmitting(false);
     }
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <section className="space-y-6 md:ml-4">
+        <div className="flex justify-center items-center min-h-[200px]">
+          <div>Loading profile...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <section className="space-y-6 md:ml-4">

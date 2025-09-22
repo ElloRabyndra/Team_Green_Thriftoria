@@ -3,19 +3,20 @@ import { useParams, useNavigate, useOutletContext } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { editProductSchema } from "./Schema";
-import { ArrowLeft, Edit3, Save} from "lucide-react";
+import { ArrowLeft, Edit3, Save } from "lucide-react";
 import { Button } from "../ui/button";
 import Loading from "../ui/loading";
 import Empty from "../ui/Empty";
 import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const userRole = id % 2 !== 0 ? "seller" : "buyer"; // Sementara
+  const { user, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const { products, loading, addToCart } = useOutletContext();
   const [product, setProduct] = useState(null);
-  
+
   // State untuk menyimpan nilai yang diformat untuk tampilan
   const [formattedPrice, setFormattedPrice] = useState("");
   const [formattedStock, setFormattedStock] = useState("");
@@ -33,6 +34,12 @@ export default function ProductDetail() {
 
   const nameInputRef = useRef(null);
 
+  // Redirect ke login jika tidak ada user setelah loading selesai
+  useEffect(() => {
+    if (!isLoading && !user) logout();
+  }, [isLoading, user]);
+
+  // Set product ketika id berubah
   useEffect(() => {
     if (products.length > 0) {
       const foundProduct = products.find(
@@ -40,23 +47,23 @@ export default function ProductDetail() {
       );
       if (foundProduct) {
         setProduct(foundProduct);
-        
+
         // Set form values setelah product ditemukan
         setValue("label", foundProduct.category.replace("-", " "));
         setValue("title", foundProduct.title);
-        
+
         // Set nilai asli untuk form (tanpa format)
         const originalPrice = (foundProduct.price * 15000).toString();
         const originalStock = (foundProduct.stock || 0).toString();
-        
+
         setValue("price", originalPrice);
         setValue("stock", originalStock);
         setValue("description", foundProduct.description);
-        
+
         // Set nilai yang diformat untuk tampilan
         setFormattedPrice(formatPrice(originalPrice));
         setFormattedStock(formatPrice(originalStock));
-        
+
         setTimeout(() => {
           // set defaut value title
           nameInputRef.current.value = foundProduct.title;
@@ -89,7 +96,7 @@ export default function ProductDetail() {
     const inputValue = e.target.value;
     const numericValue = removeFormat(inputValue);
     const formattedValue = formatPrice(numericValue);
-    
+
     // Update tampilan
     setFormattedPrice(formattedValue);
     // Update nilai form dengan nilai asli (tanpa format)
@@ -100,7 +107,7 @@ export default function ProductDetail() {
     const inputValue = e.target.value;
     const numericValue = removeFormat(inputValue);
     const formattedValue = formatPrice(numericValue);
-    
+
     // Update tampilan
     setFormattedStock(formattedValue);
     // Update nilai form dengan nilai asli (tanpa format)
@@ -270,7 +277,7 @@ export default function ProductDetail() {
           </div>
 
           {/* Action Buttons */}
-          {userRole === "seller" && (
+          {user.userRole === "seller" && (
             <div className="space-y-3 mt-6 w-full">
               <Button
                 type="submit"
