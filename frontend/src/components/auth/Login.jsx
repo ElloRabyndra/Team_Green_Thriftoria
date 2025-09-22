@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import ErrorMessage from "./ErrorMessage";
+import ErrorMessage from "../ErrorMessage";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
 import EyeButton from "../ui/eyeButton";
@@ -24,10 +24,10 @@ export default function Login() {
   const { login, isEmailRegistered, validatePassword } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   //jika user diarahkan dari ProtectedRoute
   const from = location.state?.from?.pathname || "/";
-  
+
   const {
     register,
     handleSubmit,
@@ -37,10 +37,10 @@ export default function Login() {
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
-  
+
   const onSubmit = (data) => {
     setIsSubmitting(true);
-    
+
     try {
       //Lakukan login
       const result = login(data);
@@ -48,7 +48,7 @@ export default function Login() {
       if (result.success) {
         // Reset form
         reset();
-        
+
         // Notif sukses
         toast.success(result.message);
 
@@ -59,12 +59,12 @@ export default function Login() {
         if (!isEmailRegistered(data.email)) {
           setError("email", {
             type: "manual",
-            message: "Email not registered"
+            message: "Email not registered",
           });
         } else if (!validatePassword(data.email, data.password)) {
           setError("password", {
             type: "manual",
-            message: "Incorrect password"
+            message: "Incorrect password",
           });
         } else {
           console.error("Login error:", result.message);
@@ -102,7 +102,9 @@ export default function Login() {
                 autoComplete="off"
                 disabled={isSubmitting}
               />
-              {errors.email && <ErrorMessage ErrorMessage={errors.email.message} />}
+              {errors.email && (
+                <ErrorMessage ErrorMessage={errors.email.message} />
+              )}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -117,17 +119,19 @@ export default function Login() {
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                <EyeButton 
-                  isSubmitting={isSubmitting} 
-                  showPassword={showPassword} 
-                  setShowPassword={setShowPassword} 
+                <EyeButton
+                  isSubmitting={isSubmitting}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
                 />
               </div>
-              {errors.password && <ErrorMessage ErrorMessage={errors.password.message} />}
+              {errors.password && (
+                <ErrorMessage ErrorMessage={errors.password.message} />
+              )}
             </div>
-            <Button 
-              type="submit" 
-              className="w-full cursor-pointer" 
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Logging in..." : "Login"}

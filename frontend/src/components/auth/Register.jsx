@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import ErrorMessage from "./ErrorMessage";
+import ErrorMessage from "../ErrorMessage";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
 import EyeButton from "../ui/eyeButton";
@@ -26,7 +26,7 @@ export default function Register() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -39,13 +39,13 @@ export default function Register() {
 
   const onSubmit = (data) => {
     setIsSubmitting(true);
-    
+
     try {
       // Cek apakah email sudah terdaftar
       if (isEmailRegistered(data.email)) {
         setError("email", {
           type: "manual",
-          message: "Email already exists"
+          message: "Email already exists",
         });
         setIsSubmitting(false);
         return;
@@ -57,10 +57,10 @@ export default function Register() {
       if (result.success) {
         // Reset form
         reset();
-        
+
         // Notif sukses
         toast.success(result.message);
-        
+
         // Redirect ke halaman login
         navigate("/login");
       } else {
@@ -134,19 +134,19 @@ export default function Register() {
                 <Label htmlFor="password">Password</Label>
               </div>
               <div className="relative">
-              <Input
-                {...register("password")}
-                id="password"
-                type={`${showPassword ? "text" : "password"}`}
-                placeholder="Insert Password..."
-                autoComplete="off"
-                disabled={isSubmitting}
-              />
-              <EyeButton
-                isSubmitting={isSubmitting}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-              />
+                <Input
+                  {...register("password")}
+                  id="password"
+                  type={`${showPassword ? "text" : "password"}`}
+                  placeholder="Insert Password..."
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
+                <EyeButton
+                  isSubmitting={isSubmitting}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                />
               </div>
               {errors.password && (
                 <ErrorMessage ErrorMessage={errors.password.message} />
@@ -181,9 +181,9 @@ export default function Register() {
               )}
             </div>
             {/* Button */}
-            <Button 
-              type="submit" 
-              className="w-full cursor-pointer" 
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Registering..." : "Register"}

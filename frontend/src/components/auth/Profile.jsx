@@ -3,15 +3,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "./Schema";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import ErrorMessage from "./ErrorMessage";
+import ErrorMessage from "../ErrorMessage";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
 import EyeButton from "../ui/eyeButton";
@@ -35,25 +30,24 @@ export default function Profile() {
   } = useForm({
     resolver: zodResolver(profileSchema),
   });
-  
+
   // Redirect ke login jika tidak ada user setelah loading selesai
   useEffect(() => {
-    if(!isLoading && !user) logout();
+    if (!isLoading && !user) logout();
   }, [isLoading, user]);
 
   // Set default value email dari user yang sedang login
   useEffect(() => {
-    if(user) {
-      if(user.email) setValue("email", user.email);
-      if(user.phone) setValue("phone", user.phone);
-      if(user.address) setValue("address", user.address);
+    if (user) {
+      if (user.email) setValue("email", user.email);
+      if (user.phone) setValue("phone", user.phone);
+      if (user.address) setValue("address", user.address);
     }
   }, [user, setValue]);
 
-
   const onSubmit = (data) => {
     setIsSubmitting(true);
-    
+
     try {
       // Lakukan update profile
       const result = updateProfile(data);
@@ -66,27 +60,25 @@ export default function Profile() {
           address: data.address,
           old_password: "",
           new_password: "",
-          new_password_confirm: ""
+          new_password_confirm: "",
         });
-        
+
         // Set email kembali setelah reset
         setValue("email", data.email);
-        
+
         // Notif sukses
         toast.success(result.message);
-        
-
       } else {
         // Set error berdasarkan kondisi
         if (result.message === "Incorrect old password!") {
           setError("old_password", {
             type: "manual",
-            message: "Incorrect old password"
+            message: "Incorrect old password",
           });
         } else if (result.message === "Email already in use!") {
           setError("email", {
             type: "manual",
-            message: "Email already in use"
+            message: "Email already in use",
           });
         } else {
           console.error("Profile update error:", result.message);
@@ -120,16 +112,22 @@ export default function Profile() {
     <section className="space-y-6 md:ml-4">
       {/* My Profile */}
       <h1 className="text-lg font-semibold">My Profile</h1>
-      <Card className={"w-full -mt-4 min-w-80 md:min-w-md px-4 flex-row items-center gap-0"}>
+      <Card
+        className={
+          "w-full -mt-4 min-w-80 md:min-w-md px-4 flex-row items-center gap-0"
+        }
+      >
         <Avatar className="w-14 h-14">
           <AvatarImage src="https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg"></AvatarImage>
         </Avatar>
         <CardContent className="px-4">
-          <h1 className="text-md font-semibold">{user?.email?.split("@")[0]?.replace(/^\w/, c => c.toUpperCase())}</h1>
+          <h1 className="text-md font-semibold">
+            {user?.email?.split("@")[0]?.replace(/^\w/, (c) => c.toUpperCase())}
+          </h1>
           <p className="text-sm font-medium text-gray-500">{user?.email}</p>
         </CardContent>
       </Card>
-      
+
       {/* Edit Profile */}
       <Card className="w-full min-w-80 md:min-w-md">
         <CardContent>
@@ -234,7 +232,9 @@ export default function Profile() {
                 {/* New Password Confirm */}
                 <div className="grid gap-2 w-full">
                   <div className="flex items-center">
-                    <Label htmlFor="new_password_confirm">New Password Confirm</Label>
+                    <Label htmlFor="new_password_confirm">
+                      New Password Confirm
+                    </Label>
                   </div>
                   <div className="relative">
                     <Input
@@ -252,7 +252,9 @@ export default function Profile() {
                     />
                   </div>
                   {errors.new_password_confirm && (
-                    <ErrorMessage ErrorMessage={errors.new_password_confirm.message} />
+                    <ErrorMessage
+                      ErrorMessage={errors.new_password_confirm.message}
+                    />
                   )}
                 </div>
               </div>
