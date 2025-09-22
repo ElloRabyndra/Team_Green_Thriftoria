@@ -80,7 +80,7 @@ export default function Login() {
   };
 
   return (
-    <Card className="w-full min-w-80 md:min-w-md">
+    <Card className="w-full min-w-80 md:min-w-lg">
       <CardHeader className={"flex items-center justify-between gap-2"}>
         <CardTitle>Login to your account</CardTitle>
         <CardAction>

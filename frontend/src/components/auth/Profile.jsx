@@ -36,10 +36,11 @@ export default function Profile() {
     if (!isLoading && !user) logout();
   }, [isLoading, user]);
 
-  // Set default value email dari user yang sedang login
+  // Set default value 
   useEffect(() => {
     if (user) {
       if (user.email) setValue("email", user.email);
+      if(user.name) setValue("name", user.name);
       if (user.phone) setValue("phone", user.phone);
       if (user.address) setValue("address", user.address);
     }
@@ -56,15 +57,13 @@ export default function Profile() {
         // Reset form
         reset({
           email: data.email,
+          name: data.name,
           phone: data.phone,
           address: data.address,
           old_password: "",
           new_password: "",
           new_password_confirm: "",
         });
-
-        // Set email kembali setelah reset
-        setValue("email", data.email);
 
         // Notif sukses
         toast.success(result.message);
@@ -109,24 +108,9 @@ export default function Profile() {
   }
 
   return (
-    <section className="space-y-6 md:ml-4">
+    <section className="space-y-4 md:ml-4">
       {/* My Profile */}
       <h1 className="text-lg font-semibold">My Profile</h1>
-      <Card
-        className={
-          "w-full -mt-4 min-w-80 md:min-w-md px-4 flex-row items-center gap-0"
-        }
-      >
-        <Avatar className="w-14 h-14">
-          <AvatarImage src="https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg"></AvatarImage>
-        </Avatar>
-        <CardContent className="px-4">
-          <h1 className="text-md font-semibold">
-            {user?.email?.split("@")[0]?.replace(/^\w/, (c) => c.toUpperCase())}
-          </h1>
-          <p className="text-sm font-medium text-gray-500">{user?.email}</p>
-        </CardContent>
-      </Card>
 
       {/* Edit Profile */}
       <Card className="w-full min-w-80 md:min-w-md">
@@ -148,6 +132,22 @@ export default function Profile() {
                   <ErrorMessage ErrorMessage={errors.email.message} />
                 )}
               </div>
+              {/* Name */}
+              <div className="grid gap-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  {...register("name")}
+                  id="name"
+                  type="text"
+                  placeholder="Insert Name..."
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
+                {errors.name && (
+                  <ErrorMessage ErrorMessage={errors.name.message} />
+                )}
+              </div>
+
               <div className="space-y-6 lg:flex lg:gap-4 lg:space-y-0">
                 {/* Phone */}
                 <div className="grid gap-2 w-full">
