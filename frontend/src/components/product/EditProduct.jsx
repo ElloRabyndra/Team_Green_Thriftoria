@@ -39,6 +39,14 @@ export default function ProductDetail() {
     if (!isLoading && !user) logout();
   }, [isLoading, user]);
 
+  // Redirect jika bukan seller
+  useEffect(() => {
+    if (!isLoading && user && user.userRole !== "seller") {
+      navigate(-1); // kembali ke halaman sebelumnya
+      // atau navigate("/") untuk ke homepage
+    }
+  }, [isLoading, user, navigate]);
+
   // Set product ketika id berubah
   useEffect(() => {
     if (products.length > 0) {
