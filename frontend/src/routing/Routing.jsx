@@ -14,23 +14,94 @@ import CartList from "@/components/cart/CartList";
 import App from "@/pages/App";
 import "@/style/Style.css";
 import EditProduct from "@/components/product/EditProduct";
+import Dashboard from "@/components/dashboard/Dashboard";
+import RegisterShop from "@/components/dashboard/buyer/RegisterShop";
 
 const Routing = () => {
   const { theme } = useContext(ThemeContext);
   return (
-    <section className={`${theme} bg-background text-foreground font-[Poppins] min-h-screen`}>
+    <section
+      className={`${theme} bg-background text-foreground font-[Poppins] min-h-screen`}
+    >
       <Routes>
         {/* <Route path="/" element={<App />} /> */}
         <Route element={<AuthPage />}>
-          <Route path="/register" element={<AuthRedirect><Register/></AuthRedirect>} />
-          <Route path="/login" element={<AuthRedirect><Login/></AuthRedirect>} />
+          <Route
+            path="/register"
+            element={
+              <AuthRedirect>
+                <Register />
+              </AuthRedirect>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <AuthRedirect>
+                <Login />
+              </AuthRedirect>
+            }
+          />
         </Route>
-        <Route path="/" element={<MainPage/>}>
-          <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>} />
-          <Route index element={<ProtectedRoute><ProductList/></ProtectedRoute>} />
-          <Route path="/product/:id" element={<ProtectedRoute><ProductDetail/></ProtectedRoute>} />
-          <Route path="/edit-product/:id" element={<ProtectedRoute><EditProduct/></ProtectedRoute>} />
-          <Route path="/cart" element={<ProtectedRoute><CartList/></ProtectedRoute>} />
+        <Route path="/" element={<MainPage />}>
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/dashboard">
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="register-shop"
+              element={
+                <ProtectedRoute>
+                  <RegisterShop />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+          <Route
+            index
+            element={
+              <ProtectedRoute>
+                <ProductList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <ProtectedRoute>
+                <ProductDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-product/:id"
+            element={
+              <ProtectedRoute>
+                <EditProduct />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <CartList />
+              </ProtectedRoute>
+            }
+          />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
