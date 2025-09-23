@@ -66,6 +66,7 @@ export default function ProductDetail() {
 
         setValue("price", originalPrice);
         setValue("stock", originalStock);
+        setValue("category", foundProduct.category ? "others" : "shirt");
         setValue("description", foundProduct.description);
 
         // Set nilai yang diformat untuk tampilan
@@ -123,34 +124,33 @@ export default function ProductDetail() {
   };
 
   const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  
-  if (file) {
-    // Validasi file type
-    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (!validTypes.includes(file.type)) {
-      toast.error("Please select a valid image file (JPEG, JPG, PNG)");
-      // Reset input file
-      e.target.value = "";
-      return;
-    }
+    const file = e.target.files[0];
 
-    // Validasi file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size must be less than 5MB");
-      // Reset input file
-      e.target.value = "";
-      return;
-    }
+    if (file) {
+      // Validasi file type
+      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      if (!validTypes.includes(file.type)) {
+        toast.error("Please select a valid image file (JPEG, JPG, PNG)");
+        // Reset input file
+        e.target.value = "";
+        return;
+      }
 
-    // Jika validasi berhasil, update preview
-    setProduct((prev) => ({
-      ...prev,
-      previewImage: URL.createObjectURL(file), // preview sementara
-    }));
-    
-  }
-};
+      // Validasi file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size must be less than 5MB");
+        // Reset input file
+        e.target.value = "";
+        return;
+      }
+
+      // Jika validasi berhasil, update preview
+      setProduct((prev) => ({
+        ...prev,
+        previewImage: URL.createObjectURL(file), // preview sementara
+      }));
+    }
+  };
 
   const onSubmit = (data) => {
     console.log("Submitted data:", data);
@@ -293,9 +293,34 @@ export default function ProductDetail() {
             </div>
           </div>
 
+          {/* Category */}
+          <div className="w-full flex gap-2 items-center text-sm text-gray-600 mb-0.5">
+            <h3 className="font-medium mb-2">Category: </h3>
+            <div className="flex gap-4 mb-1.5">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  {...register("category")}
+                  type="radio"
+                  value="shirt"
+                  className="accent-primary text-primary"
+                />
+                <span className="text-gray-700">Shirt</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  {...register("category")}
+                  type="radio"
+                  value="others"
+                  className="accent-primary text-primary"
+                />
+                <span className="text-gray-700">Others</span>
+              </label>
+            </div>
+          </div>
+
           {/* Description */}
           <div className="w-full">
-            <h3 className="text-lg font-semibold mb-2">Description</h3>
+            <h3 className="text-lg font-semibold mb-2">Description:</h3>
             <textarea
               {...register("description")}
               id="description"
