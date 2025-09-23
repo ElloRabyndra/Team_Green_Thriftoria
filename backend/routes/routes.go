@@ -8,4 +8,5 @@ func Routes(app *fiber.App) {
 	api := app.Group("/api/v1") 
 
 	ProductsRoutes(api)
+	AuthRoutes(api)
 }
