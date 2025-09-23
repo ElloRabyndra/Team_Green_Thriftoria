@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import ErrorMessage from "./ErrorMessage";
+import ErrorMessage from "../ErrorMessage";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
 import EyeButton from "../ui/eyeButton";
@@ -26,7 +26,7 @@ export default function Register() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  
+
   const {
     register,
     handleSubmit,
@@ -39,13 +39,13 @@ export default function Register() {
 
   const onSubmit = (data) => {
     setIsSubmitting(true);
-    
+
     try {
       // Cek apakah email sudah terdaftar
       if (isEmailRegistered(data.email)) {
         setError("email", {
           type: "manual",
-          message: "Email already exists"
+          message: "Email already exists",
         });
         setIsSubmitting(false);
         return;
@@ -57,10 +57,10 @@ export default function Register() {
       if (result.success) {
         // Reset form
         reset();
-        
+
         // Notif sukses
         toast.success(result.message);
-        
+
         // Redirect ke halaman login
         navigate("/login");
       } else {
@@ -75,7 +75,7 @@ export default function Register() {
   };
 
   return (
-    <Card className="w-full min-w-80 md:min-w-md">
+    <Card className="w-full min-w-80 md:min-w-2xl mt-6">
       <CardHeader className={"flex items-center justify-between gap-2"}>
         <CardTitle>Register your account</CardTitle>
         <CardAction></CardAction>
@@ -96,6 +96,21 @@ export default function Register() {
               />
               {errors.email && (
                 <ErrorMessage ErrorMessage={errors.email.message} />
+              )}
+            </div>
+            {/* Name */}
+            <div className="grid gap-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                {...register("name")}
+                id="name"
+                type="text"
+                placeholder="Insert Name..."
+                autoComplete="off"
+                disabled={isSubmitting}
+              />
+              {errors.name && (
+                <ErrorMessage ErrorMessage={errors.name.message} />
               )}
             </div>
             {/* Phone */}
@@ -128,62 +143,64 @@ export default function Register() {
                 <ErrorMessage ErrorMessage={errors.address.message} />
               )}
             </div>
+            <div className="space-y-6 lg:flex lg:gap-4 lg:space-y-0">
+              <div className="grid gap-2 w-full">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                </div>
+                <div className="relative">
+                  <Input
+                    {...register("password")}
+                    id="password"
+                    type={`${showPassword ? "text" : "password"}`}
+                    placeholder="Insert Password..."
+                    autoComplete="off"
+                    disabled={isSubmitting}
+                  />
+                  <EyeButton
+                    isSubmitting={isSubmitting}
+                    showPassword={showPassword}
+                    setShowPassword={setShowPassword}
+                  />
+                </div>
+                {errors.password && (
+                  <ErrorMessage ErrorMessage={errors.password.message} />
+                )}
+              </div>
+              {/* Password Confirmation */}
+              <div className="grid gap-2 w-full">
+                <div className="flex items-center">
+                  <Label htmlFor="passwordConfirmation">
+                    Password Confirmation
+                  </Label>
+                </div>
+                <div className="relative">
+                  <Input
+                    {...register("passwordConfirmation")}
+                    id="passwordConfirmation"
+                    type={`${showPasswordConfirm ? "text" : "password"}`}
+                    placeholder="Insert Password Confirmation..."
+                    autoComplete="off"
+                    disabled={isSubmitting}
+                  />
+                  <EyeButton
+                    isSubmitting={isSubmitting}
+                    showPassword={showPasswordConfirm}
+                    setShowPassword={setShowPasswordConfirm}
+                  />
+                </div>
+                {errors.passwordConfirmation && (
+                  <ErrorMessage
+                    ErrorMessage={errors.passwordConfirmation.message}
+                  />
+                )}
+              </div>
+            </div>
             {/* Password */}
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-              </div>
-              <div className="relative">
-              <Input
-                {...register("password")}
-                id="password"
-                type={`${showPassword ? "text" : "password"}`}
-                placeholder="Insert Password..."
-                autoComplete="off"
-                disabled={isSubmitting}
-              />
-              <EyeButton
-                isSubmitting={isSubmitting}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-              />
-              </div>
-              {errors.password && (
-                <ErrorMessage ErrorMessage={errors.password.message} />
-              )}
-            </div>
-            {/* Password Confirmation */}
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="passwordConfirmation">
-                  Password Confirmation
-                </Label>
-              </div>
-              <div className="relative">
-                <Input
-                  {...register("passwordConfirmation")}
-                  id="passwordConfirmation"
-                  type={`${showPasswordConfirm ? "text" : "password"}`}
-                  placeholder="Insert Password Confirmation..."
-                  autoComplete="off"
-                  disabled={isSubmitting}
-                />
-                <EyeButton
-                  isSubmitting={isSubmitting}
-                  showPassword={showPasswordConfirm}
-                  setShowPassword={setShowPasswordConfirm}
-                />
-              </div>
-              {errors.passwordConfirmation && (
-                <ErrorMessage
-                  ErrorMessage={errors.passwordConfirmation.message}
-                />
-              )}
-            </div>
             {/* Button */}
-            <Button 
-              type="submit" 
-              className="w-full cursor-pointer" 
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Registering..." : "Register"}

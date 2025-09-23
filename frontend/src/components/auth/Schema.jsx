@@ -12,6 +12,10 @@ export const registerSchema = z.object({
         "Email must be a valid Gmail address"
       )
       .transform((email) => email.toLowerCase()),
+    name: z
+      .string()
+      .min(1, "Name is required")
+      .min(4, "Name must be at least 4 characters"),
     phone: z
       .string()
       .min(1, "Phone number is required")
@@ -62,6 +66,10 @@ export const profileSchema = z.object({
         "Email must be a valid Gmail address"
       )
       .transform((email) => email.toLowerCase()),
+    name: z
+      .string()
+      .min(1, "Name is required")
+      .min(4, "Name must be at least 4 characters"),
     phone: z
       .string()
       .min(1, "Phone number is required")

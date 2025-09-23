@@ -39,6 +39,14 @@ export default function ProductDetail() {
     if (!isLoading && !user) logout();
   }, [isLoading, user]);
 
+  // Redirect jika bukan seller
+  useEffect(() => {
+    if (!isLoading && user && user.userRole !== "seller") {
+      navigate(-1); // kembali ke halaman sebelumnya
+      // atau navigate("/") untuk ke homepage
+    }
+  }, [isLoading, user, navigate]);
+
   // Set product ketika id berubah
   useEffect(() => {
     if (products.length > 0) {
@@ -113,6 +121,36 @@ export default function ProductDetail() {
     // Update nilai form dengan nilai asli (tanpa format)
     setValue("stock", numericValue);
   };
+
+  const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  
+  if (file) {
+    // Validasi file type
+    const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Please select a valid image file (JPEG, JPG, PNG)");
+      // Reset input file
+      e.target.value = "";
+      return;
+    }
+
+    // Validasi file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB");
+      // Reset input file
+      e.target.value = "";
+      return;
+    }
+
+    // Jika validasi berhasil, update preview
+    setProduct((prev) => ({
+      ...prev,
+      previewImage: URL.createObjectURL(file), // preview sementara
+    }));
+    
+  }
+};
 
   const onSubmit = (data) => {
     console.log("Submitted data:", data);
@@ -197,15 +235,7 @@ export default function ProductDetail() {
               type="file"
               accept="image/*"
               className="hidden"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  const file = e.target.files[0];
-                  setProduct((prev) => ({
-                    ...prev,
-                    previewImage: URL.createObjectURL(file), // preview sementara
-                  }));
-                }
-              }}
+              onChange={handleFileChange}
             />
           </div>
         </div>

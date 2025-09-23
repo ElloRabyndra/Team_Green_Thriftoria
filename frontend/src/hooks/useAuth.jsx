@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 // Context untuk Authentication
 const AuthContext = createContext();
@@ -8,7 +8,7 @@ const AuthContext = createContext();
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -43,23 +43,24 @@ export const AuthProvider = ({ children }) => {
   // Function untuk register user baru
   const registerUser = (userData) => {
     try {
-      const { email, phone, address, password } = userData;
-      const newUser = { 
+      const { email, name, phone, address, password } = userData;
+      const newUser = {
         id: Date.now(),
-        email: email.toLowerCase(), 
+        name,
+        email: email.toLowerCase(),
         phone,
         address,
         password,
-        userRole: "buyer" // Default role sebagai buyer
+        userRole: "buyer", // Default role sebagai buyer
       };
 
       // Update users list
       const updatedUsers = [...users, newUser];
       setUsers(updatedUsers);
-      
+
       // Save ke localStorage
       localStorage.setItem("users", JSON.stringify(updatedUsers));
-      
+
       return { success: true, message: "Registration successful!" };
     } catch (error) {
       return { success: false, message: "Registration failed!" };
@@ -67,17 +68,29 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Function untuk login
+  // Function untuk login
   const login = (credentials) => {
     try {
       const { email, password } = credentials;
-      
+
       // Cari user berdasarkan email dan password
       const foundUser = users.find(
-        (user) => user.email.toLowerCase() === email.toLowerCase() && user.password === password
+        (user) =>
+          user.email.toLowerCase() === email.toLowerCase() &&
+          user.password === password
       );
 
       if (foundUser) {
-        const {password, ...userData} = foundUser;
+        // Create a new object that includes all user data except the password.
+        const userData = {
+          id: foundUser.id,
+          name: foundUser.name,
+          email: foundUser.email,
+          phone: foundUser.phone,
+          address: foundUser.address,
+          userRole: foundUser.userRole,
+        };
+
         setUser(userData);
         localStorage.setItem("currentUser", JSON.stringify(userData));
         return { success: true, message: "Login successful!", user: userData };
@@ -97,55 +110,63 @@ export const AuthProvider = ({ children }) => {
 
   // Function untuk check apakah email sudah terdaftar
   const isEmailRegistered = (email) => {
-    return users.some(user => user.email.toLowerCase() === email.toLowerCase());
+    return users.some(
+      (user) => user.email.toLowerCase() === email.toLowerCase()
+    );
   };
 
   // Function untuk validasi password
   const validatePassword = (email, password) => {
-    const foundUser = users.find(user => user.email.toLowerCase() === email.toLowerCase());
+    const foundUser = users.find(
+      (user) => user.email.toLowerCase() === email.toLowerCase()
+    );
     return foundUser && foundUser.password === password;
   };
 
   // Function untuk update profile
+  // Function untuk update profile
+  // Function untuk update profile
   const updateProfile = (profileData) => {
     try {
-      const { email, phone, address, old_password, new_password } = profileData;
-      
+      const { email, name, phone, address, old_password, new_password } =
+        profileData;
+
       // Cari user saat ini
-      const currentUserIndex = users.findIndex(u => u.id === user.id);
+      const currentUserIndex = users.findIndex((u) => u.id === user.id);
       if (currentUserIndex === -1) {
         return { success: false, message: "User not found!" };
       }
-      
+
       const currentUserData = users[currentUserIndex];
 
-      // Validasi password lama hanya jika user isi new_password 
+      // Validasi password lama hanya jika user isi new_password
       if (new_password && new_password.trim() !== "") {
         if (currentUserData.password !== old_password) {
           return { success: false, message: "Incorrect old password!" };
         }
       }
 
-      // Cek email unik 
+      // Cek email unik
       if (email.toLowerCase() !== currentUserData.email.toLowerCase()) {
         const emailExists = users.some(
-          u => u.id !== user.id && u.email.toLowerCase() === email.toLowerCase()
+          (u) =>
+            u.id !== user.id && u.email.toLowerCase() === email.toLowerCase()
         );
         if (emailExists) {
           return { success: false, message: "Email already in use!" };
         }
       }
 
-      // Update user data 
       const updatedUser = {
         ...currentUserData,
         email: email.toLowerCase(),
-        phone,
-        address,
-        password: new_password && new_password.trim() !== ""
-          ? new_password
-          : currentUserData.password, // kalau tidak isi new_password → tetap pakai lama
-        userRole: currentUserData.userRole || "buyer" 
+        name: name, 
+        phone: phone, 
+        address: address, 
+        password:
+          new_password && new_password.trim() !== ""
+            ? new_password
+            : currentUserData.password,
       };
 
       // Update users array
@@ -153,16 +174,29 @@ export const AuthProvider = ({ children }) => {
       updatedUsers[currentUserIndex] = updatedUser;
       setUsers(updatedUsers);
 
-      // Simpan session tanpa password
-      const { password, ...updatedUserData } = updatedUser;
+      const updatedUserData = {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        address: updatedUser.address,
+        userRole: updatedUser.userRole,
+      };
+
+      // Debug logging
+      console.log("Profile Data:", profileData);
+      console.log("Updated User:", updatedUser);
+      console.log("Updated User Data (for session):", updatedUserData);
+
       setUser(updatedUserData);
 
       // Save ke localStorage
       localStorage.setItem("users", JSON.stringify(updatedUsers));
       localStorage.setItem("currentUser", JSON.stringify(updatedUserData));
-      
+
       return { success: true, message: "Profile updated successfully!" };
     } catch (error) {
+      console.error("Profile update error:", error);
       return { success: false, message: "Profile update failed!" };
     }
   };
@@ -180,9 +214,5 @@ export const AuthProvider = ({ children }) => {
     updateProfile,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
