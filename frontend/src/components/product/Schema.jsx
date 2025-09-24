@@ -22,7 +22,9 @@ export const addProductSchema = z.object({
     .string()
     .min(1, "Stock is required")
     .regex(/^[0-9]+$/, "Stock must contain only digits"),
-
+  category: z
+    .string()
+    .min(1, "Category is required"),
   description: z
     .string()
     .min(1, "Description is required"),

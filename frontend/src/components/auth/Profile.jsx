@@ -110,7 +110,7 @@ export default function Profile() {
   return (
     <section className="space-y-4 md:ml-4">
       {/* My Profile */}
-      <h1 className="text-lg font-semibold">My Profile</h1>
+      <h1 className="text-lg md:text-2xl font-semibold">My Profile</h1>
 
       {/* Edit Profile */}
       <Card className="w-full min-w-80 md:min-w-md">
