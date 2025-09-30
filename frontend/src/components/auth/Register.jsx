@@ -100,51 +100,20 @@ export default function Register() {
             </div>
             {/* Name */}
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                {...register("name")}
-                id="name"
+                {...register("username")}
+                id="username"
                 type="text"
-                placeholder="Insert Name..."
+                placeholder="Insert Username..."
                 autoComplete="off"
                 disabled={isSubmitting}
               />
-              {errors.name && (
-                <ErrorMessage ErrorMessage={errors.name.message} />
+              {errors.username && (
+                <ErrorMessage ErrorMessage={errors.username.message} />
               )}
             </div>
-            {/* Phone */}
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                {...register("phone")}
-                id="phone"
-                type="text"
-                placeholder="Insert phone Number..."
-                autoComplete="off"
-                disabled={isSubmitting}
-              />
-              {errors.phone && (
-                <ErrorMessage ErrorMessage={errors.phone.message} />
-              )}
-            </div>
-            {/* Address */}
-            <div className="grid gap-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                {...register("address")}
-                id="address"
-                type="text"
-                placeholder="Insert Address..."
-                autoComplete="off"
-                disabled={isSubmitting}
-              />
-              {errors.address && (
-                <ErrorMessage ErrorMessage={errors.address.message} />
-              )}
-            </div>
-            <div className="space-y-6 lg:flex lg:gap-4 lg:space-y-0">
-              <div className="grid gap-2 w-full">
+              <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
@@ -168,7 +137,7 @@ export default function Register() {
                 )}
               </div>
               {/* Password Confirmation */}
-              <div className="grid gap-2 w-full">
+              <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="passwordConfirmation">
                     Password Confirmation
@@ -195,7 +164,6 @@ export default function Register() {
                   />
                 )}
               </div>
-            </div>
             {/* Password */}
             {/* Button */}
             <Button

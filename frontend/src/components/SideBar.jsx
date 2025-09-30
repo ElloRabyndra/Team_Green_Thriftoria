@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router";
 import { Card } from "./ui/card";
-import { ShoppingCart, User, Shirt, Footprints , LayoutGrid , ShoppingBag  } from "lucide-react";
+import { ShoppingCart, User, Shirt, Box , LayoutGrid , ShoppingBag  } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useEffect } from "react";
@@ -34,7 +34,7 @@ export default function ({isMobileMenuOpen, categories, changeCategories, cart})
             <span>Dashboard</span>
           </Link>
           {/* Cek role */}
-          {(user?.userRole === "buyer" || user?.userRole === "seller") && (
+          {(user?.role === "buyer" || user?.role === "seller") && (
             <Link to="/cart" className={`${isActive("/cart") ? "bg-secondary/50 text-primary" : "hover:bg-secondary/50"} relative w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer`}>
               <ShoppingCart className="h-5 w-5" />
               <span>Cart</span>
@@ -56,11 +56,11 @@ export default function ({isMobileMenuOpen, categories, changeCategories, cart})
             </Link>
             <Link to="/" onClick={() => changeCategories(shirtsCategories)} className={`${!isSpecialPage && categories === shirtsCategories ? "bg-secondary/50 text-primary" : "hover:bg-secondary/50"} w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer`}>
               <Shirt className="h-5 w-5" />
-              <span>Shirts</span>
+              <span>Fashion</span>
             </Link>
             <Link to="/" onClick={() => changeCategories(shoesCategories)} className={`${!isSpecialPage && categories === shoesCategories ? "bg-secondary/50 text-primary" : "hover:bg-secondary/50"} w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer`}>
-              <Footprints className="h-5 w-5" />
-              <span>Shoes</span>
+              <Box className="h-5 w-5" />
+              <span>Others</span>
             </Link>
           </div>
         </div>

@@ -27,7 +27,7 @@ export default function ProductList() {
             key={product.id}
             product={product}
             onAddToCart={addToCart}
-            userRole={user.userRole} // Sementara
+            role={user.role} // Sementara
           />
         ))}
       </div>

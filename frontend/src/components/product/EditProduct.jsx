@@ -41,7 +41,7 @@ export default function ProductDetail() {
 
   // Redirect jika bukan seller
   useEffect(() => {
-    if (!isLoading && user && user.userRole !== "seller") {
+    if (!isLoading && user && user.role !== "seller") {
       navigate(-1); // kembali ke halaman sebelumnya
       // atau navigate("/") untuk ke homepage
     }
@@ -332,7 +332,7 @@ export default function ProductDetail() {
           </div>
 
           {/* Action Buttons */}
-          {user.userRole === "seller" && (
+          {user.role === "seller" && (
             <div className="space-y-3 mt-6 w-full">
               <Button
                 type="submit"

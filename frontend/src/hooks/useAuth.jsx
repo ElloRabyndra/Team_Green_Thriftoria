@@ -43,15 +43,15 @@ export const AuthProvider = ({ children }) => {
   // Function untuk register user baru
   const registerUser = (userData) => {
     try {
-      const { email, name, phone, address, password } = userData;
+      const { email, username, password } = userData;
       const newUser = {
         id: Date.now(),
-        name,
+        username,
         email: email.toLowerCase(),
-        phone,
-        address,
+        telephone: "",
+        address: "",
         password,
-        userRole: "buyer", // Default role sebagai buyer
+        role: "buyer", // Default role sebagai buyer
       };
 
       // Update users list
@@ -84,11 +84,11 @@ export const AuthProvider = ({ children }) => {
         // Create a new object that includes all user data except the password.
         const userData = {
           id: foundUser.id,
-          name: foundUser.name,
+          username: foundUser.username,
           email: foundUser.email,
-          phone: foundUser.phone,
+          telephone: foundUser.telephone,
           address: foundUser.address,
-          userRole: foundUser.userRole,
+          role: foundUser.role,
         };
 
         setUser(userData);
@@ -124,11 +124,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Function untuk update profile
-  // Function untuk update profile
-  // Function untuk update profile
   const updateProfile = (profileData) => {
     try {
-      const { email, name, phone, address, old_password, new_password } =
+      const { email, username, telephone, address, old_password, new_password } =
         profileData;
 
       // Cari user saat ini
@@ -160,8 +158,8 @@ export const AuthProvider = ({ children }) => {
       const updatedUser = {
         ...currentUserData,
         email: email.toLowerCase(),
-        name: name, 
-        phone: phone, 
+        username: username, 
+        telephone: telephone, 
         address: address, 
         password:
           new_password && new_password.trim() !== ""
@@ -176,11 +174,11 @@ export const AuthProvider = ({ children }) => {
 
       const updatedUserData = {
         id: updatedUser.id,
-        name: updatedUser.name,
+        username: updatedUser.username,
         email: updatedUser.email,
-        phone: updatedUser.phone,
+        telephone: updatedUser.telephone,
         address: updatedUser.address,
-        userRole: updatedUser.userRole,
+        role: updatedUser.role,
       };
 
       // Debug logging

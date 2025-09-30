@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "./Schema";
@@ -12,7 +12,6 @@ import { toast } from "react-toastify";
 import EyeButton from "../ui/eyeButton";
 import { Avatar } from "../ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
-import { Camera, Upload } from "lucide-react";
 
 export default function Profile() {
   const { user, updateProfile, isLoading, logout } = useAuth();
@@ -20,8 +19,6 @@ export default function Profile() {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showNewPasswordConfirm, setShowNewPasswordConfirm] = useState(false);
-  const [previewImage, setPreviewImage] = useState(null);
-  const fileInputRef = useRef(null);
 
   const {
     register,
@@ -29,68 +26,25 @@ export default function Profile() {
     reset,
     setError,
     setValue,
-    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(profileSchema),
   });
-
-  const profilePictureValue = watch("profilePicture");
-  // Watch email dan username untuk preview real-time
-  const emailValue = watch("email");
-  const usernameValue = watch("username");
 
   // Redirect ke login jika tidak ada user setelah loading selesai
   useEffect(() => {
     if (!isLoading && !user) logout();
   }, [isLoading, user]);
 
-  // Set default value
+  // Set default value 
   useEffect(() => {
     if (user) {
       if (user.email) setValue("email", user.email);
-      if (user.username) setValue("username", user.username);
+      if(user.username) setValue("username", user.username);
       if (user.telephone) setValue("telephone", user.telephone);
       if (user.address) setValue("address", user.address);
     }
   }, [user, setValue]);
-
-  // Handle file input change
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please select a valid image file");
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size should be less than 5MB");
-        return;
-      }
-
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setPreviewImage(previewUrl);
-
-      // Set form value
-      setValue("profilePicture", file);
-    }
-  };
-
-  // Handle avatar click
-  const handleAvatarClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  // Get current profile image source
-  const getProfileImageSrc = () => {
-    if (previewImage) return previewImage;
-    if (user?.profilePicture) return user.profilePicture;
-    return "https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg";
-  };
 
   const onSubmit = (data) => {
     setIsSubmitting(true);
@@ -100,7 +54,7 @@ export default function Profile() {
       const result = updateProfile(data);
 
       if (result.success) {
-        // Reset form dengan nilai yang baru diupdate
+        // Reset form
         reset({
           email: data.email,
           username: data.username,
@@ -109,11 +63,7 @@ export default function Profile() {
           old_password: "",
           new_password: "",
           new_password_confirm: "",
-          profilePicture: data.profilePicture,
         });
-
-        // Clear preview image
-        setPreviewImage(null);
 
         // Notif sukses
         toast.success(result.message);
@@ -142,15 +92,6 @@ export default function Profile() {
     }
   };
 
-  // Cleanup preview URL on unmount
-  useEffect(() => {
-    return () => {
-      if (previewImage && previewImage.startsWith("blob:")) {
-        URL.revokeObjectURL(previewImage);
-      }
-    };
-  }, [previewImage]);
-
   // Loading state
   if (isLoading) {
     return (
@@ -176,85 +117,35 @@ export default function Profile() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
-              <div className="flex gap-4">
-                {/* Profile Picture Section */}
-                <div className="flex flex-col items-center gap-4">
-                  <div className="relative group">
-                    <Avatar
-                      className="w-18 h-18 border-4 border-primary/20 cursor-pointer transition-all duration-300 group-hover:border-primary/40"
-                      onClick={handleAvatarClick}
-                    >
-                      <AvatarImage
-                        src={getProfileImageSrc()}
-                        alt="Profile Picture"
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    </Avatar>
-
-                    {/* Camera overlay */}
-                    <div
-                      className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center cursor-pointer"
-                      onClick={handleAvatarClick}
-                    >
-                      <Camera className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-
-                  {/* Hidden File Input */}
-                  <input
-                    {...register("profilePicture")}
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-
-                  {/* Error Message for Profile Picture */}
-                  {errors.profilePicture && (
-                    <ErrorMessage
-                      ErrorMessage={errors.profilePicture.message}
-                    />
-                  )}
-                </div>
-                <div className="mt-4">
-                  <p className="font-semibold">{usernameValue || user.username}</p>
-                  <p className="text-sm font-medium text-gray-500">
-                    {emailValue || user.email}
-                  </p>
-                </div>
+              {/* Email */}
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  {...register("email")}
+                  id="email"
+                  type="email"
+                  placeholder="Insert Email..."
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
+                {errors.email && (
+                  <ErrorMessage ErrorMessage={errors.email.message} />
+                )}
               </div>
-              <div className="space-y-6 lg:flex lg:gap-4 lg:space-y-0">
-                {/* Email */}
-                <div className="grid gap-2 w-full">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    {...register("email")}
-                    id="email"
-                    type="email"
-                    placeholder="Insert Email..."
-                    autoComplete="off"
-                    disabled={isSubmitting}
-                  />
-                  {errors.email && (
-                    <ErrorMessage ErrorMessage={errors.email.message} />
-                  )}
-                </div>
-                {/* Username */}
-                <div className="grid gap-2 w-full">
-                  <Label htmlFor="username">Username</Label>
-                  <Input
-                    {...register("username")}
-                    id="username"
-                    type="text"
-                    placeholder="Insert Username..."
-                    autoComplete="off"
-                    disabled={isSubmitting}
-                  />
-                  {errors.username && (
-                    <ErrorMessage ErrorMessage={errors.username.message} />
-                  )}
-                </div>
+              {/* Username */}
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  {...register("username")}
+                  id="username"
+                  type="text"
+                  placeholder="Insert Username..."
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                />
+                {errors.username && (
+                  <ErrorMessage ErrorMessage={errors.username.message} />
+                )}
               </div>
 
               <div className="space-y-6 lg:flex lg:gap-4 lg:space-y-0">
@@ -289,7 +180,6 @@ export default function Profile() {
                   )}
                 </div>
               </div>
-
               {/* Old Password */}
               <div className="grid gap-2">
                 <div className="flex items-center">
@@ -314,7 +204,6 @@ export default function Profile() {
                   <ErrorMessage ErrorMessage={errors.old_password.message} />
                 )}
               </div>
-
               <div className="space-y-6 lg:flex lg:gap-4 lg:space-y-0">
                 {/* New Password */}
                 <div className="grid gap-2 w-full">
@@ -369,7 +258,6 @@ export default function Profile() {
                   )}
                 </div>
               </div>
-
               {/* Button */}
               <Button
                 type="submit"
