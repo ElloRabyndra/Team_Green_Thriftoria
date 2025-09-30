@@ -6,7 +6,7 @@ import { Link } from "react-router";
 export default function ProductCard({ 
   product, 
   onAddToCart, 
-  userRole = "buyer", // Default role adalah buyer
+  role = "buyer", // Default role adalah buyer
 }) {
   // Fungsi untuk format harga
   const formatPrice = (price) => {
@@ -19,7 +19,7 @@ export default function ProductCard({
   };
   return (
     <Card className="overflow-hidden hover:shadow-lg hover:-translate-y-2 transition-all duration-300">
-      {userRole === "seller" ? (
+      {role === "seller" ? (
       <Link to={`/edit-product/${product.id}`} className="relative overflow-hidden group block">
         <img 
           src={product.thumbnail} 
@@ -78,7 +78,7 @@ export default function ProductCard({
         </div>
 
         {/* Tombol berbeda berdasarkan role */}
-        {userRole === "buyer" ? (
+        {role === "buyer" ? (
           <button 
             className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 px-4 rounded-lg transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             onClick={() => onAddToCart(product)}

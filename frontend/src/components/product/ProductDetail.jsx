@@ -1,14 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router";
+import { useAuth } from "@/hooks/useAuth";
 import {
   ArrowLeft,
   ShoppingCart,
-  Star,
-  Heart,
-  Share2,
-  Eye,
-  Plus,
-  Minus,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import Loading from "../ui/loading";
@@ -16,7 +11,7 @@ import Empty from "../ui/Empty";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const userRole = id % 2 !== 0 ? "seller" : "buyer"; // Sementara
+  const { user, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const { products, loading, addToCart } = useOutletContext();
   const [product, setProduct] = useState(null);
@@ -31,6 +26,11 @@ export default function ProductDetail() {
       }
     }
   }, [id, products]);
+
+  // Redirect ke login jika tidak ada user setelah loading selesai
+  useEffect(() => {
+    if (!isLoading && !user) logout();
+  }, [isLoading, user]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
@@ -132,7 +132,7 @@ export default function ProductDetail() {
           </div>
           
           {/* Action Buttons */}
-          {userRole === "buyer" && (
+          {user.role === "buyer" && (
             <div className="space-y-3 mt-5">
               <Button
                 onClick={() => addToCart(product)}

@@ -12,19 +12,10 @@ export const registerSchema = z.object({
         "Email must be a valid Gmail address"
       )
       .transform((email) => email.toLowerCase()),
-    name: z
+    username: z
       .string()
-      .min(1, "Name is required")
-      .min(4, "Name must be at least 4 characters"),
-    phone: z
-      .string()
-      .min(1, "Phone number is required")
-      .regex(/^[0-9]+$/, "Phone number must contain only digits")
-      .min(10, "Phone number must be at least 10 digits"),
-    address: z
-      .string()
-      .min(1, "Address is required")
-      .min(5, "Address must be at least 5 characters"),
+      .min(1, "Username is required")
+      .min(4, "Username must be at least 4 characters"),
     password: z
       .string()
       .min(1, "Password is required")
@@ -56,6 +47,9 @@ export const loginSchema = z.object({
 
 // Schema untuk Edit Profile
 export const profileSchema = z.object({
+    profilePicture: z
+      .any()
+      .optional(),
     email: z
       .string()
       .min(1, "Email is required")
@@ -66,11 +60,11 @@ export const profileSchema = z.object({
         "Email must be a valid Gmail address"
       )
       .transform((email) => email.toLowerCase()),
-    name: z
+    username: z
       .string()
-      .min(1, "Name is required")
-      .min(4, "Name must be at least 4 characters"),
-    phone: z
+      .min(1, "Username is required")
+      .min(4, "Username must be at least 4 characters"),
+    telephone: z
       .string()
       .min(1, "Phone number is required")
       .regex(/^[0-9]+$/, "Phone number must contain only digits")
