@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router";
 import Empty from "../ui/Empty";
 import CartCard from "./CartCard";
@@ -6,6 +7,35 @@ import CartDetail from "./CartDetail";
 export default function CartList() {
   const { cart, totalPrice, addToCart, decreaseQuantity, removeFromCart } =
     useOutletContext();
+  
+  // State untuk track item yang dipilih
+  const [selectedCartId, setSelectedCartId] = useState(null);
+
+  // Set default selection ke cart pertama saat component mount atau cart berubah
+  useEffect(() => {
+    if (cart.length > 0) {
+      setSelectedCartId(cart[0].id);
+    } else {
+      setSelectedCartId(null);
+    }
+  }, [cart]);
+
+  // Fungsi untuk handle selection
+  const handleSelectCart = (productId) => {
+    if (selectedCartId === productId) {
+      // Jika klik item yang sama, unselect dan kembali ke default (cart pertama)
+      setSelectedCartId(cart.length > 0 ? cart[0].id : null);
+    } else {
+      // Pilih item baru
+      setSelectedCartId(productId);
+    }
+  };
+
+  // Dapatkan data item yang terpilih untuk CartDetail
+  const selectedCartItem = cart.find(item => item.id === selectedCartId);
+  const selectedItemPrice = selectedCartItem 
+    ? selectedCartItem.price * selectedCartItem.quantity * 15000
+    : 0;
 
   return (
     <section className="px-4">
@@ -21,6 +51,8 @@ export default function CartList() {
                   <li key={product.id}>
                     <CartCard
                       product={product}
+                      isSelected={selectedCartId === product.id}
+                      onSelect={handleSelectCart}
                       addToCart={addToCart}
                       decreaseQuantity={decreaseQuantity}
                       removeFromCart={removeFromCart}
@@ -30,7 +62,10 @@ export default function CartList() {
               </ul>
             </main>
             <aside className="mt-4 w-full xl:w-1/2">
-              <CartDetail totalPrice={totalPrice} />
+              <CartDetail 
+                selectedItem={selectedCartItem}
+                selectedItemPrice={selectedItemPrice}
+              />
             </aside>
           </div>
         </div>
