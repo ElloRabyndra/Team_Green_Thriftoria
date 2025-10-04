@@ -66,7 +66,7 @@ export default function ProductDetail() {
 
         setValue("price", originalPrice);
         setValue("stock", originalStock);
-        setValue("category", foundProduct.category ? "others" : "shirt");
+        setValue("category", foundProduct.category ? "others" : "fashion");
         setValue("description", foundProduct.description);
 
         // Set nilai yang diformat untuk tampilan
@@ -301,10 +301,10 @@ export default function ProductDetail() {
                 <input
                   {...register("category")}
                   type="radio"
-                  value="shirt"
+                  value="fashion"
                   className="accent-primary text-primary"
                 />
-                <span className="text-gray-700">Shirt</span>
+                <span className="text-gray-700">Fashion</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
