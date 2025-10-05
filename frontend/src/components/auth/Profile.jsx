@@ -61,13 +61,19 @@ export default function Profile() {
     if (file) {
       // Validate file type
       if (!file.type.startsWith("image/")) {
-        toast.error("Please select a valid image file");
+        setError("profilePicture", {
+          type: "manual",
+          message: "Please select a valid image file",
+        });
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size should be less than 5MB");
+        setError("profilePicture", {
+          type: "manual",
+          message: "File size must be less than 5MB",
+        })
         return;
       }
 
@@ -94,6 +100,7 @@ export default function Profile() {
 
   const onSubmit = (data) => {
     setIsSubmitting(true);
+    console.log(data);
 
     try {
       // Lakukan update profile
@@ -209,19 +216,20 @@ export default function Profile() {
                     onChange={handleFileChange}
                     className="hidden"
                   />
-
+                </div>
+                <div className="mt-4">
+                  <p className="font-semibold">
+                    {usernameValue || user.username}
+                  </p>
+                  <p className="text-sm font-medium text-gray-500 mb-1">
+                    {emailValue || user.email}
+                  </p>
                   {/* Error Message for Profile Picture */}
                   {errors.profilePicture && (
                     <ErrorMessage
                       ErrorMessage={errors.profilePicture.message}
                     />
                   )}
-                </div>
-                <div className="mt-4">
-                  <p className="font-semibold">{usernameValue || user.username}</p>
-                  <p className="text-sm font-medium text-gray-500">
-                    {emailValue || user.email}
-                  </p>
                 </div>
               </div>
               <div className="space-y-6 lg:flex lg:gap-4 lg:space-y-0">
