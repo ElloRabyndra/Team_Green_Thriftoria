@@ -99,12 +99,12 @@ const Dashboard = () => {
   };
 
   // Get current user's menu
-  const currentMenu = dashboardMenu[user.userRole] || dashboardMenu.buyer;
+  const currentMenu = dashboardMenu[user.role] || dashboardMenu.buyer;
 
   return (
-    <section className="p-4 ">
+    <section className="p-4 py-0 ">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold mb-2">My Dashboard</h1>
+        <h1 className="text-lg md:text-2xl font-semibold mb-2">My Dashboard</h1>
         <p className="text-muted-foreground">
           Welcome back! Here's what you can do today.
         </p>
@@ -120,7 +120,7 @@ const Dashboard = () => {
         </Avatar>
         <CardContent className="px-4">
           <h1 className="text-md font-semibold">
-            {user.name}
+            {user.username}
           </h1>
           <p className="text-sm font-medium text-gray-500">{user?.email}</p>
         </CardContent>
@@ -137,16 +137,6 @@ const Dashboard = () => {
             colorClass={menu.colorClass}
           />
         ))}
-      </div>
-
-      {/* Role indicator - for development purposes */}
-      <div className="mt-8 p-4 bg-muted rounded-lg">
-        <p className="text-sm text-muted-foreground">
-          Current role:{" "}
-          <span className="font-medium capitalize text-foreground">
-            {user.userRole}
-          </span>
-        </p>
       </div>
     </section>
   );
