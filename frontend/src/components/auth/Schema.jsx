@@ -47,9 +47,22 @@ export const loginSchema = z.object({
 
 // Schema untuk Edit Profile
 export const profileSchema = z.object({
-    profilePicture: z
-      .any()
-      .optional(),
+  profilePicture: z
+    .any()
+    .optional()
+    .refine(
+      (file) => !file || file instanceof File,
+      { message: "Invalid file" }
+    )
+    .refine(
+      (file) => !file || file.size <= 5 * 1024 * 1024,
+      { message: "File size must not exceed 5MB" }
+    )
+    .refine(
+      (file) =>
+        !file || ["image/jpeg", "image/png", "image/jpg"].includes(file.type),
+      { message: "Only JPG and PNG formats are allowed" }
+    ),
     email: z
       .string()
       .min(1, "Email is required")
