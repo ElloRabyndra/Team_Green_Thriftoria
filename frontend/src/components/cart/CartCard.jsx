@@ -1,5 +1,5 @@
 import { Card } from "../ui/card";
-import { Plus, Minus, X, Check } from "lucide-react";
+import { Plus, Minus, X, Check, Store } from "lucide-react";
 
 export default function CartCard({
   product,
@@ -42,6 +42,10 @@ export default function CartCard({
           </h2>
           <p className="text-sm text-muted-foreground capitalize font-medium">
             {product.category.replace("-", " ")}
+          </p>
+          <p className="flex gap-2 items-center text-muted-foreground text-sm font-medium capitalize">
+            <Store className="h-4 w-4" />
+            {product.shopName}
           </p>
         </div>
         <p className="text-sm font-semibold md:text-base text-primary">
