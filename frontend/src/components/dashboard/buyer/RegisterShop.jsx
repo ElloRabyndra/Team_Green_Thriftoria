@@ -45,7 +45,7 @@ const RegisterShop = () => {
 
   // Redirect jika bukan buyer
   useEffect(() => {
-    if (!isLoading && user && user.userRole !== "buyer") {
+    if (!isLoading && user && user.role !== "buyer") {
       navigate(-1); // kembali ke halaman sebelumnya
       // atau navigate("/") untuk ke homepage
     }
@@ -54,7 +54,7 @@ const RegisterShop = () => {
   // Set default value email dari user yang sedang login
   useEffect(() => {
     if (user) {
-      if (user.email) setValue("name", user.email.split("@")[0]);
+      if (user.email) setValue("name", user.username);
       if (user.phone) setValue("phone", user.phone);
       if (user.address) setValue("address", user.address);
     }
@@ -66,17 +66,29 @@ const RegisterShop = () => {
       // Validasi file type
       const validTypes = ["image/jpeg", "image/png", "image/jpg"];
       if (!validTypes.includes(file.type)) {
-        alert("Please select a valid image file (JPEG, PNG)");
+        setError("qrisPicture", {
+          type: "manual",
+          message: "Please select a valid image file (JPEG, PNG)",
+        })
         return;
       }
 
       // Validasi file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert("File size must be less than 5MB");
+        setError("qrisPicture", {
+          type: "manual",
+          message: "File size must be less than 5MB",
+        })
         return;
       }
 
       setQrisFile(file);
+
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      setValue("qrisPicture", dataTransfer.files, {
+        shouldValidate: true,
+      });
 
       // Create preview URL
       const reader = new FileReader();
@@ -94,7 +106,8 @@ const RegisterShop = () => {
   };
 
   const onSubmit = (data) => {
-    setIsSubmitting(true);
+    console.log(data);
+    toast.success("Shop registered successfully!");
   };
 
   return (
@@ -120,62 +133,62 @@ const RegisterShop = () => {
             <div className="flex flex-col gap-6">
               {/* Shop Name */}
               <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="shopName">Shop Name</Label>
                 <Input
-                  {...register("name")}
-                  id="name"
+                  {...register("shopName")}
+                  id="shopName"
                   type="text"
                   placeholder="Insert Shop Name..."
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.name && (
-                  <ErrorMessage ErrorMessage={errors.name.message} />
+                {errors.shopName && (
+                  <ErrorMessage ErrorMessage={errors.shopName.message} />
                 )}
               </div>
               {/* Phone */}
               <div className="grid gap-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="shopTelephone">Phone Number</Label>
                 <Input
-                  {...register("phone")}
-                  id="phone"
+                  {...register("shopTelephone")}
+                  id="shopTelephone"
                   type="text"
                   placeholder="Insert Shop Phone..."
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.phone && (
-                  <ErrorMessage ErrorMessage={errors.phone.message} />
+                {errors.shopTelephone && (
+                  <ErrorMessage ErrorMessage={errors.shopTelephone.message} />
                 )}
               </div>
               {/* Address */}
               <div className="grid gap-2">
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="shopAddress">Address</Label>
                 <Input
-                  {...register("address")}
-                  id="address"
+                  {...register("shopAddress")}
+                  id="shopAddress"
                   type="text"
                   placeholder="Insert Shop Address..."
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.address && (
-                  <ErrorMessage ErrorMessage={errors.address.message} />
+                {errors.shopAddress && (
+                  <ErrorMessage ErrorMessage={errors.shopAddress.message} />
                 )}
               </div>
-              {/* Address */}
+              {/* Bank */}
               <div className="grid gap-2">
-                <Label htmlFor="address">Bank Account</Label>
+                <Label htmlFor="accountNumber">Bank Account</Label>
                 <Input
-                  {...register("bank_account")}
-                  id="bank_account"
+                  {...register("accountNumber")}
+                  id="accountNumber"
                   type="text"
-                  placeholder="Insert Bank Account..."
+                  placeholder="e.g. BCA: 1234567890 - Seller"
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.address && (
-                  <ErrorMessage ErrorMessage={errors.bank_account.message} />
+                {errors.accountNumber && (
+                  <ErrorMessage ErrorMessage={errors.accountNumber.message} />
                 )}
               </div>
               {/* Qris */}
@@ -189,6 +202,7 @@ const RegisterShop = () => {
                     {/* Input QRIS Picture Button */}
                     <div className="flex-1">
                       <input
+                        {...register("qrisPicture")}
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
@@ -221,6 +235,9 @@ const RegisterShop = () => {
                       Preview
                     </button>
                   </div>
+                  {errors.qrisPicture && (
+                    <ErrorMessage ErrorMessage={errors.qrisPicture.message} />
+                  )}
                 </div>
 
                 {/* Preview Overlay/Popup */}
