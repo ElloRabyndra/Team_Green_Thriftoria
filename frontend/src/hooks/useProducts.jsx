@@ -112,7 +112,9 @@ export const useProducts = () => {
       setCart(cart.map(item => item.id === product.id ? 
         {...item, quantity: item.quantity + 1} : item));
     } else {
-      setCart([...cart, {id: product.id, title: product.title, category: product.category, thumbnail: product.thumbnail, price: product.price, quantity: 1}]);
+      // dummy shop name (sementara)
+      const shopName = product.id % 2 === 0 ? "Shop 1" : "Shop 2";
+      setCart([...cart, {id: product.id, title: product.title, shopName, category: product.category, thumbnail: product.thumbnail, price: product.price, quantity: 1}]);
     }
   }
 
