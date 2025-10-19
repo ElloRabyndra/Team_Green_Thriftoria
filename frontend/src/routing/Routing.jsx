@@ -11,11 +11,19 @@ import Profile from "@/components/auth/Profile";
 import ProductList from "@/components/product/ProductList";
 import ProductDetail from "@/components/product/ProductDetail";
 import CartList from "@/components/cart/CartList";
-import App from "@/pages/App";
 import "@/style/Style.css";
 import EditProduct from "@/components/product/EditProduct";
 import Dashboard from "@/components/dashboard/Dashboard";
 import RegisterShop from "@/components/dashboard/buyer/RegisterShop";
+import Checkout from "@/components/cart/Checkout";
+import MyOrder from "@/components/dashboard/buyer/MyOrder";
+import OrderDetail from "@/components/dashboard/buyer/OrderDetail";
+import OrderHistory from "@/components/dashboard/buyer/OrderHistory";
+import ViewShop from "@/components/auth/ViewShop";
+import MyProductList from "@/components/dashboard/seller/MyProductList";
+import MySales from "@/components/dashboard/seller/MySales";
+import SaleDetail from "@/components/dashboard/seller/SaleDetail";
+import MyShop from "@/components/dashboard/seller/MyShop";
 
 const Routing = () => {
   const { theme } = useContext(ThemeContext);
@@ -24,7 +32,6 @@ const Routing = () => {
       className={`${theme} bg-background text-foreground font-[Poppins] min-h-screen`}
     >
       <Routes>
-        {/* <Route path="/" element={<App />} /> */}
         <Route element={<AuthPage />}>
           <Route
             path="/register"
@@ -52,6 +59,14 @@ const Routing = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/shop/:shopId"
+            element={
+              <ProtectedRoute>
+                <ViewShop />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/dashboard">
             <Route
               index
@@ -66,6 +81,62 @@ const Routing = () => {
               element={
                 <ProtectedRoute>
                   <RegisterShop />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="my-shop"
+              element={
+                <ProtectedRoute>
+                  <MyShop />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="orders"
+              element={
+                <ProtectedRoute>
+                  <MyOrder />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="order/:orderId"
+              element={
+                <ProtectedRoute>
+                  <OrderDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="order-history"
+              element={
+                <ProtectedRoute>
+                  <OrderHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="my-products"
+              element={
+                <ProtectedRoute>
+                  <MyProductList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="sales"
+              element={
+                <ProtectedRoute>
+                  <MySales />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="sale/:saleId"
+              element={
+                <ProtectedRoute>
+                  <SaleDetail />
                 </ProtectedRoute>
               }
             />
@@ -99,6 +170,14 @@ const Routing = () => {
             element={
               <ProtectedRoute>
                 <CartList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
               </ProtectedRoute>
             }
           />
