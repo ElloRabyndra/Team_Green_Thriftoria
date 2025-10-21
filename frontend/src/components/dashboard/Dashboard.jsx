@@ -88,13 +88,6 @@ const Dashboard = () => {
         route: "/dashboard/shops",
         iconName: "Building2",
       },
-      {
-        id: 3,
-        title: "Products",
-        description: "Monitor all products in the marketplace",
-        route: "/dashboard/products",
-        iconName: "Archive",
-      },
     ],
   };
 

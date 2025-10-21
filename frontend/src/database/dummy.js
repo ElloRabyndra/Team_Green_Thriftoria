@@ -175,4 +175,47 @@ const orderItems = [
   },
 ];
 
-export { shops, sampleOrders, orderItems };
+const allUsers = [
+  {
+    id: 1,
+    username: "Darlene Robertson",
+    email: "alma.lawson@example.com",
+    telephone: "(252) 555-0126",
+    address: "123 Main St, New York, NY 10001",
+    role: "Buyer",
+  },
+  {
+    id: 2,
+    username: "Annette Black",
+    email: "bill.sanders@example.com",
+    telephone: "(252) 555-0126",
+    address: "456 Oak Ave, Los Angeles, CA 90001",
+    role: "Seller",
+  },
+  {
+    id: 3,
+    username: "Ronald Richards",
+    email: "weaver@example.com",
+    telephone: "(252) 555-0126",
+    address: "789 Pine Rd, Chicago, IL 60601",
+    role: "Buyer",
+  },
+  {
+    id: 4,
+    username: "Ralph Edwards",
+    email: "simmons@example.com",
+    telephone: "(252) 555-0126",
+    address: "321 Elm St, Houston, TX 77001",
+    role: "Seller",
+  },
+  {
+    id: 5,
+    username: "Jenny Wilson",
+    email: "jenny.wilson@example.com",
+    telephone: "(252) 555-0126",
+    address: "654 Maple Dr, Phoenix, AZ 85001",
+    role: "Buyer",
+  },
+];
+
+export { shops, sampleOrders, orderItems, allUsers };

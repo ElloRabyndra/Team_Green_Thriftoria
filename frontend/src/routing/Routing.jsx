@@ -24,6 +24,7 @@ import MyProductList from "@/components/dashboard/seller/MyProductList";
 import MySales from "@/components/dashboard/seller/MySales";
 import SaleDetail from "@/components/dashboard/seller/SaleDetail";
 import MyShop from "@/components/dashboard/seller/MyShop";
+import BuyerList from "@/components/dashboard/admin/BuyerList";
 
 const Routing = () => {
   const { theme } = useContext(ThemeContext);
@@ -137,6 +138,14 @@ const Routing = () => {
               element={
                 <ProtectedRoute>
                   <SaleDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="buyers"
+              element={
+                <ProtectedRoute>
+                  <BuyerList />
                 </ProtectedRoute>
               }
             />
