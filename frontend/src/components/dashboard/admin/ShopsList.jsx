@@ -9,28 +9,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { allUsers } from "@/database/dummy";
+import { allShops } from "@/database/dummy";
+import { Link } from "react-router";
 
-// Badge component untuk role
-function RoleBadge({ role }) {
-  const isSeller = role === "Seller";
+// Badge component untuk status
+function StatusBadge({ statusAdmin }) {
+  const isAccept = statusAdmin === "Accept";
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
-        isSeller
+        isAccept
           ? "bg-primary/10 text-primary"
           : "bg-secondary text-secondary-foreground"
       }`}
     >
-      {role}
+      {statusAdmin}
     </span>
   );
 }
 
 // Buyer List Component
-const BuyerList = () => {
+const ShopsList = () => {
+  const acceptShop = allShops.filter((shop) => shop.statusAdmin === "Accept");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState(allUsers);
+  const [filteredShops, setFilteredShops] = useState(acceptShop);
   const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = (e) => {
@@ -38,12 +40,12 @@ const BuyerList = () => {
     setIsSearching(true);
 
     if (searchQuery.trim() === "") {
-      setFilteredUsers(allUsers);
+      setFilteredShops(acceptShop);
     } else {
-      const filtered = allUsers.filter((user) =>
-        user.username.toLowerCase().includes(searchQuery.toLowerCase())
+      const filtered = acceptShop.filter((shop) =>
+        shop.shopName.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredUsers(filtered);
+      setFilteredShops(filtered);
     }
   };
 
@@ -51,18 +53,18 @@ const BuyerList = () => {
     const value = e.target.value;
     setSearchQuery(value);
 
-    // Reset to all users if search is cleared
+    // Reset to all shops if search is cleared
     if (value.trim() === "") {
-      setFilteredUsers(allUsers);
+      setFilteredShops(acceptShop);
       setIsSearching(false);
     }
   };
 
-  const handleView = (user) => {
-    console.log("View user:", user);
+  const handleView = (shop) => {
+    console.log("View shop:", shop);
   };
 
-  const handleDelete = (user) => {};
+  const handleDelete = (shop) => {};
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
@@ -71,21 +73,36 @@ const BuyerList = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              Buyers
+              Shop
             </h1>
           </div>
-
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="relative w-full md:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder="Search users..."
-              className="w-full pl-10 pr-4 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-sm"
-            />
-          </form>
+          <div className="flex items-center gap-4">
+            {/* Accept Shop */}
+            <Link
+              to="/dashboard/shops"
+              className="text-sm bg-secondary text-primary px-4 py-2 rounded-xl cursor-pointer"
+            >
+              Accept Shop
+            </Link>
+            {/* Pending Shop */}
+            <Link
+              to="/dashboard/shops/pending"
+              className="text-sm text-foreground bg-card hover:bg-secondary hover:text-primary px-4 py-2 rounded-xl cursor-pointer"
+            >
+              Pending Shop
+            </Link>
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="relative w-full md:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search Shops..."
+                className="w-full pl-10 pr-4 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-sm"
+              />
+            </form>
+          </div>
         </div>
 
         {/* Table Card */}
@@ -94,9 +111,9 @@ const BuyerList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  {/* Username - Always visible */}
+                  {/* ShopName - Always visible */}
                   <TableHead className="w-[140px] sm:w-[180px]">
-                    Username
+                    Shop Name
                   </TableHead>
 
                   {/* Email - Hidden below sm */}
@@ -114,8 +131,10 @@ const BuyerList = () => {
                     Address
                   </TableHead>
 
-                  {/* Role - Always visible */}
-                  <TableHead className="w-[80px] sm:w-[100px]">Role</TableHead>
+                  {/* Status - Always visible */}
+                  <TableHead className="w-[80px] sm:w-[100px]">
+                    Status
+                  </TableHead>
 
                   {/* Action - Always visible */}
                   <TableHead className="w-[100px] text-center">
@@ -124,7 +143,7 @@ const BuyerList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers.length === 0 ? (
+                {filteredShops.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={6}
@@ -132,61 +151,61 @@ const BuyerList = () => {
                     >
                       <div className="flex flex-col items-center justify-center gap-2">
                         <Search className="h-8 w-8 opacity-50" />
-                        <p className="font-medium">User not found</p>
+                        <p className="font-medium">Shop not found</p>
                         <p className="text-sm">
                           {isSearching
-                            ? `No users found matching "${searchQuery}"`
-                            : "No users available"}
+                            ? `No Shops found matching "${searchQuery}"`
+                            : "No Shops available"}
                         </p>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      {/* Username - Always visible */}
+                  filteredShops.map((shop) => (
+                    <TableRow key={shop.id}>
+                      {/* ShopName - Always visible */}
                       <TableCell className="font-medium">
                         <div className="truncate max-w-[130px] sm:max-w-[170px]">
-                          {user.username}
+                          {shop.shopName}
                         </div>
                       </TableCell>
 
                       {/* Email - Hidden below sm */}
                       <TableCell className="hidden lg:table-cell text-muted-foreground">
                         <div className="truncate max-w-[190px]">
-                          {user.email}
+                          {shop.email}
                         </div>
                       </TableCell>
 
                       {/* Telephone - Hidden below md */}
                       <TableCell className="hidden md:table-cell text-muted-foreground">
-                        {user.telephone}
+                        {shop.shopPhone}
                       </TableCell>
 
                       {/* Address - Hidden below lg */}
                       <TableCell className="hidden xl:table-cell text-muted-foreground">
                         <div className="truncate max-w-[210px]">
-                          {user.address}
+                          {shop.shopAddress}
                         </div>
                       </TableCell>
 
-                      {/* Role - Always visible */}
+                      {/* Status - Always visible */}
                       <TableCell>
-                        <RoleBadge role={user.role} />
+                        <StatusBadge statusAdmin={shop.statusAdmin} />
                       </TableCell>
 
                       {/* Action - Always visible */}
                       <TableCell>
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => handleView(user)}
+                            onClick={() => handleView(shop)}
                             className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors"
                             title="View Details"
                           >
                             <Eye className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => handleDelete(user)}
+                            onClick={() => handleDelete(shop)}
                             className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
                             title="Delete User"
                           >
@@ -203,13 +222,13 @@ const BuyerList = () => {
         </Card>
 
         {/* Footer Info */}
-        {filteredUsers.length > 0 && (
+        {filteredShops.length > 0 && (
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-sm text-muted-foreground">
             <p>
-              Showing {filteredUsers.length}{" "}
-              {isSearching ? "result(s)" : "user(s)"}
+              Showing {filteredShops.length}{" "}
+              {isSearching ? "result(s)" : "Shop(s)"}
             </p>
-            <p>Total Users: {allUsers.length}</p>
+            <p>Total Shop: {filteredShops.length}</p>
           </div>
         )}
       </div>
@@ -217,4 +236,4 @@ const BuyerList = () => {
   );
 };
 
-export default BuyerList;
+export default ShopsList;

@@ -25,6 +25,8 @@ import MySales from "@/components/dashboard/seller/MySales";
 import SaleDetail from "@/components/dashboard/seller/SaleDetail";
 import MyShop from "@/components/dashboard/seller/MyShop";
 import BuyerList from "@/components/dashboard/admin/BuyerList";
+import ShopsList from "@/components/dashboard/admin/ShopsList";
+import PendingList from "@/components/dashboard/admin/PendingList";
 
 const Routing = () => {
   const { theme } = useContext(ThemeContext);
@@ -146,6 +148,22 @@ const Routing = () => {
               element={
                 <ProtectedRoute>
                   <BuyerList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="shops"
+              element={
+                <ProtectedRoute>
+                  <ShopsList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="shops/pending"
+              element={
+                <ProtectedRoute>
+                  <PendingList />
                 </ProtectedRoute>
               }
             />
