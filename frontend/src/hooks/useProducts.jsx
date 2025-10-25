@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getProducts, getSearchProducts } from "@/service/api";
+import { getProducts, getSearchProducts } from "@/service/oldApi";
 
 // Daftar kategori thrift yang akan ditampilkan
 export const thriftCategories = [
