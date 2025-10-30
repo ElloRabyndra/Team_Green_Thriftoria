@@ -46,6 +46,8 @@ func SignUp(c *fiber.Ctx) error {
 		Password:       string(hashedPassword),
 		Role:           "pembeli",
 		ProfilePicture: "https://i.pravatar.cc/150",
+		Address: "",
+		Telephone: "",
 	}
 
 	if err := database.DB.Create(&user).Error; err != nil {
@@ -110,10 +112,7 @@ func Login(c *fiber.Ctx) error{
 
 	return c.JSON(fiber.Map{
 		"message": "Login success",
-		"user": fiber.Map{
-			"id":   existingUser.ID,
-			"role": existingUser.Role,
-		},
+		"user": existingUser,
 	})
 }
 

@@ -1,83 +1,62 @@
-# 📌 API Documentation
-## Base URL
+DOKUMENTASI APLIKASI
 
-```
-http://127.0.0.1:3000/api/v1
-```
+BASE URL
+http://localhost:3000/api/v1/
 
----
+1. Jalankan Aplikasi
+go run main.go
 
-## 🔑 Authentication
+2. Dokumentasi API
 
-### **Register**
+Register 
+  POST http://localhost:3000/api/v1/register
+    Request Body:
+      {
+        "username": "steven",
+        "email": "steven@gmail.com",
+        "password": "123456"
+      }
+    
+    Response (201 Created):
+      {
+        "message": "Register success",
+        "user": {
+          "id": 1,
+          "username": "steven",
+          "email": "steven@gmail.com",
+          "address": "",
+          "telephone": "",
+          "role": "pembeli",
+          "profile_picture": "https://i.pravatar.cc/150",
+          "shop": null
+        }
+      }
 
-**POST** `/register`
+Login  
+  POST http://localhost:3000/api/v1/login
+    Request Body:
+      {
+        "email": "steven@gmail.com",
+        "password": "123456"
+      } 
+    
+    Response (200 OK):
+      {
+        "message": "Login success",
+        "user": {
+          "id": 1,
+          "username": "steven",
+          "email": "steven@gmail.com",
+          "role": "pembeli",
+          "profile_picture": "https://i.pravatar.cc/150",
+          "shop": null
+        }
+      }
+Token JWT akan disimpan otomatis di cookie bernama token.
 
-**Request Body (JSON):**
-
-```json
-{
-  "username": "steven2",
-  "email": "steven2@gmail.com",
-  "password": "steven2"
-}
-```
-
-**Response 201 (Created):**
-
-```json
-{
-  "message": "Register success",
-  "user": {
-    "id": 1,
-    "username": "steven2",
-    "email": "steven2@gmail.com",
-    "role": "pembeli",
-    "profile_picture": "https://i.pravatar.cc/150"
-  }
-}
-```
-
----
-
-### **Login**
-
-**POST** `/login`
-
-**Request Body (JSON):**
-
-```json
-{
-  "email": "steven2@gmail.com",
-  "password": "steven2"
-}
-```
-
-**Response 200 (OK):**
-
-```json
-{
-  "message": "Login success",
-  "user": {
-    "id": 1,
-    "role": "pembeli"
-  }
-}
-```
-
-> Cookie `token` otomatis diset (HttpOnly, Secure, SameSite=Lax).
-> Gunakan cookie ini untuk request yang butuh autentikasi.
-
----
-
-### **Logout**
-
-**POST** `/logout`
-
-**Response 200:**
-
-```json
-{
-  "message": "Logout success"
-}
-```
+Logout
+  POST http://localhost:3000/api/v1/logout
+    Response: 
+      {
+        "message": "Logout success"
+      }
