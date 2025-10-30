@@ -31,7 +31,7 @@ export const registerShopSchema = z.object({
       message: "File size must not exceed 5MB",
     })
     .refine(
-      (file) => ["image/jpeg", "image/png", "image/jpg"].includes(file.type),
+      (file) => ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(file.type),
       {
         message: "Only JPG and PNG formats are allowed",
       }
@@ -72,7 +72,7 @@ export const editShopSchema = z.object({
           (file) =>
             !file ||
             (file.size <= 5 * 1024 * 1024 &&
-              ["image/jpeg", "image/png", "image/jpg"].includes(file.type)),
+              ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(file.type)),
           {
             message:
               "QRIS picture must be JPG/PNG format and not exceed 5MB if uploaded",

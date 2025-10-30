@@ -1,5 +1,6 @@
 import { Card } from "../ui/card";
 import { Plus, Minus, X, Check, Store } from "lucide-react";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 export default function CartCard({
   cartItem,
@@ -20,11 +21,11 @@ export default function CartCard({
   };
 
   return (
-    <Card 
+    <Card
       className={`flex gap-2 flex-row p-2 transition-all duration-200 ${
-        isSelected 
-          ? 'ring-2 ring-primary bg-primary/5' 
-          : 'hover:shadow-md opacity-100'
+        isSelected
+          ? "ring-2 ring-primary bg-primary/5"
+          : "hover:shadow-md opacity-100"
       }`}
     >
       <img
@@ -59,24 +60,25 @@ export default function CartCard({
             onClick={() => onSelect(cartItem.id)}
             className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all duration-200 hover:scale-110 ${
               isSelected
-                ? 'bg-primary border-primary text-primary-foreground'
-                : 'border-border hover:border-primary'
+                ? "bg-primary border-primary text-primary-foreground"
+                : "border-border hover:border-primary"
             }`}
             title={isSelected ? "Selected" : "Select this item"}
           >
             {isSelected && <Check className="h-3 w-3" />}
           </button>
-          
+
           {/* Remove Button */}
-          <button 
-            onClick={() => removeFromCart(cartItem.id)}
-            className="text-muted-foreground hover:text-destructive transition-colors duration-200"
-            title="Remove from cart"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <ConfirmDialog onConfirm={() => removeFromCart(cartItem.id)}>
+            <button
+              className="text-muted-foreground hover:text-destructive transition-colors duration-200"
+              title="Remove from cart"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </ConfirmDialog>
         </div>
-        
+
         {/* Quantity Controls */}
         <div className="flex items-center">
           <button
