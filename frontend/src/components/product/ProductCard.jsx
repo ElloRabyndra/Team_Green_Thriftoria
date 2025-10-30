@@ -2,6 +2,7 @@ import { ShoppingCart, Eye, Edit3, X } from "lucide-react";
 import { Card } from "../ui/card";
 import { Link } from "react-router";
 import { toast } from "react-toastify";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 // ProductCard Component
 export default function ProductCard({ product, onAddToCart, role = "buyer" }) {
@@ -28,12 +29,18 @@ export default function ProductCard({ product, onAddToCart, role = "buyer" }) {
     <div className="relative group">
       {/* Delete/Cancel Button - positioned outside card, only visible on hover */}
       {role === "seller" && (
-        <button
-          className="absolute -top-1 -right-2 z-10 bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-400 p-1.5 rounded-full shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100"
-          title="Cancel Order"
+        <ConfirmDialog
+          onConfirm={() => {
+            toast.success("Order cancelled!");
+          }}
         >
-          <X className="h-4 w-4" />
-        </button>
+          <button
+            className="absolute -top-1 -right-2 z-10 bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-400 p-1.5 rounded-full shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100"
+            title="Cancel Order"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </ConfirmDialog>
       )}
       <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
         {role === "seller" ? (

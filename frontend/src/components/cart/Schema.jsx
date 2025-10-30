@@ -24,7 +24,7 @@ export const checkoutSchema = z.object({
       message: "File size must not exceed 5MB",
     })
     .refine(
-      (file) => ["image/jpeg", "image/png", "image/jpg"].includes(file?.type),
+      (file) => ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(file?.type),
       {
         message: "Only JPG and PNG formats are allowed",
       }

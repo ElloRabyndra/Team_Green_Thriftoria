@@ -70,7 +70,7 @@ export default function Checkout() {
     const file = event.target.files[0];
     if (file) {
       // Validasi file type
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
         setError("proofPayment", {
           type: "manual",
