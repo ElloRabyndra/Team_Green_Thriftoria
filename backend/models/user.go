@@ -9,6 +9,7 @@ type User struct {
 	Telephone   	string    	`json:"telephone" gorm:"type:varchar(15)"`
 	Role			string		`json:"role" gorm:"type:enum('admin','penjual','pembeli');default('pembeli')"`
 	ProfilePicture	string		`json:"profile_picture" gorm:"type:varchar(100);default('https://i.pravatar.cc/150')"`
+	Shop      		Shop      	`gorm:"foreignKey:UserID"`
 }
 
 type RegisterInput struct {
