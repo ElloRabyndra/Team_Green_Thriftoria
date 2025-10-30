@@ -12,7 +12,7 @@ const shops = [
 const sampleOrders = [
   {
     id: 1,
-    recepient: "John Doe",
+    recipient: "John Doe",
     telephone: "+62 812 3456 7890",
     address: "Jl. Contoh, Jakarta, Indonesia",
     note: "Hati-hati di jalan",
@@ -27,7 +27,7 @@ const sampleOrders = [
   },
   {
     id: 2,
-    recepient: "Max Mustermann",
+    recipient: "Max Mustermann",
     telephone: "+62 812 3456 7890",
     address: "Jl. Contoh, Jakarta, Indonesia",
     note: "Hati-hati di jalan",
@@ -42,7 +42,7 @@ const sampleOrders = [
   },
   {
     id: 3,
-    recepient: "John Doe",
+    recipient: "John Doe",
     telephone: "+62 812 3456 7890",
     address: "Jl. Contoh, Jakarta, Indonesia",
     note: "Hati-hati di jalan",
@@ -57,7 +57,7 @@ const sampleOrders = [
   },
   {
     id: 4,
-    recepient: "John Doe",
+    recipient: "John Doe",
     telephone: "+62 812 3456 7890",
     address: "Jl. Contoh, Jakarta, Indonesia",
     note: "Hati-hati di jalan",
@@ -72,7 +72,7 @@ const sampleOrders = [
   },
   {
     id: 5,
-    recepient: "John Doe",
+    recipient: "John Doe",
     telephone: "+62 812 3456 7890",
     address: "Jl. Contoh, Jakarta, Indonesia",
     note: "Hati-hati di jalan",
@@ -87,7 +87,7 @@ const sampleOrders = [
   },
   {
     id: 6,
-    recepient: "John Doe",
+    recipient: "John Doe",
     telephone: "+62 812 3456 7890",
     address: "Jl. Contoh, Jakarta, Indonesia",
     note: "Hati-hati di jalan",

@@ -23,7 +23,7 @@ export default function OrderCard({ order }) {
       currency: "IDR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(price * 15000);
+    }).format(price);
   };
 
   // Fungsi untuk format tanggal
@@ -103,7 +103,7 @@ export default function OrderCard({ order }) {
 
           <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground shrink-0 mb-1">
             <Clock className="h-4 w-4" />
-            <span>{formatDate(order.orderDate)}</span>
+            <span>{formatDate(order.createdAt)}</span>
           </div>
 
           {/* Order Details */}
@@ -112,7 +112,7 @@ export default function OrderCard({ order }) {
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Package className="h-4 w-4" />
                 <span>
-                  {order.totalItems} Item{order.totalItems > 1 ? "s" : ""}
+                  {order.productCount} Item{order.productCount > 1 ? "s" : ""}
                 </span>
               </div>
               <span className="font-semibold text-base sm:text-lg text-primary">

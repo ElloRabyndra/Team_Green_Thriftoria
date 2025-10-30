@@ -127,10 +127,10 @@ const SaleDetail = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4">
-                {/* Recepient */}
+                {/* Recipient */}
                 <div>
-                  <p className="text-sm text-muted-foreground">Recepient:</p>
-                  <p className="font-medium">{sale.recepient}</p>
+                  <p className="text-sm text-muted-foreground">Recipient:</p>
+                  <p className="font-medium">{sale.recipient}</p>
                 </div>
                 {/* Telephone */}
                 <div>

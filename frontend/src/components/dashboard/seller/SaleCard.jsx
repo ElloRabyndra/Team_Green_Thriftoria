@@ -66,7 +66,7 @@ const SaleCard = ({ sale }) => {
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4 pb-4 border-b border-border">
             <div className="flex-1 min-w-0 -mt-1">
               <h3 className="font-bold text-base sm:text-lg text-foreground truncate">
-                {sale.recepient}
+                {sale.recipient}
               </h3>
               <p className="text-sm text-muted-foreground mt-1">
                 {sale.telephone}

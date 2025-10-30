@@ -9,13 +9,12 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useProducts } from "@/hooks/useProducts";
 import { useEffect } from "react";
 
-export default function ({
+export default function SideBar({
   isMobileMenuOpen,
-  categories,
-  changeCategories,
+  selectedCategory,
+  changeCategory,
   cart,
 }) {
   const { user, logout, isLoading } = useAuth();
@@ -27,12 +26,6 @@ export default function ({
     location.pathname === "/checkout" ||
     location.pathname.startsWith("/dashboard") ||
     location.pathname.startsWith("/shop");
-  const {
-    thriftCategories,
-    shirtsCategories,
-    shoesCategories,
-    gadgetsCategories,
-  } = useProducts();
 
   useEffect(() => {
     if (!isLoading && !user) logout();
@@ -97,10 +90,9 @@ export default function ({
           <div className="space-y-2">
             <Link
               to="/"
-              onClick={() => changeCategories(thriftCategories)}
+              onClick={() => changeCategory("All")}
               className={`${
-                !isSpecialPage &&
-                (categories === thriftCategories || categories.length === 0)
+                !isSpecialPage && selectedCategory === "All"
                   ? "bg-secondary/50 text-primary"
                   : "hover:bg-secondary/50"
               } w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer`}
@@ -110,9 +102,9 @@ export default function ({
             </Link>
             <Link
               to="/"
-              onClick={() => changeCategories(shirtsCategories)}
+              onClick={() => changeCategory("Fashion")}
               className={`${
-                !isSpecialPage && categories === shirtsCategories
+                !isSpecialPage && selectedCategory === "Fashion"
                   ? "bg-secondary/50 text-primary"
                   : "hover:bg-secondary/50"
               } w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer`}
@@ -122,9 +114,9 @@ export default function ({
             </Link>
             <Link
               to="/"
-              onClick={() => changeCategories(shoesCategories)}
+              onClick={() => changeCategory("Others")}
               className={`${
-                !isSpecialPage && categories === shoesCategories
+                !isSpecialPage && selectedCategory === "Others"
                   ? "bg-secondary/50 text-primary"
                   : "hover:bg-secondary/50"
               } w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer`}

@@ -4,6 +4,7 @@ import { ShoppingBag, Store } from "lucide-react";
 
 export default function CartDetail({ selectedItems, selectedItemsPrice }) {
   const navigate = useNavigate();
+  
   // Fungsi untuk format harga
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
@@ -18,12 +19,13 @@ export default function CartDetail({ selectedItems, selectedItemsPrice }) {
   const subtotal = selectedItemsPrice;
   const total = subtotal + deliveryFee;
 
-  // Handler untuk navigasi ke or dengan data
+  // Handler untuk navigasi ke checkout dengan data
   const handlePlaceOrder = () => {
+    if (selectedItems.length === 0) return;
     navigate("/checkout", {
       state: {
-        userID : 1, // Sementara
-        shopID: 1, // Sementara
+        userId: selectedItems[0]?.userId,
+        shopId: selectedItems[0]?.shopId,
         selectedItems, 
         subtotal,
         deliveryFee,
@@ -44,8 +46,9 @@ export default function CartDetail({ selectedItems, selectedItemsPrice }) {
     );
   }
 
-  // Get shop name from first selected item
+  // Get shop info from first selected item
   const shopName = selectedItems[0]?.shopName;
+  const shopId = selectedItems[0]?.shopId;
 
   return (
     <Card className="p-6 sticky top-4">
@@ -55,7 +58,10 @@ export default function CartDetail({ selectedItems, selectedItemsPrice }) {
           <h2 className="text-xl font-semibold">Cart Summary</h2>
           
           {/* Shop Name */}
-          <Link to={`/shop/${1}`} className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+          <Link 
+            to={`/shop/${shopId}`} 
+            className="mt-2 flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
             <Store className="h-4 w-4" />
             <span className="font-medium capitalize">{shopName}</span>
           </Link>
@@ -65,8 +71,8 @@ export default function CartDetail({ selectedItems, selectedItemsPrice }) {
             {selectedItems.map((item) => (
               <div key={item.id} className="flex items-center gap-3">
                 <img
-                  src={item.thumbnail}
-                  alt={item.title}
+                  src={item.image}
+                  alt={item.name}
                   className="w-12 h-12 object-cover rounded-md flex-shrink-0"
                   onError={(e) => {
                     e.target.src = "https://via.placeholder.com/48x48?text=No+Image";
@@ -74,13 +80,13 @@ export default function CartDetail({ selectedItems, selectedItemsPrice }) {
                 />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-sm truncate">
-                    {item.title}
+                    {item.name}
                   </h3>
                   <p className="text-xs text-muted-foreground capitalize">
-                    {item.category.replace("-", " ")} • Qty: {item.quantity}
+                    {item.label} • Qty: {item.quantity}
                   </p>
                   <p className="text-xs font-medium text-primary">
-                    {formatPrice(item.price * item.quantity * 15000)}
+                    {formatPrice(item.price * item.quantity)}
                   </p>
                 </div>
               </div>
@@ -119,7 +125,8 @@ export default function CartDetail({ selectedItems, selectedItemsPrice }) {
         {/* Place Order Button */}
         <button 
           onClick={handlePlaceOrder} 
-          className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-md flex items-center justify-center gap-2 cursor-pointer"
+          disabled={selectedItems.length === 0}
+          className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ShoppingBag className="h-5 w-5" />
           Checkout ({selectedItems.length} {selectedItems.length === 1 ? 'item' : 'items'})

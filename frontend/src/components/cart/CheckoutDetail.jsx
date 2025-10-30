@@ -39,7 +39,10 @@ export default function CheckoutDetail({
           <h2 className="text-xl font-semibold">Checkout Summary</h2>
 
           {/* Shop Name */}
-          <Link to={`/shop/${1}`} className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+          <Link
+            to={`/shop/${1}`}
+            className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"
+          >
             <Store className="h-4 w-4" />
             <span className="font-medium capitalize">{shopName}</span>
           </Link>
@@ -49,8 +52,8 @@ export default function CheckoutDetail({
             {selectedItems.map((item) => (
               <div key={item.id} className="flex items-center gap-3">
                 <img
-                  src={item.thumbnail}
-                  alt={item.title}
+                  src={item.image}
+                  alt={item.name}
                   className="w-12 h-12 object-cover rounded-md flex-shrink-0"
                   onError={(e) => {
                     e.target.src =
@@ -58,12 +61,12 @@ export default function CheckoutDetail({
                   }}
                 />
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-sm truncate">{item.title}</h3>
+                  <h3 className="font-medium text-sm truncate">{item.name}</h3>
                   <p className="text-xs text-muted-foreground capitalize">
-                    {item.category.replace("-", " ")} • Qty: {item.quantity}
+                    {item.label} • Qty: {item.quantity}
                   </p>
                   <p className="text-xs font-medium text-primary">
-                    {formatPrice(item.price * item.quantity * 15000)}
+                    {formatPrice(item.price * item.quantity)}
                   </p>
                 </div>
               </div>
@@ -95,6 +98,7 @@ export default function CheckoutDetail({
 
         {/* Place Order Button */}
         <button
+          type="submit"
           className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-md flex items-center justify-center gap-2 cursor-pointer"
         >
           <ShoppingBag className="h-5 w-5" />
