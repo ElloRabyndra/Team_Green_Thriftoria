@@ -1,23 +1,26 @@
-DOKUMENTASI APLIKASI
+#### DOKUMENTASI APLIKASI
 
-BASE URL
+#### BASE URL
 http://localhost:3000/api/v1/
 
-1. Jalankan Aplikasi
+#### 1. Jalankan Aplikasi
 go run main.go
 
-2. Dokumentasi API
+#### 2. Dokumentasi API
 
-Register 
+#### Register 
   POST http://localhost:3000/api/v1/register
     Request Body:
+      ```json
       {
         "username": "steven",
         "email": "steven@gmail.com",
         "password": "123456"
       }
+      ```
     
     Response (201 Created):
+      ```json
       {
         "message": "Register success",
         "user": {
@@ -31,16 +34,20 @@ Register
           "shop": null
         }
       }
+      ```
 
-Login  
+#### Login  
   POST http://localhost:3000/api/v1/login
     Request Body:
+      ```json
       {
         "email": "steven@gmail.com",
         "password": "123456"
       } 
+      ```
     
     Response (200 OK):
+      ```json
       {
         "message": "Login success",
         "user": {
@@ -52,9 +59,10 @@ Login
           "shop": null
         }
       }
+      ```
 Token JWT akan disimpan otomatis di cookie bernama token.
 
-Logout
+#### Logout
   POST http://localhost:3000/api/v1/logout
     Response: 
       {
