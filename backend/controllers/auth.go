@@ -4,7 +4,6 @@ import (
 	"finpro/database"
 	"finpro/models"
 	"os"
-	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,7 +15,6 @@ func SignUp(c *fiber.Ctx) error {
 	input:= new(models.RegisterInput)
 
 	if err := c.BodyParser(&input); err != nil {
-		fmt.Printf("Error BodyParser: %v\n", err) // Cetak error jika ada
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid request body",
 		})

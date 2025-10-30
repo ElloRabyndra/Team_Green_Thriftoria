@@ -7,9 +7,9 @@ import (
 )
 
 func ProductsRoutes(api fiber.Router){
-	event := api.Group("/products")
-	event.Get("/", controllers.GetProducts)
-	event.Post("/", controllers.CreateProduct)
-	event.Patch("/:id", controllers.UpdateProduct)
-	event.Delete("/:id", controllers.DeleteProduct)
+	product := api.Group("/products")
+	product.Get("/", controllers.GetProducts)
+	product.Post("/", controllers.CreateProduct)
+	product.Patch("/:id", controllers.UpdateProduct)
+	product.Delete("/:id", controllers.DeleteProduct)
 }
