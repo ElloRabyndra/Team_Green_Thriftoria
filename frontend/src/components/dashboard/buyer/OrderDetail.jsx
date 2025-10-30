@@ -1,61 +1,65 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, Phone, ShoppingBag, Store, Check, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowLeft, Phone, Store, Check, X } from "lucide-react";
+import { useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { sampleOrders, orderItems } from "@/database/dummy";
+import { useOrders } from "@/hooks/useOrders";
+import Loading from "@/components/ui/loading";
 
 const OrderDetail = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
   const { orderId } = useParams();
-  const [order, setOrder] = useState(null);
-  const [currentOrderItem, setCurrentOrderItem] = useState([]);
 
-  // Ambil detail order dan item
+  // Ambil data dan fungsi dari useOrders
+  const {
+    orderDetail,
+    fetchOrderDetail,
+    approveCancel,
+    denyCancel,
+    requestCancel,
+    loading,
+    resetOrderDetail,
+  } = useOrders();
+
+  // Ambil detail order saat orderId berubah
   useEffect(() => {
-    if (!orderId) return;
-
-    const id = Number(orderId);
-    const foundOrder = sampleOrders.find((order) => order.id === id);
-    const items = orderItems.filter((item) => item.orderId === id);
-
-    if (foundOrder) {
-      setOrder(foundOrder);
-      setCurrentOrderItem(items);
-    }
-
-    console.log("foundOrder:", foundOrder);
-    console.log("items:", items);
+    if (orderId) fetchOrderDetail(Number(orderId));
+    return () => resetOrderDetail(); // bersihkan saat keluar halaman
   }, [orderId]);
 
-  // Redirect jika bukan buyer atau seller
+  // Redirect jika bukan buyer/seller atau orderDetail tidak ada
   useEffect(() => {
-    if (!isLoading && user && user.role !== "buyer" && user.role !== "seller") {
+    if (!isLoading && user && user.role !== "buyer" && user.role !== "seller")
       navigate(-1);
-    }
   }, [isLoading, user, navigate]);
 
-  // Fungsi untuk format harga
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("id-ID", {
+  // Redirect jika orderDetail tidak ada
+  useEffect(() => {
+    if (!loading && orderDetail === null) navigate(-1);
+  }, [loading, orderDetail, navigate]);
+
+  const order = orderDetail;
+  if (loading || !orderDetail) {
+    return <Loading />;
+  }
+
+  // 🧮 Fungsi format harga dan tanggal
+  const formatPrice = (price) =>
+    new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
-  };
 
-  // Fungsi untuk format tanggal
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("id-ID", {
+  const formatDate = (dateString) =>
+    new Intl.DateTimeFormat("id-ID", {
       day: "2-digit",
       month: "short",
       year: "numeric",
-    }).format(date);
-  };
+    }).format(new Date(dateString));
 
   // Konfigurasi status
   const statusConfig = {
@@ -87,13 +91,6 @@ const OrderDetail = () => {
       color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
     },
   };
-  if (!order) {
-    return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
-        Loading order details...
-      </div>
-    );
-  }
 
   return (
     <section className="space-y-4 md:ml-4">
@@ -119,17 +116,22 @@ const OrderDetail = () => {
               {order.statusShipping !== "cancelled" &&
                 order.statusShipping !== "cancelPending" &&
                 order.statusShipping !== "delivered" && (
-                  <button className="text-sm hover:text-red-400 hover:underline cursor-pointer">
+                  <button
+                    onClick={() =>
+                      requestCancel(order.orderId, user.role, user.id)
+                    }
+                    className="text-sm hover:text-red-400 hover:underline cursor-pointer"
+                  >
                     Cancel Order
                   </button>
                 )}
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4">
-                {/* Recepient */}
+                {/* Recipient */}
                 <div>
-                  <p className="text-sm text-muted-foreground">Recepient:</p>
-                  <p className="font-medium">{order.recepient}</p>
+                  <p className="text-sm text-muted-foreground">Recipient:</p>
+                  <p className="font-medium">{order.recipient}</p>
                 </div>
                 {/* Telephone */}
                 <div>
@@ -151,7 +153,7 @@ const OrderDetail = () => {
                 {/* Order Date */}
                 <div>
                   <p className="text-sm text-muted-foreground">Order Date:</p>
-                  <p className="font-medium">{formatDate(order.orderDate)}</p>
+                  <p className="font-medium">{formatDate(order.createdAt)}</p>
                 </div>
 
                 {/* Status Badge */}
@@ -195,7 +197,10 @@ const OrderDetail = () => {
                 <h2 className="text-xl font-semibold">Order Summary</h2>
 
                 {/* Shop Name */}
-                <Link to={`/shop/${1}`} className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <Link
+                  to={`/shop/${1}`}
+                  className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"
+                >
                   <Store className="h-4 w-4" />
                   <span className="font-medium capitalize">
                     {order.shopName}
@@ -211,7 +216,7 @@ const OrderDetail = () => {
 
                 {/* Selected Items */}
                 <div className="mt-4 space-y-3 max-h-48 overflow-y-auto pr-2">
-                  {currentOrderItem.map((item) => (
+                  {order.orderItems.map((item) => (
                     <div key={item.id} className="flex items-center gap-3">
                       <img
                         src={item.image}
@@ -227,10 +232,10 @@ const OrderDetail = () => {
                           {item.name}
                         </h3>
                         <p className="text-xs text-muted-foreground capitalize">
-                          {item.label.replace("-", " ")} • Qty: {item.quantity}
+                          {item.label} • Qty: {item.quantity}
                         </p>
                         <p className="text-xs font-medium text-primary">
-                          {formatPrice(item.price * item.quantity * 15000)}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
                     </div>
@@ -243,7 +248,7 @@ const OrderDetail = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">
-                    {formatPrice(order.totalPrice * 15000 - 30000)}
+                    {formatPrice(order.totalPrice - 30000)}
                   </span>
                 </div>
 
@@ -256,7 +261,7 @@ const OrderDetail = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-lg font-bold text-primary">
-                      {formatPrice(order.totalPrice * 15000)}
+                      {formatPrice(order.totalPrice)}
                     </span>
                   </div>
                 </div>

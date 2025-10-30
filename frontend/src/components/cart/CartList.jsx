@@ -8,15 +8,17 @@ import CartDetail from "./CartDetail";
 export default function CartList() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-  const { cart, addToCart, decreaseQuantity, removeFromCart } =
+  const { cart, increaseQuantity, decreaseQuantity, removeFromCart } =
     useOutletContext();
 
-  // State untuk track items yang dipilih (array of IDs)
+  // State untuk track items yang dipilih (array of cart IDs)
   const [selectedCartIds, setSelectedCartIds] = useState([]);
 
   // Redirect ke login jika tidak ada user setelah loading selesai
   useEffect(() => {
-    if (!isLoading && !user) logout();
+    if (!isLoading && !user) {
+      navigate("/login");
+    }
   }, [isLoading, user]);
 
   // Redirect jika bukan buyer atau seller
@@ -33,49 +35,49 @@ export default function CartList() {
     } else {
       setSelectedCartIds([]);
     }
-  }, [cart]);
+  }, [cart.length]);
 
   // Fungsi untuk handle selection
-  const handleSelectCart = (productId) => {
-    const clickedProduct = cart.find((item) => item.id === productId);
-    
+  const handleSelectCart = (cartId) => {
+    const clickedItem = cart.find((item) => item.id === cartId);
+
     // Jika belum ada yang dipilih, pilih item ini
     if (selectedCartIds.length === 0) {
-      setSelectedCartIds([productId]);
+      setSelectedCartIds([cartId]);
       return;
     }
 
-    // Cek shopName dari item yang sudah dipilih
-    const firstSelectedProduct = cart.find(
+    // Cek shopId dari item yang sudah dipilih
+    const firstSelectedItem = cart.find(
       (item) => item.id === selectedCartIds[0]
     );
 
     // Jika item sudah dipilih, unselect
-    if (selectedCartIds.includes(productId)) {
-      const newSelected = selectedCartIds.filter((id) => id !== productId);
+    if (selectedCartIds.includes(cartId)) {
+      const newSelected = selectedCartIds.filter((id) => id !== cartId);
       // Jika tidak ada yang tersisa, pilih item pertama dari cart
       setSelectedCartIds(newSelected.length > 0 ? newSelected : [cart[0].id]);
       return;
     }
 
-    // Jika shopName berbeda, ganti semua selection dengan item yang baru diklik
-    if (clickedProduct.shopName !== firstSelectedProduct.shopName) {
-      setSelectedCartIds([productId]);
+    // Jika shopId berbeda, ganti semua selection dengan item yang baru diklik
+    if (clickedItem.shopId !== firstSelectedItem.shopId) {
+      setSelectedCartIds([cartId]);
       return;
     }
 
-    // Jika shopName sama, tambahkan ke selection
-    setSelectedCartIds([...selectedCartIds, productId]);
+    // Jika shopId sama, tambahkan ke selection
+    setSelectedCartIds([...selectedCartIds, cartId]);
   };
 
   // Dapatkan data items yang terpilih untuk CartDetail
   const selectedCartItems = cart.filter((item) =>
     selectedCartIds.includes(item.id)
   );
-  
+
   // Hitung total harga dari semua item yang dipilih
   const selectedItemsPrice = selectedCartItems.reduce(
-    (total, item) => total + item.price * item.quantity * 15000,
+    (total, item) => total + item.price * item.quantity,
     0
   );
 
@@ -89,13 +91,13 @@ export default function CartList() {
           <div className="flex flex-col xl:flex-row gap-6">
             <main className="w-full xl:w-1/2">
               <ul className="mt-4 space-y-4">
-                {cart.map((product) => (
-                  <li key={product.id}>
+                {cart.map((cartItem) => (
+                  <li key={cartItem.id}>
                     <CartCard
-                      product={product}
-                      isSelected={selectedCartIds.includes(product.id)}
+                      cartItem={cartItem}
+                      isSelected={selectedCartIds.includes(cartItem.id)}
                       onSelect={handleSelectCart}
-                      addToCart={addToCart}
+                      increaseQuantity={increaseQuantity}
                       decreaseQuantity={decreaseQuantity}
                       removeFromCart={removeFromCart}
                     />

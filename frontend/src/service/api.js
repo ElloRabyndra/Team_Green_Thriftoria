@@ -81,7 +81,7 @@ export const getDetailProduct = async (productId) => {
   return response.data;
 };
 
-export const createProduct = async (productData) => {
+export const addProduct = async (productData) => {
   const response = await api.post('/products', productData);
   return response.data;
 };
