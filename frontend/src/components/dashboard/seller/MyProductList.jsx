@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext } from "react-router";
 import ProductCard from "@/components/product/ProductCard";
 import RenderProduct from "@/components/product/RenderProduct";
 import Empty from "@/components/ui/Empty";
+import { Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const MyProductList = () => {
@@ -16,7 +17,7 @@ const MyProductList = () => {
 
   // Redirect jika bukan buyer atau seller
   useEffect(() => {
-    if (!isLoading && user && (user.role !== "buyer" && user.role !== "seller")) {
+    if (!isLoading && user && user.role !== "buyer" && user.role !== "seller") {
       navigate(-1); // kembali ke halaman sebelumnya
       // atau navigate("/") untuk ke homepage
     }
@@ -33,6 +34,14 @@ const MyProductList = () => {
         <Empty>No products found</Empty>
       ) : (
         <section className="p-4 py-0">
+          <aside className="fixed bottom-0 right-0 p-8 z-50">
+            <button
+              onClick={() => navigate("/dashboard/add-product")}
+              className="cursor-pointer py-3 px-3 text-2xl bg-primary text-white rounded-full  transition"
+            >
+              <Plus />
+            </button>
+          </aside>
           <div className="mb-6">
             <h1 className="text-lg md:text-2xl font-semibold mb-2">
               My Product

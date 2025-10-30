@@ -12,6 +12,7 @@ import ProductList from "@/components/product/ProductList";
 import ProductDetail from "@/components/product/ProductDetail";
 import CartList from "@/components/cart/CartList";
 import "@/style/Style.css";
+import AddProduct from "@/components/product/AddProduct";
 import EditProduct from "@/components/product/EditProduct";
 import Dashboard from "@/components/dashboard/Dashboard";
 import RegisterShop from "@/components/dashboard/buyer/RegisterShop";
@@ -92,6 +93,22 @@ const Routing = () => {
               element={
                 <ProtectedRoute>
                   <MyShop />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="add-product"
+              element={
+                <ProtectedRoute>
+                  <AddProduct />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="edit-product/:id"
+              element={
+                <ProtectedRoute>
+                  <EditProduct />
                 </ProtectedRoute>
               }
             />
@@ -181,14 +198,6 @@ const Routing = () => {
             element={
               <ProtectedRoute>
                 <ProductDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/edit-product/:id"
-            element={
-              <ProtectedRoute>
-                <EditProduct />
               </ProtectedRoute>
             }
           />

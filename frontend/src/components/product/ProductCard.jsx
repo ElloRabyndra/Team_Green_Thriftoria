@@ -31,7 +31,7 @@ export default function ProductCard({
       <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
         {role === "seller" ? (
           <Link
-            to={`/edit-product/${product.id}`}
+            to={`/dashboard/edit-product/${product.id}`}
             className="relative overflow-hidden group block"
           >
             <img
