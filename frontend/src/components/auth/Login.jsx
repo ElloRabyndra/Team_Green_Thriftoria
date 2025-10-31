@@ -21,7 +21,7 @@ import EyeButton from "../ui/eyeButton";
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isEmailRegistered, validatePassword } = useAuth();
+  const { login } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -38,36 +38,27 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
 
     try {
-      //Lakukan login
-      const result = login(data);
+      const result = await login(data);
 
       if (result.success) {
-        // Reset form
         reset();
-
-        // Notif sukses
         toast.success(result.message);
-
-        // Redirect ke halaman yang dituju sebelumnya atau ke home
         navigate(from, { replace: true });
       } else {
-        // Set error berdasarkan kondisi
-        if (!isEmailRegistered(data.email)) {
+        if (result.message.includes("Email or Password not valid")) {
           setError("email", {
             type: "manual",
-            message: "Email not registered",
+            message: "Invalid email or password",
           });
-        } else if (!validatePassword(data.email, data.password)) {
           setError("password", {
             type: "manual",
-            message: "Incorrect password",
+            message: "Invalid email or password",
           });
         } else {
-          console.error("Login error:", result.message);
           toast.error(result.message);
         }
       }

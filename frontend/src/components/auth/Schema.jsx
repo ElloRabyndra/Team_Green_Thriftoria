@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-// Schema untuk registrasi 
-export const registerSchema = z.object({
+// Schema untuk registrasi
+export const registerSchema = z
+  .object({
     email: z
       .string()
       .min(1, "Email is required")
@@ -23,46 +24,52 @@ export const registerSchema = z.object({
     passwordConfirmation: z
       .string()
       .min(1, "Password confirmation is required")
-      .min(5, "Password confirmation must be at least 5 characters")
+      .min(5, "Password confirmation must be at least 5 characters"),
   })
-  .refine(data => data.password === data.passwordConfirmation, {
+  .refine((data) => data.password === data.passwordConfirmation, {
     message: "Passwords do not match",
-    path: ["passwordConfirmation"]
+    path: ["passwordConfirmation"],
   });
 
-// Schema untuk login 
+// Schema untuk login
 export const loginSchema = z.object({
-    email: z
-      .string()
-      .min(1, "Email is required")
-      .min(5, "Email must be at least 5 characters")
-      .email("Email must be a valid email address")
-      .regex(/^[^\s@]+@gmail\.com$/, "Email must be a valid Gmail address")
-      .transform((email) => email.toLowerCase()),
-    password: z
-      .string()
-      .min(1, "Password is required")
-      .min(5, "Password must be at least 5 characters")
-  });
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .min(5, "Email must be at least 5 characters")
+    .email("Email must be a valid email address")
+    .regex(/^[^\s@]+@gmail\.com$/, "Email must be a valid Gmail address")
+    .transform((email) => email.toLowerCase()),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(5, "Password must be at least 5 characters"),
+});
 
 // Schema untuk Edit Profile
-export const profileSchema = z.object({
-  profilePicture: z
-    .any()
-    .optional()
-    .refine(
-      (file) => !file || file instanceof File,
-      { message: "Invalid file" }
-    )
-    .refine(
-      (file) => !file || file.size <= 5 * 1024 * 1024,
-      { message: "File size must not exceed 5MB" }
-    )
-    .refine(
-      (file) =>
-        !file || ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(file.type),
-      { message: "Only JPG and PNG formats are allowed" }
-    ),
+export const profileSchema = z
+  .object({
+    profile_picture: z
+      .any()
+      .optional() // Tetap optional, mengizinkan undefined saat tidak ada update file
+      .refine((file) => !file || file instanceof File, {
+        message: "Invalid file type",
+      })
+      .refine((file) => !file || file.size <= 5 * 1024 * 1024, {
+        message: "File size must not exceed 5MB",
+      })
+      .refine(
+        (
+          file // Perbaiki pesan error agar sesuai dengan yang diizinkan (termasuk WEBP)
+        ) =>
+          !file ||
+          ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(
+            file.type
+          ),
+        { message: "Only JPG, PNG, JPEG, WEBP formats are allowed" }
+      ),
+
+    // Email dan Username tetap required (karena harus selalu ada di profile)
     email: z
       .string()
       .min(1, "Email is required")
@@ -73,26 +80,40 @@ export const profileSchema = z.object({
         "Email must be a valid Gmail address"
       )
       .transform((email) => email.toLowerCase()),
+
     username: z
       .string()
       .min(1, "Username is required")
       .min(4, "Username must be at least 4 characters"),
+
+    // KRUSIAL: telephone HARUS DIUBAH agar menerima string kosong ("") yang mungkin
+    // menjadi nilai default saat pertama load dari database.
     telephone: z
       .string()
-      .min(1, "Phone number is required")
-      .regex(/^[0-9]+$/, "Phone number must contain only digits")
-      .min(10, "Phone number must be at least 10 digits"),
+      .optional()
+      .or(z.literal(""))
+      .refine((val) => {
+        if (val === undefined || val === "") return true; // Lulus jika kosong
+        return /^[0-9]+$/.test(val) && val.length >= 10;
+      }, "Phone number must be at least 10 digits and contain only digits"),
+
+    // KRUSIAL: address HARUS DIUBAH agar menerima string kosong ("")
     address: z
       .string()
-      .min(1, "Address is required")
-      .min(5, "Address must be at least 5 characters"),
+      .optional()
+      .or(z.literal(""))
+      .refine((val) => {
+        if (val === undefined || val === "") return true; // Lulus jika kosong
+        return val.length >= 5;
+      }, "Address must be at least 5 characters"),
+
     old_password: z.string().optional().or(z.literal("")),
     new_password: z.string().optional().or(z.literal("")),
     new_password_confirm: z.string().optional().or(z.literal("")),
   })
   .refine(
+    // ... (Logika validasi password tetap sama)
     (data) => {
-      // Kalau salah satu password diisi, semua wajib diisi
       if (data.old_password || data.new_password || data.new_password_confirm) {
         return (
           data.old_password.trim() !== "" &&
