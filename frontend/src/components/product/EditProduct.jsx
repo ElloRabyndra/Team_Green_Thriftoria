@@ -44,7 +44,7 @@ export default function ProductDetail() {
   useEffect(() => {
     if (!isLoading && user && user.role !== "seller") {
       navigate(-1); // kembali ke halaman sebelumnya
-      // atau navigate("/") untuk ke homepage
+      // atau navigate("/products") untuk ke homepage
     }
   }, [isLoading, user, navigate]);
 
@@ -173,7 +173,7 @@ export default function ProductDetail() {
         <div className="mb-2">
           <Button
             variant="ghost"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/products")}
             className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -191,7 +191,7 @@ export default function ProductDetail() {
       <div className="mb-4">
         <Button
           variant="ghost"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/products")}
           className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
         >
           <ArrowLeft className="h-4 w-4" />
