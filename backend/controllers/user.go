@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GetProfile(c *fiber.Ctx) error {
@@ -49,6 +50,7 @@ func UpdateProfile(c *fiber.Ctx) error {
 	email := c.FormValue("email")
 	address := c.FormValue("address")
 	telephone := c.FormValue("telephone")
+	password := c.FormValue("password") 
 
 	if username != "" {
 		user.Username = username
@@ -61,6 +63,17 @@ func UpdateProfile(c *fiber.Ctx) error {
 	}
 	if telephone != "" {
 		user.Telephone = telephone
+	}
+	if password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status":  "error",
+				"message": "Failed to hash password",
+				"error":   err.Error(),
+			})
+		}
+		user.Password = string(hashedPassword)
 	}
 
 	file, err := c.FormFile("profile_picture")
