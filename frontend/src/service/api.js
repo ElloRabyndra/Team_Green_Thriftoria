@@ -1,68 +1,69 @@
-import axios from 'axios';
+import axios from "axios";
 
-// API Configuration
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
+const API_URL = "http://localhost:3000/api/v1";
 
 // Axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
-// Request interceptor untuk menambahkan token ke setiap request
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+    "Content-Type": "application/json",
   },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+  withCredentials: true,
+});
 
 // Response interceptor untuk handle error
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired atau invalid, redirect ke login
-      localStorage.removeItem('token');
-      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
 // ==================== AUTH ENDPOINTS ====================
-export const register = async (email, username, password) => {
-  const response = await api.post('/auth/register', { email, username, password });
-  return response.data;
-};
 
-export const login = async (email, password) => {
-  const response = await api.post('/auth/login', { email, password });
-  return response.data;
-};
+// Fungsi API untuk Register
+export const registerApi = (data) => api.post("/register", data);
+
+// Fungsi API untuk Login
+export const loginApi = (data) => api.post("/login", data);
+
+// Fungsi API untuk Logout
+export const logoutApi = () => api.post("/logout");
 
 // ==================== USER PROFILE ENDPOINTS ====================
-export const getDetailUser = async (userId) => {
-  const response = await api.get(`/user/${userId}`);
-  return response.data;
-};
 
-export const editProfile = async (userId, profileData) => {
-  const response = await api.put(`/user/${userId}`, profileData);
-  return response.data;
+// Fungsi API untuk mendapatkan Profile
+export const getProfileApi = () => api.get("/user/profile");
+
+// Fungsi API untuk update Profile
+export const updateProfileApi = (data) => {
+  const formData = new FormData(); // ... (field text lainnya tetap)
+
+  formData.append("username", data.username || "");
+  formData.append("email", data.email || "");
+  formData.append("address", data.address || "");
+  formData.append("telephone", data.telephone || "");
+  formData.append("old_password", data.old_password || "");
+  formData.append("new_password", data.new_password || "");
+
+  const profilePic = data.profile_picture; 
+
+  if (profilePic && profilePic instanceof File) {
+    formData.append("profile_picture", profilePic, profilePic.name);
+  }
+
+  return api.patch("/user/profile", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 // ==================== PRODUCT ENDPOINTS ====================
 export const getAllProduct = async () => {
-  const response = await api.get('/products');
+  const response = await api.get("/products");
   return response.data;
 };
 
@@ -72,7 +73,7 @@ export const getProductByCategory = async (category) => {
 };
 
 export const searchProduct = async (query) => {
-  const response = await api.get('/products/search', { params: { q: query } });
+  const response = await api.get("/products/search", { params: { q: query } });
   return response.data;
 };
 
@@ -82,7 +83,7 @@ export const getDetailProduct = async (productId) => {
 };
 
 export const addProduct = async (productData) => {
-  const response = await api.post('/products', productData);
+  const response = await api.post("/products", productData);
   return response.data;
 };
 
@@ -98,7 +99,7 @@ export const deleteProduct = async (productId) => {
 
 // ==================== CART ENDPOINTS ====================
 export const addToCart = async (userId, productId) => {
-  const response = await api.post('/cart', { userId, productId });
+  const response = await api.post("/cart", { userId, productId });
   return response.data;
 };
 
@@ -123,7 +124,7 @@ export const deleteCartItem = async (cartId) => {
  * @param {Object} orderData - { userId, shopId, recipient, telephone, address, note, totalPrice, proofPayment, orderItems: [{productId, quantity, price}] }
  */
 export const createOrder = async (orderData) => {
-  const response = await api.post('/orders', orderData);
+  const response = await api.post("/orders", orderData);
   return response.data;
 };
 
@@ -163,7 +164,7 @@ export const acceptCancel = async (orderId) => {
  * @param {Object} shopData - { userId, shopName, shopTelephone, shopAddress, accountNumber, qrisPicture }
  */
 export const createShop = async (shopData) => {
-  const response = await api.post('/shops', shopData);
+  const response = await api.post("/shops", shopData);
   return response.data;
 };
 
@@ -185,7 +186,7 @@ export const getAllSales = async (shopId) => {
 
 /**
  * Accept or reject payment
- * @param {number} orderId 
+ * @param {number} orderId
  * @param {boolean} status - true to accept, false to reject
  */
 export const acceptPayment = async (orderId, status) => {
@@ -195,28 +196,30 @@ export const acceptPayment = async (orderId, status) => {
 
 /**
  * Change order shipping status
- * @param {number} orderId 
+ * @param {number} orderId
  * @param {string} statusShipping - awaitingPayment, prepared, shipped, delivered, cancelPending, cancelled
  */
 export const changeStatusShipping = async (orderId, statusShipping) => {
-  const response = await api.put(`/sales/${orderId}/status`, { statusShipping });
+  const response = await api.put(`/sales/${orderId}/status`, {
+    statusShipping,
+  });
   return response.data;
 };
 
 // ==================== ADMIN ENDPOINTS ====================
 export const getAllShop = async () => {
-  const response = await api.get('/admin/shops');
+  const response = await api.get("/admin/shops");
   return response.data;
 };
 
 export const getRequestShop = async () => {
-  const response = await api.get('/admin/shops/requests');
+  const response = await api.get("/admin/shops/requests");
   return response.data;
 };
 
 /**
  * Accept or reject shop registration
- * @param {number} shopId 
+ * @param {number} shopId
  * @param {boolean} status - true to accept, false to reject
  */
 export const acceptRequestShop = async (shopId, status) => {
@@ -225,7 +228,7 @@ export const acceptRequestShop = async (shopId, status) => {
 };
 
 export const getAllUser = async () => {
-  const response = await api.get('/admin/users');
+  const response = await api.get("/admin/users");
   return response.data;
 };
 
@@ -236,11 +239,11 @@ export const getAllUser = async () => {
  */
 export const setAuthToken = (token) => {
   if (token) {
-    localStorage.setItem('token', token);
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    localStorage.setItem("token", token);
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
-    localStorage.removeItem('token');
-    delete api.defaults.headers.common['Authorization'];
+    localStorage.removeItem("token");
+    delete api.defaults.headers.common["Authorization"];
   }
 };
 
@@ -248,9 +251,9 @@ export const setAuthToken = (token) => {
  * Remove token and logout
  */
 export const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  delete api.defaults.headers.common['Authorization'];
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  delete api.defaults.headers.common["Authorization"];
 };
 
 // Export axios instance untuk custom requests

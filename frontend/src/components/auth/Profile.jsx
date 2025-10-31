@@ -35,25 +35,26 @@ export default function Profile() {
     resolver: zodResolver(profileSchema),
   });
 
-  const profilePictureValue = watch("profilePicture");
+  const profilePictureValue = watch("profile_picture");
   // Watch email dan username untuk preview real-time
   const emailValue = watch("email");
   const usernameValue = watch("username");
 
-  // Redirect ke login jika tidak ada user setelah loading selesai
+  // Ganti useEffect lama (untuk set default value) dengan logika reset yang benar
   useEffect(() => {
-    if (!isLoading && !user) logout();
-  }, [isLoading, user]);
-
-  // Set default value
-  useEffect(() => {
-    if (user) {
-      if (user.email) setValue("email", user.email);
-      if (user.username) setValue("username", user.username);
-      if (user.telephone) setValue("telephone", user.telephone);
-      if (user.address) setValue("address", user.address);
+    // KRUSIAL: Reset form HANYA jika user sudah dimuat DAN nilai form belum diisi
+    if (user && !isLoading) {
+      reset({
+        email: user.email || "",
+        username: user.username || "",
+        telephone: user.telephone || "",
+        address: user.address || "",
+        old_password: "",
+        new_password: "",
+        new_password_confirm: "",
+      });
     }
-  }, [user, setValue]);
+  }, [user, isLoading, reset]);
 
   // Handle file input change
   const handleFileChange = (event) => {
@@ -61,7 +62,7 @@ export default function Profile() {
     if (file) {
       // Validate file type
       if (!file.type.startsWith("image/")) {
-        setError("profilePicture", {
+        setError("profile_picture", {
           type: "manual",
           message: "Please select a valid image file",
         });
@@ -70,10 +71,10 @@ export default function Profile() {
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError("profilePicture", {
+        setError("profile_picture", {
           type: "manual",
           message: "File size must be less than 5MB",
-        })
+        });
         return;
       }
 
@@ -82,7 +83,7 @@ export default function Profile() {
       setPreviewImage(previewUrl);
 
       // Set form value
-      setValue("profilePicture", file);
+      setValue("profile_picture", file);
     }
   };
 
@@ -94,20 +95,19 @@ export default function Profile() {
   // Get current profile image source
   const getProfileImageSrc = () => {
     if (previewImage) return previewImage;
-    if (user?.profilePicture) return user.profilePicture;
+    if (user?.profile_picture !== "https://i.pravatar.cc/150")
+      return user.profile_picture;
     return "https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg";
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
-    console.log(data);
+    const { new_password_confirm, ...dataToSend } = data;
 
     try {
-      // Lakukan update profile
-      const result = updateProfile(data);
+      const result = await updateProfile(dataToSend);
 
       if (result.success) {
-        // Reset form dengan nilai yang baru diupdate
         reset({
           email: data.email,
           username: data.username,
@@ -116,28 +116,22 @@ export default function Profile() {
           old_password: "",
           new_password: "",
           new_password_confirm: "",
-          profilePicture: data.profilePicture,
         });
 
-        // Clear preview image
         setPreviewImage(null);
-
-        // Notif sukses
         toast.success(result.message);
       } else {
-        // Set error berdasarkan kondisi
-        if (result.message === "Incorrect old password!") {
+        if (result.message.includes("Incorrect old password")) {
           setError("old_password", {
             type: "manual",
             message: "Incorrect old password",
           });
-        } else if (result.message === "Email already in use!") {
+        } else if (result.message.includes("Email already in use")) {
           setError("email", {
             type: "manual",
             message: "Email already in use",
           });
         } else {
-          console.error("Profile update error:", result.message);
           toast.error(result.message);
         }
       }
@@ -159,7 +153,7 @@ export default function Profile() {
   }, [previewImage]);
 
   // Loading state
-  if (isLoading) {
+  if (isLoading || !user) {
     return (
       <section className="space-y-6 md:ml-4">
         <div className="flex justify-center items-center min-h-[200px]">
@@ -167,10 +161,6 @@ export default function Profile() {
         </div>
       </section>
     );
-  }
-
-  if (!user) {
-    return null;
   }
 
   return (
@@ -209,7 +199,7 @@ export default function Profile() {
 
                   {/* Hidden File Input */}
                   <input
-                    {...register("profilePicture")}
+                    {...register("profile_picture")}
                     ref={fileInputRef}
                     type="file"
                     accept="image/*"
@@ -225,9 +215,9 @@ export default function Profile() {
                     {emailValue || user.email}
                   </p>
                   {/* Error Message for Profile Picture */}
-                  {errors.profilePicture && (
+                  {errors.profile_picture && (
                     <ErrorMessage
-                      ErrorMessage={errors.profilePicture.message}
+                      ErrorMessage={errors.profile_picture.message}
                     />
                   )}
                 </div>

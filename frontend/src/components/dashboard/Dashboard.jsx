@@ -109,12 +109,15 @@ const Dashboard = () => {
         }
       >
         <Avatar className="w-14 h-14 rounded-full overflow-hidden">
-          <AvatarImage src="https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg"></AvatarImage>
+          <AvatarImage
+            src={`${
+              user?.profile_picture ||
+              "https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg"
+            }`}
+          ></AvatarImage>
         </Avatar>
         <CardContent className="px-4">
-          <h1 className="text-md font-semibold">
-            {user.username}
-          </h1>
+          <h1 className="text-md font-semibold">{user.username}</h1>
           <p className="text-sm font-medium text-gray-500">{user?.email}</p>
         </CardContent>
       </Card>
