@@ -17,6 +17,6 @@ func Protected() fiber.Handler {
 
 func jwtError(c *fiber.Ctx, err error) error {
 	return c.Status(401).JSON(fiber.Map{
-		"error": "Unauthorized",
+		"error": "Unauthorized: Need to be logged in to access this resource",
 	})
 }
