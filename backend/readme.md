@@ -26,7 +26,7 @@ Register
           "email": "steven@gmail.com",
           "address": "",
           "telephone": "",
-          "role": "pembeli",
+          "role": "buyer",
           "profile_picture": "https://i.pravatar.cc/150",
           "shop": null
         }
@@ -47,7 +47,7 @@ Login
           "id": 1,
           "username": "steven",
           "email": "steven@gmail.com",
-          "role": "pembeli",
+          "role": "buyer",
           "profile_picture": "https://i.pravatar.cc/150",
           "shop": null
         }

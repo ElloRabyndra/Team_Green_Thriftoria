@@ -44,7 +44,7 @@ func SignUp(c *fiber.Ctx) error {
 		Username:       input.Username,
 		Email:          input.Email,
 		Password:       string(hashedPassword),
-		Role:           "pembeli",
+		Role:           "buyer",
 		ProfilePicture: "https://i.pravatar.cc/150",
 		Address: "",
 		Telephone: "",
