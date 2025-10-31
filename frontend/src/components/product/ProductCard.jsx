@@ -1,13 +1,11 @@
 import { ShoppingCart, Eye, Edit3, X } from "lucide-react";
 import { Card } from "../ui/card";
 import { Link } from "react-router";
+import { toast } from "react-toastify";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 // ProductCard Component
-export default function ProductCard({
-  product,
-  onAddToCart,
-  role = "buyer", // Default role adalah buyer
-}) {
+export default function ProductCard({ product, onAddToCart, role = "buyer" }) {
   // Fungsi untuk format harga
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
@@ -15,18 +13,34 @@ export default function ProductCard({
       currency: "IDR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(price * 15000);
+    }).format(price);
   };
+
+  const handleAddToCart = async () => {
+    const success = await onAddToCart(product);
+    if (success) {
+      toast.success("Product added to cart!");
+    } else {
+      toast.error("Failed to add product to cart");
+    }
+  };
+
   return (
     <div className="relative group">
       {/* Delete/Cancel Button - positioned outside card, only visible on hover */}
       {role === "seller" && (
-        <button
-          className="absolute -top-1 -right-2 z-10 bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-400 p-1.5 rounded-full shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100"
-          title="Cancel Order"
+        <ConfirmDialog
+          onConfirm={() => {
+            toast.success("Order cancelled!");
+          }}
         >
-          <X className="h-4 w-4" />
-        </button>
+          <button
+            className="absolute -top-1 -right-2 z-10 bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-400 p-1.5 rounded-full shadow-lg transition-all duration-200 hover:scale-110 active:scale-95 opacity-0 group-hover:opacity-100"
+            title="Cancel Order"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </ConfirmDialog>
       )}
       <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
         {role === "seller" ? (
@@ -35,12 +49,11 @@ export default function ProductCard({
             className="relative overflow-hidden group block"
           >
             <img
-              src={product.thumbnail}
-              alt={product.title}
-              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+              src={product.image}
+              alt={product.name}
+              className="w-full h-48 object-cover transition-transform duration-300"
               onError={(e) => {
-                e.target.src =
-                  "https://via.placeholder.com/300x200?text=No+Image";
+                e.target.src = "https://i.sstatic.net/y9DpT.jpg";
               }}
             />
 
@@ -60,12 +73,11 @@ export default function ProductCard({
             className="relative overflow-hidden group block"
           >
             <img
-              src={product.thumbnail}
-              alt={product.title}
-              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+              src={product.image}
+              alt={product.name}
+              className="w-full h-48 object-cover transition-transform duration-300"
               onError={(e) => {
-                e.target.src =
-                  "https://via.placeholder.com/300x200?text=No+Image";
+                e.target.src = "https://i.sstatic.net/y9DpT.jpg";
               }}
             />
           </Link>
@@ -74,10 +86,10 @@ export default function ProductCard({
         <div className="p-4">
           <div className="mb-2">
             <span className="text-xs text-gray-500 uppercase font-medium">
-              {product.category.replace("-", " ")}
+              {product.label}
             </span>
             <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
-              {product.title}
+              {product.name}
             </h3>
           </div>
 
@@ -99,7 +111,7 @@ export default function ProductCard({
           {role === "buyer" ? (
             <button
               className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 px-4 rounded-lg transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              onClick={() => onAddToCart(product)}
+              onClick={() => handleAddToCart()}
             >
               <ShoppingCart className="h-4 w-4" />
               <span className="text-sm font-medium">Add to Cart</span>

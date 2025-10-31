@@ -27,9 +27,9 @@ func GetProducts(c *fiber.Ctx) error {
 func CreateProduct(c *fiber.Ctx) error {
 	// userRole := c.Locals("role")
 
-	// if userRole != "penjual" {
+	// if userRole != "seller" {
 	// 	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-	// 		"error": "Hanya penjual yang bisa menambahkan produk",
+	// 		"error": "Hanya seller yang bisa menambahkan produk",
 	// 	})
 	// }
 

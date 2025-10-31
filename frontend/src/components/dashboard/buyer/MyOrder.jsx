@@ -2,35 +2,17 @@ import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import Empty from "@/components/ui/Empty";
 import OrderCard from "./OrderCard";
-import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { sampleOrders } from "@/database/dummy";
+import { useOrders } from "@/hooks/useOrders";
+import Loading from "@/components/ui/loading";
 
 const MyOrder = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch orders (sementara pakai dummy)
-  const fetchOrders = async () => {
-    try {
-      // TODO: Ganti bagian ini nanti dengan request ke endpoint getAllOrder
-      // Contoh nanti:
-      // const response = await fetch("/api/orders");
-      // const data = await response.json();
-      // setOrders(data);
-
-      // Sekarang masih dummy:
-      setOrders(sampleOrders);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load orders");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Ambil semua fungsi & state dari useOrders
+  const { orders, loading, fetchOrders } = useOrders();
 
   // Panggil fetchOrders setelah user terautentikasi
   useEffect(() => {
@@ -39,13 +21,13 @@ const MyOrder = () => {
         navigate(-1);
         return;
       }
-      fetchOrders();
+      fetchOrders(user.id); // ambil order milik user
     }
   }, [isLoading, user, navigate]);
 
   // Loading state
   if (loading) {
-    return <div className="p-4">Loading...</div>;
+    return <Loading />;
   }
 
   return (

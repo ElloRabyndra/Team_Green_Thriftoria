@@ -7,7 +7,7 @@ type User struct {
 	Password   		string    	`json:"-" gorm:"type:varchar(100)"`
 	Address   		string    	`json:"address" gorm:"type:varchar(200)"`
 	Telephone   	string    	`json:"telephone" gorm:"type:varchar(15)"`
-	Role			string		`json:"role" gorm:"type:enum('admin','penjual','pembeli');default('pembeli')"`
+	Role			string		`json:"role" gorm:"type:enum('admin','seller','buyer');default('buyer')"`
 	ProfilePicture	string		`json:"profile_picture" gorm:"type:varchar(100);default('https://i.pravatar.cc/150')"`
 	Shop      		*Shop      	`gorm:"foreignKey:UserID"`
 }

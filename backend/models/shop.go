@@ -11,6 +11,6 @@ type Shop struct {
 	AccountNumber 	string    	`json:"account_number"`
 	QrisPicture		string		`json:"qris_picture" gorm:"type:varchar(100)"`
 	Products    	[]Product 	`gorm:"foreignKey:ShopID"`
-	StatusAdmin		string		`json:"status_admin" gorm:"type:enum('approve','pending');default('pembeli')"`
+	StatusAdmin		string		`json:"status_admin" gorm:"type:enum('approve','pending');default('buyer')"`
 	CreatedAt   	time.Time	`json:"created_at" gorm:"autoCreateTime"`
 }

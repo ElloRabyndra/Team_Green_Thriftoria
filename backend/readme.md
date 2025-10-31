@@ -29,7 +29,7 @@ go run main.go
           "email": "steven@gmail.com",
           "address": "",
           "telephone": "",
-          "role": "pembeli",
+          "role": "buyer",
           "profile_picture": "https://i.pravatar.cc/150",
           "shop": null
         }
@@ -54,7 +54,7 @@ go run main.go
           "id": 1,
           "username": "steven",
           "email": "steven@gmail.com",
-          "role": "pembeli",
+          "role": "buyer",
           "profile_picture": "https://i.pravatar.cc/150",
           "shop": null
         }

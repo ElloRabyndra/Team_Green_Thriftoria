@@ -9,6 +9,7 @@ import Loading from "../ui/loading";
 import Empty from "../ui/Empty";
 import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -58,7 +59,7 @@ export default function ProductDetail() {
 
         // Set form values setelah product ditemukan
         setValue("label", foundProduct.category.replace("-", " "));
-        setValue("title", foundProduct.title);
+        setValue("name", foundProduct.name);
 
         // Set nilai asli untuk form (tanpa format)
         const originalPrice = (foundProduct.price * 15000).toString();
@@ -74,8 +75,8 @@ export default function ProductDetail() {
         setFormattedStock(formatPrice(originalStock));
 
         setTimeout(() => {
-          // set defaut value title
-          nameInputRef.current.value = foundProduct.title;
+          // set defaut value name
+          nameInputRef.current.value = foundProduct.name;
           nameInputRef.current?.focus();
         }, 100);
       }
@@ -128,9 +129,9 @@ export default function ProductDetail() {
 
     if (file) {
       // Validasi file type
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
-        toast.error("Please select a valid image file (JPEG, JPG, PNG)");
+        toast.error("Please select a valid image file (JPEG, JPG, PNG, WEBP)");
         // Reset input file
         e.target.value = "";
         return;
@@ -209,9 +210,9 @@ export default function ProductDetail() {
           <div className="overflow-hidden w-full max-w-sm max-h-96 sm:w-80 lg:w-96 rounded-2xl">
             <img
               src={
-                product.previewImage || product.thumbnail // jika ada preview baru, pakai itu
+                product.previewImage || product.image // jika ada preview baru, pakai itu
               }
-              alt={product.title}
+              alt={product.name}
               className="w-full h-full object-cover rounded-lg"
               onError={(e) => {
                 e.target.src =
@@ -223,15 +224,15 @@ export default function ProductDetail() {
           {/* Overlay untuk role penjual dengan tombol edit (input file) */}
           <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-2xl">
             <label
-              htmlFor="thumbnail"
+              htmlFor="image"
               className="bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-200 hover:shadow-xl cursor-pointer"
               title="Edit Product Image"
             >
               <Edit3 className="h-5 w-5" />
             </label>
             <input
-              {...register("thumbnail")}
-              id="thumbnail"
+              {...register("image")}
+              id="image"
               type="file"
               accept="image/*"
               className="hidden"
@@ -253,9 +254,9 @@ export default function ProductDetail() {
               className="text-sm text-gray-500 uppercase font-medium border-none outline-none w-full bg-transparent"
             />
             <input
-              {...register("title")}
+              {...register("name")}
               ref={nameInputRef}
-              id="title"
+              id="name"
               type="text"
               placeholder="Insert Title..."
               autoComplete="off"

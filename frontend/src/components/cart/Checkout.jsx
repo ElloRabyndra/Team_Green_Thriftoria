@@ -5,15 +5,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutSchema } from "./Schema";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { ArrowLeft, Store, Package, X, Upload } from "lucide-react";
+import { ArrowLeft, X, Upload } from "lucide-react";
 import { Button } from "../ui/button";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import ErrorMessage from "../ErrorMessage";
-import EyeButton from "../ui/eyeButton";
 import CheckoutDetail from "./CheckoutDetail";
 import { Textarea } from "../ui/textarea";
 import { toast } from "react-toastify";
+import { useOrders } from "@/hooks/useOrders";
 
 export default function Checkout() {
   const location = useLocation();
@@ -28,6 +28,7 @@ export default function Checkout() {
   const [showProofPaymentPreview, setShowProofPaymentPreview] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
+  const { makeOrder } = useOrders();
 
   // Redirect jika tidak ada data
   useEffect(() => {
@@ -45,8 +46,8 @@ export default function Checkout() {
   }
 
   const {
-    userID,
-    shopID,
+    userId,
+    shopId,
     selectedItems,
     subtotal,
     deliveryFee,
@@ -69,12 +70,12 @@ export default function Checkout() {
     const file = event.target.files[0];
     if (file) {
       // Validasi file type
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
         setError("proofPayment", {
           type: "manual",
           message: "Please select a valid image file (JPEG, PNG)",
-        })
+        });
         return;
       }
 
@@ -83,7 +84,7 @@ export default function Checkout() {
         setError("proofPayment", {
           type: "manual",
           message: "File size must be less than 5MB",
-        })
+        });
         return;
       }
 
@@ -115,8 +116,24 @@ export default function Checkout() {
 
   const onSubmit = (data) => {
     setIsSubmitting(true);
-    console.log(data);
     try {
+      const orderData = {
+        userId: userId,
+        shopId: shopId,
+        recipient: data.recipient,
+        telephone: data.telephone,
+        address: data.address,
+        note: data.note,
+        totalPrice: total,
+        proofPayment: proofPaymentFile,
+        orderItems: selectedItems.map((item) => ({
+          id: item.id,
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+      };
+      makeOrder(orderData);
     } catch (error) {
       console.error("Checkout error:", error);
     } finally {
@@ -125,7 +142,6 @@ export default function Checkout() {
       navigate("/dashboard/orders");
     }
   };
-
 
   return (
     <section className="space-y-4 md:ml-4">
