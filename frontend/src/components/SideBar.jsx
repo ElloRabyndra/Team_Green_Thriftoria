@@ -89,7 +89,7 @@ export default function SideBar({
           </h3>
           <div className="space-y-2">
             <Link
-              to="/"
+              to="/products"
               onClick={() => changeCategory("All")}
               className={`${
                 !isSpecialPage && selectedCategory === "All"
@@ -101,7 +101,7 @@ export default function SideBar({
               <span>All</span>
             </Link>
             <Link
-              to="/"
+              to="/products"
               onClick={() => changeCategory("Fashion")}
               className={`${
                 !isSpecialPage && selectedCategory === "Fashion"
@@ -113,7 +113,7 @@ export default function SideBar({
               <span>Fashion</span>
             </Link>
             <Link
-              to="/"
+              to="/products"
               onClick={() => changeCategory("Others")}
               className={`${
                 !isSpecialPage && selectedCategory === "Others"

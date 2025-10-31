@@ -28,6 +28,7 @@ import MyShop from "@/components/dashboard/seller/MyShop";
 import BuyerList from "@/components/dashboard/admin/BuyerList";
 import ShopsList from "@/components/dashboard/admin/ShopsList";
 import PendingList from "@/components/dashboard/admin/PendingList";
+import LandingPage from "@/pages/LandingPage";
 
 const Routing = () => {
   const { theme } = useContext(ThemeContext);
@@ -36,6 +37,7 @@ const Routing = () => {
       className={`${theme} bg-background text-foreground font-[Poppins] min-h-screen`}
     >
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route element={<AuthPage />}>
           <Route
             path="/register"
@@ -54,7 +56,7 @@ const Routing = () => {
             }
           />
         </Route>
-        <Route path="/" element={<MainPage />}>
+        <Route element={<MainPage />}>
           <Route
             path="/profile"
             element={
@@ -186,7 +188,7 @@ const Routing = () => {
             />
           </Route>
           <Route
-            index
+            path="/products"
             element={
               <ProtectedRoute>
                 <ProductList />

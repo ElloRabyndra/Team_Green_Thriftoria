@@ -47,7 +47,7 @@ const RegisterShop = () => {
   useEffect(() => {
     if (!isLoading && user && user.role !== "buyer") {
       navigate(-1); // kembali ke halaman sebelumnya
-      // atau navigate("/") untuk ke homepage
+      // atau navigate("/products") untuk ke homepage
     }
   }, [isLoading, user, navigate]);
 
