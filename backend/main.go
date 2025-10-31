@@ -15,10 +15,12 @@ func main() {
 	database.Migrate()
 	app := fiber.New()
 
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:3000, http://localhost:5173",
-		AllowHeaders: "Origin, Content-Type, Accept",
-	}))
+		app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:3000,http://localhost:5173", // Spasi dihilangkan untuk amannya
+		AllowHeaders: "Origin, Content-Type, Accept, Cookie",
+		AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH,OPTIONS",
+		AllowCredentials: true,
+		}))
 
 	app.Static("/assets", "./assets")
 
