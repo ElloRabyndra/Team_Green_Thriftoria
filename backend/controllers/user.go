@@ -46,34 +46,47 @@ func UpdateProfile(c *fiber.Ctx) error {
 		})
 	}
 
-	username := c.FormValue("username")
-	email := c.FormValue("email")
-	address := c.FormValue("address")
-	telephone := c.FormValue("telephone")
-	password := c.FormValue("password") 
+		username := c.FormValue("username")
+		email := c.FormValue("email")
+		address := c.FormValue("address")
+		telephone := c.FormValue("telephone")
+		oldPassword := c.FormValue("old_password")
+		newPassword := c.FormValue("new_password") 
 
-	if username != "" {
-		user.Username = username
-	}
-	if email != "" {
-		user.Email = email
-	}
-	if address != "" {
-		user.Address = address
-	}
-	if telephone != "" {
-		user.Telephone = telephone
-	}
-	if password != "" {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"status":  "error",
-				"message": "Failed to hash password",
-				"error":   err.Error(),
-			})
-		}
-		user.Password = string(hashedPassword)
+    // --- LOGIKA UPDATE DATA NON-PASSWORD ---
+		if username != "" { user.Username = username }
+		if email != "" { user.Email = email }
+		if address != "" { user.Address = address }
+		if telephone != "" { user.Telephone = telephone }
+
+    // --- LOGIKA UPDATE PASSWORD DENGAN VALIDASI ---
+		if newPassword != "" {
+        // 1. Verifikasi oldPassword harus diisi
+        if oldPassword == "" {
+             return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "status": "error",
+                "message": "Old password is required to change password",
+            })
+        }
+        
+        // 2. Verifikasi oldPassword BENAR
+        if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(oldPassword)); err != nil {
+            return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+                "status": "error",
+                "message": "Incorrect old password", // Pesan ini akan ditangkap oleh frontend
+            })
+        }
+        
+        // 3. Hash dan update newPassword
+			hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+				if err != nil {
+						return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+							"status": "error",
+							"message": "Failed to hash password",
+							"error": err.Error(),
+  })
+   }
+   user.Password = string(hashedPassword)  
 	}
 
 	file, err := c.FormFile("profile_picture")
@@ -87,14 +100,17 @@ func UpdateProfile(c *fiber.Ctx) error {
 			".png": true,
 			".jpg": true,
 			".jpeg": true,
+			".webp": true,
 		}
 		if !allowedExt[ext] {
-			return c.Status(400).JSON(fiber.Map{"error": "Foto berformat harus PNG, JPG, atau JPEG"})
+			return c.Status(400).JSON(fiber.Map{"error": "Foto berformat harus PNG, JPG, JPEG atau WEBP"})
 		}
 
 		if user.ProfilePicture != "" && !strings.Contains(user.ProfilePicture, "pravatar.cc") {
 			oldPath := "." + strings.TrimPrefix(user.ProfilePicture, "http://127.0.0.1:3000")
-			_ = os.Remove(oldPath)
+        if _, statErr := os.Stat(oldPath); statErr == nil {
+            _ = os.Remove(oldPath) 
+        }
 		}
 		
 		filename := strconv.FormatInt(time.Now().UnixNano(), 10) + ext
