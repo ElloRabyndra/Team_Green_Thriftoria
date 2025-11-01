@@ -74,7 +74,7 @@ export default function OrderCard({ order }) {
   };
 
   const currentStatus =
-    statusConfig[order.statusShipping] || statusConfig.awaitingPayment;
+    statusConfig[order.status_shipping] || statusConfig.awaitingPayment;
 
   return (
     <Link to={`/dashboard/order/${order.id}`}>
@@ -89,21 +89,21 @@ export default function OrderCard({ order }) {
             >
               <Store className="h-5 w-5 text-primary" />
               <span className="font-bold text-foreground hover:text-primary transition-colors">
-                {order.shopName}
+                {order.shop_name}
               </span>
             </div>
             {/* Telephone */}
             <div className="flex items-center gap-2 ml-1 text-muted-foreground">
               <Phone className="h-3 w-3" />
               <span className="text-xs text-muted-foreground">
-                {order.shopPhone}
+                {order.shop_telephone}
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground shrink-0 mb-1">
             <Clock className="h-4 w-4" />
-            <span>{formatDate(order.createdAt)}</span>
+            <span>{formatDate(order.created_at)}</span>
           </div>
 
           {/* Order Details */}
@@ -116,7 +116,7 @@ export default function OrderCard({ order }) {
                 </span>
               </div>
               <span className="font-semibold text-base sm:text-lg text-primary">
-                {formatPrice(order.totalPrice)}
+                {formatPrice(order.total_price)}
               </span>
             </div>
           </div>

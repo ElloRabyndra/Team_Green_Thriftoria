@@ -37,14 +37,14 @@ export default function ProductList() {
     if (products.length === 0) return;
     // if (user.Shop) {
     setProductList(
-      products.filter((product) => product.shopId !== user.id) // nanti ganti ke shopId
+      products.filter((product) => product.shop_id !== user.id) // nanti ganti ke shop_id
     );
     // } else {
     //   setProductList(products);
     // }
   }, [products]);
 
-  // Wrapper function untuk addToCart dengan userId
+  // Wrapper function untuk addToCart dengan user_id
   const handleAddToCart = async (product) => {
     return await addToCart(user.id, product);
   };
@@ -63,7 +63,7 @@ export default function ProductList() {
             product={product}
             onAddToCart={handleAddToCart}
             role={user.role}
-            shopId={user.id} // nanti ganti ke shopId
+            shop_id={user.id} // nanti ganti ke shop_id
           />
         ))}
       </div>

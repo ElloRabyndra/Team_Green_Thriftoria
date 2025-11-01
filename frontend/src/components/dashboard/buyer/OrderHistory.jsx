@@ -29,6 +29,8 @@ const OrderHistory = () => {
     return <Loading />;
   }
 
+  console.log(orderHistory);
+
   return (
     <section className="p-4 py-0">
       <div className="mb-6">
@@ -42,7 +44,7 @@ const OrderHistory = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
           {orderHistory.map((order) => (
-            <OrderCard key={order.orderId} order={order} />
+            <OrderCard key={order.id} order={order} />
           ))}
         </div>
       )}

@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const { user, logout, isLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const {
     productDetail,
@@ -18,11 +18,6 @@ export default function ProductDetail() {
     loading: productLoading,
     addToCart,
   } = useProducts();
-
-  // Redirect ke login jika tidak ada user setelah loading selesai
-  useEffect(() => {
-    if (!isLoading && !user) logout();
-  }, [isLoading, user]);
 
   // Ambil data produk
   useEffect(() => {

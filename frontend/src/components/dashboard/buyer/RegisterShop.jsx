@@ -66,7 +66,7 @@ const RegisterShop = () => {
       // Validasi file type
       const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
-        setError("qrisPicture", {
+        setError("qris_picture", {
           type: "manual",
           message: "Please select a valid image file (JPEG, PNG)",
         })
@@ -75,7 +75,7 @@ const RegisterShop = () => {
 
       // Validasi file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError("qrisPicture", {
+        setError("qris_picture", {
           type: "manual",
           message: "File size must be less than 5MB",
         })
@@ -86,7 +86,7 @@ const RegisterShop = () => {
 
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
-      setValue("qrisPicture", dataTransfer.files, {
+      setValue("qris_picture", dataTransfer.files, {
         shouldValidate: true,
       });
 
@@ -133,62 +133,62 @@ const RegisterShop = () => {
             <div className="flex flex-col gap-6">
               {/* Shop Name */}
               <div className="grid gap-2">
-                <Label htmlFor="shopName">Shop Name</Label>
+                <Label htmlFor="shop_name">Shop Name</Label>
                 <Input
-                  {...register("shopName")}
-                  id="shopName"
+                  {...register("shop_name")}
+                  id="shop_name"
                   type="text"
                   placeholder="Insert Shop Name..."
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.shopName && (
-                  <ErrorMessage ErrorMessage={errors.shopName.message} />
+                {errors.shop_name && (
+                  <ErrorMessage ErrorMessage={errors.shop_name.message} />
                 )}
               </div>
               {/* Phone */}
               <div className="grid gap-2">
-                <Label htmlFor="shopTelephone">Phone Number</Label>
+                <Label htmlFor="shop_telephone">Phone Number</Label>
                 <Input
-                  {...register("shopTelephone")}
-                  id="shopTelephone"
+                  {...register("shop_telephone")}
+                  id="shop_telephone"
                   type="text"
                   placeholder="Insert Shop Phone..."
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.shopTelephone && (
-                  <ErrorMessage ErrorMessage={errors.shopTelephone.message} />
+                {errors.shop_telephone && (
+                  <ErrorMessage ErrorMessage={errors.shop_telephone.message} />
                 )}
               </div>
               {/* Address */}
               <div className="grid gap-2">
-                <Label htmlFor="shopAddress">Address</Label>
+                <Label htmlFor="shop_address">Address</Label>
                 <Input
-                  {...register("shopAddress")}
-                  id="shopAddress"
+                  {...register("shop_address")}
+                  id="shop_address"
                   type="text"
                   placeholder="Insert Shop Address..."
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.shopAddress && (
-                  <ErrorMessage ErrorMessage={errors.shopAddress.message} />
+                {errors.shop_address && (
+                  <ErrorMessage ErrorMessage={errors.shop_address.message} />
                 )}
               </div>
               {/* Bank */}
               <div className="grid gap-2">
-                <Label htmlFor="accountNumber">Bank Account</Label>
+                <Label htmlFor="account_number">Bank Account</Label>
                 <Input
-                  {...register("accountNumber")}
-                  id="accountNumber"
+                  {...register("account_number")}
+                  id="account_number"
                   type="text"
                   placeholder="e.g. BCA: 1234567890 - Seller"
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.accountNumber && (
-                  <ErrorMessage ErrorMessage={errors.accountNumber.message} />
+                {errors.account_number && (
+                  <ErrorMessage ErrorMessage={errors.account_number.message} />
                 )}
               </div>
               {/* Qris */}
@@ -202,7 +202,7 @@ const RegisterShop = () => {
                     {/* Input QRIS Picture Button */}
                     <div className="flex-1">
                       <input
-                        {...register("qrisPicture")}
+                        {...register("qris_picture")}
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
@@ -235,8 +235,8 @@ const RegisterShop = () => {
                       Preview
                     </button>
                   </div>
-                  {errors.qrisPicture && (
-                    <ErrorMessage ErrorMessage={errors.qrisPicture.message} />
+                  {errors.qris_picture && (
+                    <ErrorMessage ErrorMessage={errors.qris_picture.message} />
                   )}
                 </div>
 

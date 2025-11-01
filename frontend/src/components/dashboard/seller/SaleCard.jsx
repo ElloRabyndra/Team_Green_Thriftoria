@@ -11,7 +11,7 @@ const SaleCard = ({ sale }) => {
       currency: "IDR",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(price * 15000);
+    }).format(price);
   };
 
   // Fungsi untuk format tanggal
@@ -56,8 +56,7 @@ const SaleCard = ({ sale }) => {
   };
 
   const currentStatus =
-    statusConfig[sale.statusShipping] || statusConfig.awaitingPayment;
-
+    statusConfig[sale.status_shipping] || statusConfig.awaitingPayment;
   return (
     <Link to={`/dashboard/sale/${sale.id}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
@@ -78,17 +77,17 @@ const SaleCard = ({ sale }) => {
           <div className="space-y-2 mb-4">
             <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground shrink-0">
               <Clock className="h-4 w-4" />
-              <span>{formatDate(sale.orderDate)}</span>
+              <span>{formatDate(sale.created_at)}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Package className="h-4 w-4" />
                 <span>
-                  {sale.totalItems} Item{sale.totalItems > 1 ? "s" : ""}
+                  {sale.productCount} Item{sale.productCount > 1 ? "s" : ""}
                 </span>
               </div>
               <span className="font-semibold text-base sm:text-lg text-primary">
-                {formatPrice(sale.totalPrice)}
+                {formatPrice(sale.total_price)}
               </span>
             </div>
           </div>

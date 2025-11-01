@@ -25,7 +25,7 @@ export const useProducts = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cart, setCart] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [total_price, setTotalPrice] = useState(0);
 
   // Fetch products saat component mount atau kategori berubah
   useEffect(() => {
@@ -100,7 +100,7 @@ export const useProducts = () => {
   };
 
   const addNewProduct = async ({
-    shopId,
+    shop_id,
     name,
     category,
     label,
@@ -111,7 +111,7 @@ export const useProducts = () => {
   }) => {
     try {
       const response = await addProduct(
-        shopId,
+        shop_id,
         name,
         category,
         label,
@@ -131,14 +131,14 @@ export const useProducts = () => {
     }
   };
 
-  const editExistingProduct = async (productId, updatedData) => {
+  const editExistingProduct = async (product_id, updatedData) => {
     try {
       const productData = {
         ...updatedData,
         image: "https://www.svgrepo.com/show/508699/landscape-placeholder.svg", // abaikan file image asli
       };
 
-      const response = await editProduct(productId, productData);
+      const response = await editProduct(product_id, productData);
 
       if (response.success) {
         await fetchProducts();
@@ -150,9 +150,9 @@ export const useProducts = () => {
     }
   };
 
-  const removeProduct = async (productId) => {
+  const removeProduct = async (product_id) => {
     try {
-      const response = await deleteProduct(productId);
+      const response = await deleteProduct(product_id);
       if (response.success) {
         await fetchProducts();
         return { success: true, message: response.message };
@@ -164,9 +164,9 @@ export const useProducts = () => {
   };
 
   // ==================== CART ====================
-  const loadCart = async (userId) => {
+  const loadCart = async (user_id) => {
     try {
-      const response = await getAllCart(userId);
+      const response = await getAllCart(user_id);
       if (response.success) {
         setCart(response.data || []);
       }
@@ -176,11 +176,11 @@ export const useProducts = () => {
     }
   };
 
-  const addToCart = async (userId, product) => {
+  const addToCart = async (user_id, product) => {
     try {
-      const response = await addToCartApi(userId, product.id);
+      const response = await addToCartApi(user_id, product.id);
       if (response.success) {
-        await loadCart(userId);
+        await loadCart(user_id);
         return true;
       }
     } catch (error) {
@@ -189,35 +189,35 @@ export const useProducts = () => {
     }
   };
 
-  const updateQuantity = async (userId, cartId, quantity) => {
+  const updateQuantity = async (user_id, cartId, quantity) => {
     try {
       if (quantity < 1) {
-        await removeFromCart(userId, cartId);
+        await removeFromCart(user_id, cartId);
         return;
       }
 
       const response = await updateCartQuantity(cartId, quantity);
       if (response.success) {
-        await loadCart(userId);
+        await loadCart(user_id);
       }
     } catch (error) {
       console.error("Error updating quantity:", error);
     }
   };
 
-  const increaseQuantity = async (userId, cartItem) => {
-    await updateQuantity(userId, cartItem.id, cartItem.quantity + 1);
+  const increaseQuantity = async (user_id, cartItem) => {
+    await updateQuantity(user_id, cartItem.id, cartItem.quantity + 1);
   };
 
-  const decreaseQuantity = async (userId, cartItem) => {
-    await updateQuantity(userId, cartItem.id, cartItem.quantity - 1);
+  const decreaseQuantity = async (user_id, cartItem) => {
+    await updateQuantity(user_id, cartItem.id, cartItem.quantity - 1);
   };
 
-  const removeFromCart = async (userId, cartId) => {
+  const removeFromCart = async (user_id, cartId) => {
     try {
       const response = await deleteCartItem(cartId);
       if (response.success) {
-        await loadCart(userId);
+        await loadCart(user_id);
       }
     } catch (error) {
       console.error("Error removing from cart:", error);
@@ -234,7 +234,7 @@ export const useProducts = () => {
     productDetail,
     getProductDetail,
     cart,
-    totalPrice,
+    total_price,
     loading,
     selectedCategory,
     searchQuery,

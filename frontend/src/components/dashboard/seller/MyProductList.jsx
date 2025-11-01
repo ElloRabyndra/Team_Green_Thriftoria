@@ -29,15 +29,15 @@ const MyProductList = () => {
   // Filter produk penjual
   useEffect(() => {
     if (products.length === 0) return;
-    setMyProducts(products.filter((p) => p.shopId === user.id)); // nanti ganti ke shopId
+    setMyProducts(products.filter((p) => p.shop_id === user.id)); // nanti ganti ke shop_id
   }, [products]);
 
   if (productLoading) {
     return <RenderProduct />;
   }
 
-  const handleRemoveProduct = async (productId) => {
-    return await removeProduct(productId);
+  const handleRemoveProduct = async (product_id) => {
+    return await removeProduct(product_id);
   };
 
   return (
@@ -76,7 +76,7 @@ const MyProductList = () => {
                 product={product}
                 onRemoveProduct={handleRemoveProduct}
                 role={user.role} // Sementara
-                shopId={user.id} // nanti ganti ke shopId
+                shop_id={user.id} // nanti ganti ke shop_id
               />
             ))}
           </div>

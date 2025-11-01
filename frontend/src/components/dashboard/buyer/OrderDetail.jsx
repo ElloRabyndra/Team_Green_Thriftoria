@@ -2,10 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowLeft, Phone, Store, Check, X } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { useOrders } from "@/hooks/useOrders";
 import Loading from "@/components/ui/loading";
+import Empty from "@/components/ui/Empty";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { toast } from "react-toastify";
 
 const OrderDetail = () => {
   const navigate = useNavigate();
@@ -19,14 +22,13 @@ const OrderDetail = () => {
     approveCancel,
     denyCancel,
     requestCancel,
-    loading,
+    loading: orderLoading,
     resetOrderDetail,
   } = useOrders();
 
   // Ambil detail order saat orderId berubah
   useEffect(() => {
     if (orderId) fetchOrderDetail(Number(orderId));
-    return () => resetOrderDetail(); // bersihkan saat keluar halaman
   }, [orderId]);
 
   // Redirect jika bukan buyer/seller atau orderDetail tidak ada
@@ -35,17 +37,29 @@ const OrderDetail = () => {
       navigate(-1);
   }, [isLoading, user, navigate]);
 
-  // Redirect jika orderDetail tidak ada
-  useEffect(() => {
-    if (!loading && orderDetail === null) navigate(-1);
-  }, [loading, orderDetail, navigate]);
-
-  const order = orderDetail;
-  if (loading || !orderDetail) {
+  if (orderLoading && !orderDetail) {
     return <Loading />;
   }
 
-  // 🧮 Fungsi format harga dan tanggal
+  if (!orderDetail) {
+    return (
+      <>
+        {/* Back Button */}
+        <div className="mb-2">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/dashboard")}
+            className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
+        <Empty>No order found</Empty>
+      </>
+    );
+  }
+  // Fungsi format harga dan tanggal
   const formatPrice = (price) =>
     new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -60,6 +74,15 @@ const OrderDetail = () => {
       month: "short",
       year: "numeric",
     }).format(new Date(dateString));
+
+  // fungsi cek role yang request cancel
+  const cancelRole = (orderDetail, user) => {
+    user.role === "seller"
+      ? orderDetail.shop_id === user.id
+        ? "seller"
+        : "buyer"
+      : "buyer";
+  };
 
   // Konfigurasi status
   const statusConfig = {
@@ -92,13 +115,29 @@ const OrderDetail = () => {
     },
   };
 
+  const handleRequestCancel = async (order_id, role, user_id) => {
+    await requestCancel(order_id, role, user_id);
+    await fetchOrderDetail(order_id);
+  };
+
+  const handleApproveCancel = async (order_id, user_id) => {
+    await approveCancel(order_id, user_id);
+    await fetchOrderDetail(order_id);
+    toast.success("Order cancelled successfully!");
+  };
+
+  const handleDenyCancel = async (order_id, user_id) => {
+    await denyCancel(order_id, user_id);
+    await fetchOrderDetail(order_id);
+    toast.success("Cancel request denied!");
+  };
   return (
     <section className="space-y-4 md:ml-4">
       {/* Back Button */}
       <div className="mb-4">
         <Button
           variant="ghost"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -112,18 +151,23 @@ const OrderDetail = () => {
           <Card className="w-full min-w-80 md:min-w-96">
             <CardHeader className="flex items-center justify-between gap-2">
               <CardTitle>Order Information</CardTitle>
-              {/* Tombol Cancel hanya muncul jika statusShipping bukan cancelled atau cancelPending */}
-              {order.statusShipping !== "cancelled" &&
-                order.statusShipping !== "cancelPending" &&
-                order.statusShipping !== "delivered" && (
-                  <button
-                    onClick={() =>
-                      requestCancel(order.orderId, user.role, user.id)
+              {/* Tombol Cancel hanya muncul jika status_shipping bukan cancelled atau cancelPending */}
+              {orderDetail.status_shipping !== "cancelled" &&
+                orderDetail.status_shipping !== "cancelPending" &&
+                orderDetail.status_shipping !== "delivered" && (
+                  <ConfirmDialog
+                    onConfirm={() =>
+                      handleRequestCancel(
+                        orderDetail.id,
+                        cancelRole(orderDetail, user),
+                        user.id
+                      )
                     }
-                    className="text-sm hover:text-red-400 hover:underline cursor-pointer"
                   >
-                    Cancel Order
-                  </button>
+                    <button className="text-sm hover:text-red-400 hover:underline cursor-pointer">
+                      Cancel Order
+                    </button>
+                  </ConfirmDialog>
                 )}
             </CardHeader>
             <CardContent>
@@ -131,29 +175,31 @@ const OrderDetail = () => {
                 {/* Recipient */}
                 <div>
                   <p className="text-sm text-muted-foreground">Recipient:</p>
-                  <p className="font-medium">{order.recipient}</p>
+                  <p className="font-medium">{orderDetail.recipient}</p>
                 </div>
                 {/* Telephone */}
                 <div>
                   <p className="text-sm text-muted-foreground">Telephone:</p>
-                  <p className="font-medium">{order.telephone}</p>
+                  <p className="font-medium">{orderDetail.telephone}</p>
                 </div>
                 {/* Shipping Address */}
                 <div>
                   <p className="text-sm text-muted-foreground">
                     Shipping Address:
                   </p>
-                  <p className="font-medium">{order.address}</p>
+                  <p className="font-medium">{orderDetail.address}</p>
                 </div>
                 {/* Note */}
                 <div>
                   <p className="text-sm text-muted-foreground">Note:</p>
-                  <p className="font-medium max-w-sm">{order.note}</p>
+                  <p className="font-medium max-w-sm">{orderDetail.note}</p>
                 </div>
                 {/* Order Date */}
                 <div>
                   <p className="text-sm text-muted-foreground">Order Date:</p>
-                  <p className="font-medium">{formatDate(order.createdAt)}</p>
+                  <p className="font-medium">
+                    {formatDate(orderDetail.created_at)}
+                  </p>
                 </div>
 
                 {/* Status Badge */}
@@ -161,25 +207,42 @@ const OrderDetail = () => {
                   <p className="text-sm text-muted-foreground">Status:</p>
                   <span
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${
-                      statusConfig[order.statusShipping].color
+                      statusConfig[orderDetail.status_shipping].color
                     }`}
                   >
-                    <span>{statusConfig[order.statusShipping].label}</span>
+                    <span>
+                      {statusConfig[orderDetail.status_shipping].label}
+                    </span>
                   </span>
 
                   {/* Jika status cancelPending dan dibatalkan oleh seller */}
-                  {order.statusShipping === "cancelPending" &&
-                    order.cancelBy === "seller" && (
+                  {orderDetail.status_shipping === "cancelPending" &&
+                    ((orderDetail.cancelBy === "seller" &&
+                      orderDetail.shop_id !== user.id) || //  nanti ganti ke user.shop jadi user.shop_id
+                      (orderDetail.cancelBy === "seller" &&
+                        user.role === "buyer")) && (
                       <div className="flex items-center gap-1 ml-2">
                         {/* Tombol Setuju */}
-                        <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
-                          <Check size={16} />
-                        </button>
+                        <ConfirmDialog
+                          onConfirm={() =>
+                            handleApproveCancel(orderDetail.id, user.id)
+                          }
+                        >
+                          <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
+                            <Check size={16} />
+                          </button>
+                        </ConfirmDialog>
 
                         {/* Tombol Tolak */}
-                        <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-                          <X size={16} />
-                        </button>
+                        <ConfirmDialog
+                          onConfirm={() =>
+                            handleDenyCancel(orderDetail.id, user.id)
+                          }
+                        >
+                          <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+                            <X size={16} />
+                          </button>
+                        </ConfirmDialog>
                       </div>
                     )}
                 </div>
@@ -203,20 +266,20 @@ const OrderDetail = () => {
                 >
                   <Store className="h-4 w-4" />
                   <span className="font-medium capitalize">
-                    {order.shopName}
+                    {orderDetail.shop_name}
                   </span>
                 </Link>
                 {/* Telephone */}
                 <div className="flex items-center gap-2 ml-1 mt-1 text-muted-foreground">
                   <Phone className="h-3 w-3" />
                   <span className="text-xs text-muted-foreground">
-                    {order.shopPhone}
+                    {orderDetail?.shop_telephone}
                   </span>
                 </div>
 
                 {/* Selected Items */}
                 <div className="mt-4 space-y-3 max-h-48 overflow-y-auto pr-2">
-                  {order.orderItems.map((item) => (
+                  {orderDetail?.orderItems.map((item) => (
                     <div key={item.id} className="flex items-center gap-3">
                       <img
                         src={item.image}
@@ -248,7 +311,7 @@ const OrderDetail = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">
-                    {formatPrice(order.totalPrice - 30000)}
+                    {formatPrice(orderDetail?.total_price - 30000)}
                   </span>
                 </div>
 
@@ -261,7 +324,7 @@ const OrderDetail = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-lg font-bold text-primary">
-                      {formatPrice(order.totalPrice)}
+                      {formatPrice(orderDetail?.total_price)}
                     </span>
                   </div>
                 </div>

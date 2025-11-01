@@ -39,7 +39,7 @@ export const getProfileApi = () => api.get("/user/profile");
 
 // Fungsi API untuk update Profile
 export const updateProfileApi = (data) => {
-  const formData = new FormData(); // ... (field text lainnya tetap)
+  const formData = new FormData();
 
   formData.append("username", data.username || "");
   formData.append("email", data.email || "");
@@ -48,7 +48,7 @@ export const updateProfileApi = (data) => {
   formData.append("old_password", data.old_password || "");
   formData.append("new_password", data.new_password || "");
 
-  const profilePic = data.profile_picture; 
+  const profilePic = data.profile_picture;
 
   if (profilePic && profilePic instanceof File) {
     formData.append("profile_picture", profilePic, profilePic.name);
@@ -77,8 +77,8 @@ export const searchProduct = async (query) => {
   return response.data;
 };
 
-export const getDetailProduct = async (productId) => {
-  const response = await api.get(`/products/${productId}`);
+export const getDetailProduct = async (product_id) => {
+  const response = await api.get(`/products/${product_id}`);
   return response.data;
 };
 
@@ -87,24 +87,24 @@ export const addProduct = async (productData) => {
   return response.data;
 };
 
-export const editProduct = async (productId, productData) => {
-  const response = await api.put(`/products/${productId}`, productData);
+export const editProduct = async (product_id, productData) => {
+  const response = await api.put(`/products/${product_id}`, productData);
   return response.data;
 };
 
-export const deleteProduct = async (productId) => {
-  const response = await api.delete(`/products/${productId}`);
+export const deleteProduct = async (product_id) => {
+  const response = await api.delete(`/products/${product_id}`);
   return response.data;
 };
 
 // ==================== CART ENDPOINTS ====================
-export const addToCart = async (userId, productId) => {
-  const response = await api.post("/cart", { userId, productId });
+export const addToCart = async (user_id, product_id) => {
+  const response = await api.post("/cart", { user_id, product_id });
   return response.data;
 };
 
-export const getAllCart = async (userId) => {
-  const response = await api.get(`/cart/${userId}`);
+export const getAllCart = async (user_id) => {
+  const response = await api.get(`/cart/${user_id}`);
   return response.data;
 };
 
@@ -121,87 +121,87 @@ export const deleteCartItem = async (cartId) => {
 // ==================== ORDER ENDPOINTS ====================
 /**
  * Create new order
- * @param {Object} orderData - { userId, shopId, recipient, telephone, address, note, totalPrice, proofPayment, orderItems: [{productId, quantity, price}] }
+ * @param {Object} orderData - { user_id, shop_id, recipient, telephone, address, note, total_price, proof_payment, orderItems: [{product_id, quantity, price}] }
  */
 export const createOrder = async (orderData) => {
   const response = await api.post("/orders", orderData);
   return response.data;
 };
 
-export const getAllOrder = async (userId) => {
-  const response = await api.get(`/orders/user/${userId}`);
+export const getAllOrder = async (user_id) => {
+  const response = await api.get(`/orders/user/${user_id}`);
   return response.data;
 };
 
-export const getAllOrderHistory = async (userId) => {
-  const response = await api.get(`/orders/history/${userId}`);
+export const getAllOrderHistory = async (user_id) => {
+  const response = await api.get(`/orders/history/${user_id}`);
   return response.data;
 };
 
-export const getOrderDetail = async (orderId) => {
-  const response = await api.get(`/orders/${orderId}`);
+export const getOrderDetail = async (order_id) => {
+  const response = await api.get(`/orders/${order_id}`);
   return response.data;
 };
 
-export const cancelOrder = async (orderId, userRole) => {
-  const response = await api.put(`/orders/${orderId}/cancel`, { userRole });
+export const cancelOrder = async (order_id, userRole) => {
+  const response = await api.put(`/orders/${order_id}/cancel`, { userRole });
   return response.data;
 };
 
-export const rejectCancel = async (orderId) => {
-  const response = await api.put(`/orders/${orderId}/reject-cancel`);
+export const rejectCancel = async (order_id) => {
+  const response = await api.put(`/orders/${order_id}/reject-cancel`);
   return response.data;
 };
 
-export const acceptCancel = async (orderId) => {
-  const response = await api.put(`/orders/${orderId}/accept-cancel`);
+export const acceptCancel = async (order_id) => {
+  const response = await api.put(`/orders/${order_id}/accept-cancel`);
   return response.data;
 };
 
 // ==================== SHOP ENDPOINTS ====================
 /**
  * Create new shop
- * @param {Object} shopData - { userId, shopName, shopTelephone, shopAddress, accountNumber, qrisPicture }
+ * @param {Object} shopData - { user_id, shop_name, shop_telephone, shop_address, account_number, qris_picture }
  */
 export const createShop = async (shopData) => {
   const response = await api.post("/shops", shopData);
   return response.data;
 };
 
-export const getDetailShop = async (shopId) => {
-  const response = await api.get(`/shops/${shopId}`);
+export const getDetailShop = async (shop_id) => {
+  const response = await api.get(`/shops/${shop_id}`);
   return response.data;
 };
 
-export const editShop = async (shopId, shopData) => {
-  const response = await api.put(`/shops/${shopId}`, shopData);
+export const editShop = async (shop_id, shopData) => {
+  const response = await api.put(`/shops/${shop_id}`, shopData);
   return response.data;
 };
 
 // ==================== SALES ENDPOINTS (SELLER) ====================
-export const getAllSales = async (shopId) => {
-  const response = await api.get(`/sales/shop/${shopId}`);
+export const getAllSales = async (shop_id) => {
+  const response = await api.get(`/sales/shop/${shop_id}`);
   return response.data;
 };
 
 /**
  * Accept or reject payment
- * @param {number} orderId
+ * @param {number} order_id
  * @param {boolean} status - true to accept, false to reject
  */
-export const acceptPayment = async (orderId, status) => {
-  const response = await api.put(`/sales/${orderId}/payment`, { status });
+export const acceptPayment = async (order_id, status) => {
+  const response = await api.put(`/sales/${order_id}/payment`, { status });
   return response.data;
 };
 
 /**
  * Change order shipping status
- * @param {number} orderId
- * @param {string} statusShipping - awaitingPayment, prepared, shipped, delivered, cancelPending, cancelled
+ * @param {number} order_id
+ * @param {string} status_shipping - awaitingPayment, prepared, shipped, delivered, cancelPending, cancelled
  */
-export const changeStatusShipping = async (orderId, statusShipping) => {
-  const response = await api.put(`/sales/${orderId}/status`, {
-    statusShipping,
+export const changeStatusShipping = async (order_id, status_shipping) => {
+  const response = await api.put(`/sales/${order_id}/status`, {
+    status_shipping,
   });
   return response.data;
 };
@@ -219,11 +219,11 @@ export const getRequestShop = async () => {
 
 /**
  * Accept or reject shop registration
- * @param {number} shopId
+ * @param {number} shop_id
  * @param {boolean} status - true to accept, false to reject
  */
-export const acceptRequestShop = async (shopId, status) => {
-  const response = await api.put(`/admin/shops/${shopId}/approve`, { status });
+export const acceptRequestShop = async (shop_id, status) => {
+  const response = await api.put(`/admin/shops/${shop_id}/approve`, { status });
   return response.data;
 };
 

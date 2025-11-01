@@ -49,7 +49,7 @@ export default function CartList() {
       return;
     }
 
-    // Cek shopId dari item yang sudah dipilih
+    // Cek shop_id dari item yang sudah dipilih
     const firstSelectedItem = cart.find(
       (item) => item.id === selectedCartIds[0]
     );
@@ -62,17 +62,17 @@ export default function CartList() {
       return;
     }
 
-    // Jika shopId berbeda, ganti semua selection dengan item yang baru diklik
-    if (clickedItem.shopId !== firstSelectedItem.shopId) {
+    // Jika shop_id berbeda, ganti semua selection dengan item yang baru diklik
+    if (clickedItem.shop_id !== firstSelectedItem.shop_id) {
       setSelectedCartIds([cartId]);
       return;
     }
 
-    // Jika shopId sama, tambahkan ke selection
+    // Jika shop_id sama, tambahkan ke selection
     setSelectedCartIds([...selectedCartIds, cartId]);
   };
 
-  // Wrapper functions dengan userId
+  // Wrapper functions dengan user_id
   const handleIncreaseQuantity = async (cartItem) => {
     if (!user?.id) return;
     await increaseQuantity(user.id, cartItem);

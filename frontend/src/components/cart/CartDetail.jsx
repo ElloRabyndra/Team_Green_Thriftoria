@@ -24,13 +24,13 @@ export default function CartDetail({ selectedItems, selectedItemsPrice }) {
     if (selectedItems.length === 0) return;
     navigate("/checkout", {
       state: {
-        userId: selectedItems[0]?.userId,
-        shopId: selectedItems[0]?.shopId,
+        user_id: selectedItems[0]?.user_id,
+        shop_id: selectedItems[0]?.shop_id,
         selectedItems, 
         subtotal,
         deliveryFee,
         total,
-        shopName: selectedItems[0]?.shopName
+        shop_name: selectedItems[0]?.shop_name
       }
     });
   };
@@ -47,8 +47,8 @@ export default function CartDetail({ selectedItems, selectedItemsPrice }) {
   }
 
   // Get shop info from first selected item
-  const shopName = selectedItems[0]?.shopName;
-  const shopId = selectedItems[0]?.shopId;
+  const shop_name = selectedItems[0]?.shop_name;
+  const shop_id = selectedItems[0]?.shop_id;
 
   return (
     <Card className="p-6 sticky top-4">
@@ -59,11 +59,11 @@ export default function CartDetail({ selectedItems, selectedItemsPrice }) {
           
           {/* Shop Name */}
           <Link 
-            to={`/shop/${shopId}`} 
+            to={`/shop/${shop_id}`} 
             className="mt-2 flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
           >
             <Store className="h-4 w-4" />
-            <span className="font-medium capitalize">{shopName}</span>
+            <span className="font-medium capitalize">{shop_name}</span>
           </Link>
 
           {/* Selected Items */}

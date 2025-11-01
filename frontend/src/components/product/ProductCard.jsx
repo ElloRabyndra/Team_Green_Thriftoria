@@ -10,7 +10,7 @@ export default function ProductCard({
   onAddToCart = async () => {},
   onRemoveProduct = async () => {},
   role = "buyer",
-  shopId = null,
+  shop_id = null,
 }) {
   // Fungsi untuk format harga
   const formatPrice = (price) => {
@@ -31,8 +31,8 @@ export default function ProductCard({
     }
   };
 
-  const handleDeleteProduct = async (productId) => {
-    const success = await onRemoveProduct(productId);
+  const handleDeleteProduct = async (product_id) => {
+    const success = await onRemoveProduct(product_id);
     if (success) {
       toast.success("Product deleted successfully!");
     } else {
@@ -43,7 +43,7 @@ export default function ProductCard({
   return (
     <div className="relative group">
       {/* Delete/Cancel Button - positioned outside card, only visible on hover */}
-      {role === "seller" && product.shopId === shopId && (
+      {role === "seller" && product.shop_id === shop_id && (
         <ConfirmDialog
           onConfirm={() => {
             handleDeleteProduct(product.id);
@@ -58,7 +58,7 @@ export default function ProductCard({
         </ConfirmDialog>
       )}
       <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
-        {role === "seller" && product.shopId === shopId ? (
+        {role === "seller" && product.shop_id === shop_id ? (
           <Link
             to={`/dashboard/edit-product/${product.id}`}
             className="relative overflow-hidden group block"
@@ -125,7 +125,7 @@ export default function ProductCard({
           </div>
 
           {/* Tombol berbeda berdasarkan role */}
-          {(role === "seller" && product.shopId !== shopId) ||
+          {(role === "seller" && product.shop_id !== shop_id) ||
           role === "buyer" ? (
             <button
               className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 px-4 rounded-lg transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"

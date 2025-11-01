@@ -9,11 +9,11 @@ import ProductCard from "../product/ProductCard";
 const dummyShops = [
   {
     id: 1,
-    userId: 1,
+    user_id: 1,
     userName: "John Doe",
-    shopName: "Premium Fashion Store",
-    shopAddress: "Jl. Contoh, Jakarta, Indonesia",
-    shopTelephone: "+62 812 3456 7890",
+    shop_name: "Premium Fashion Store",
+    shop_address: "Jl. Contoh, Jakarta, Indonesia",
+    shop_telephone: "+62 812 3456 7890",
   },
 ];
 
@@ -23,21 +23,21 @@ const dummyProducts = [
     name: "Elegant Blazer",
     price: 350000,
     thumbnail: "https://picsum.photos/seed/blazer/400/400",
-    shopName: "Premium Fashion Store",
+    shop_name: "Premium Fashion Store",
   },
   {
     id: 102,
     name: "Casual T-Shirt",
     price: 120000,
     thumbnail: "https://picsum.photos/seed/tshirt/400/400",
-    shopName: "Premium Fashion Store",
+    shop_name: "Premium Fashion Store",
   },
   {
     id: 103,
     name: "Leather Shoes",
     price: 450000,
     thumbnail: "https://picsum.photos/seed/shoes/400/400",
-    shopName: "Premium Fashion Store",
+    shop_name: "Premium Fashion Store",
   },
 ];
 
@@ -98,7 +98,7 @@ const ViewShop = () => {
           <div>
             <h1 className="text-sm md:text-lg font-semibold text-foreground flex items-center gap-2">
               <Store className="w-6 h-6 text-primary" />
-              {shop.shopName}
+              {shop.shop_name}
             </h1>
             <p className="text-sm text-muted-foreground mt-2">
               Owner:{" "}
@@ -109,11 +109,11 @@ const ViewShop = () => {
             <div className="mt-3 space-y-2 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                <span>{shop.shopAddress}</span>
+                <span>{shop.shop_address}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-primary" />
-                <span>{shop.shopTelephone}</span>
+                <span>{shop.shop_telephone}</span>
               </div>
             </div>
           </div>
