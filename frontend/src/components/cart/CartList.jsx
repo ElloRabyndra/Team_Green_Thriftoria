@@ -1,25 +1,20 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useOutletContext } from "react-router";
+import { useNavigate } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
+import { useProducts } from "@/hooks/useProducts";
 import Empty from "../ui/Empty";
 import CartCard from "./CartCard";
 import CartDetail from "./CartDetail";
+import Loading from "../ui/loading";
 
 export default function CartList() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-  const { cart, increaseQuantity, decreaseQuantity, removeFromCart } =
-    useOutletContext();
+  const { cart, loading, loadCart, increaseQuantity, decreaseQuantity, removeFromCart } =
+    useProducts();
 
   // State untuk track items yang dipilih (array of cart IDs)
   const [selectedCartIds, setSelectedCartIds] = useState([]);
-
-  // Redirect ke login jika tidak ada user setelah loading selesai
-  useEffect(() => {
-    if (!isLoading && !user) {
-      navigate("/login");
-    }
-  }, [isLoading, user]);
 
   // Redirect jika bukan buyer atau seller
   useEffect(() => {
@@ -27,6 +22,13 @@ export default function CartList() {
       navigate(-1);
     }
   }, [isLoading, user, navigate]);
+
+  // Load cart when user is available
+  useEffect(() => {
+    if (user?.id) {
+      loadCart(user.id);
+    }
+  }, [user?.id]);
 
   // Set default selection ke cart pertama saat component mount atau cart berubah
   useEffect(() => {
@@ -70,6 +72,22 @@ export default function CartList() {
     setSelectedCartIds([...selectedCartIds, cartId]);
   };
 
+  // Wrapper functions dengan userId
+  const handleIncreaseQuantity = async (cartItem) => {
+    if (!user?.id) return;
+    await increaseQuantity(user.id, cartItem);
+  };
+
+  const handleDecreaseQuantity = async (cartItem) => {
+    if (!user?.id) return;
+    await decreaseQuantity(user.id, cartItem);
+  };
+
+  const handleRemoveFromCart = async (cartId) => {
+    if (!user?.id) return;
+    await removeFromCart(user.id, cartId);
+  };
+
   // Dapatkan data items yang terpilih untuk CartDetail
   const selectedCartItems = cart.filter((item) =>
     selectedCartIds.includes(item.id)
@@ -80,6 +98,10 @@ export default function CartList() {
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  if (loading || isLoading) {
+    return <Loading />;
+  }
 
   return (
     <section className="px-4">
@@ -97,9 +119,9 @@ export default function CartList() {
                       cartItem={cartItem}
                       isSelected={selectedCartIds.includes(cartItem.id)}
                       onSelect={handleSelectCart}
-                      increaseQuantity={increaseQuantity}
-                      decreaseQuantity={decreaseQuantity}
-                      removeFromCart={removeFromCart}
+                      increaseQuantity={handleIncreaseQuantity}
+                      decreaseQuantity={handleDecreaseQuantity}
+                      removeFromCart={handleRemoveFromCart}
                     />
                   </li>
                 ))}

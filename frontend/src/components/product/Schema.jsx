@@ -2,11 +2,11 @@ import { z } from "zod";
 
 // Schema untuk product
 export const addProductSchema = z.object({
-  title: z
+  name: z
     .string()
-    .min(1, "Product title is required")
-    .min(3, "Product title must be at least 3 characters")
-    .max(100, "Product title must be at most 100 characters"),
+    .min(1, "Product name is required")
+    .min(3, "Product name must be at least 3 characters")
+    .max(100, "Product name must be at most 100 characters"),
 
   label: z
     .string()
@@ -22,16 +22,10 @@ export const addProductSchema = z.object({
     .string()
     .min(1, "Stock is required")
     .regex(/^[0-9]+$/, "Stock must contain only digits"),
-  category: z
-    .string()
-    .min(1, "Category is required"),
-  description: z
-    .string()
-    .min(1, "Description is required"),
+  category: z.string().min(1, "Category is required"),
+  description: z.string().min(1, "Description is required"),
 
-  thumbnail: z
-    .any()
-    .optional(),
+  image: z.any().optional(),
 });
 
 export const editProductSchema = addProductSchema.partial();

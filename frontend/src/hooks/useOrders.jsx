@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   createOrder,
   getAllOrder,
@@ -8,15 +8,18 @@ import {
   rejectCancel,
   acceptCancel,
 } from "@/service/dummyApi";
-import { useOutletContext } from "react-router";
+import { useProducts } from "./useProducts";
+import { useAuth } from "./useAuth";
 
 export const useOrders = () => {
+  const { user } = useAuth();
+  const { removeFromCart: removeFromCartHook } = useProducts();
+
   // State Utama
   const [orders, setOrders] = useState([]);
   const [orderHistory, setOrderHistory] = useState([]);
   const [orderDetail, setOrderDetail] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { removeFromCart } = useOutletContext();
 
   // Fetch Semua Order Aktif
   const fetchOrders = async (userId) => {
@@ -71,10 +74,12 @@ export const useOrders = () => {
     try {
       const response = await createOrder(orderData);
       if (response.success) {
-        // Hapus cart
-        orderData.orderItems.forEach((item) => {
-          removeFromCart(item.id);
-        });
+        // Hapus cart items menggunakan userId dari user context
+        if (user?.id) {
+          for (const item of orderData.orderItems) {
+            await removeFromCartHook(user.id, item.id);
+          }
+        }
         await fetchOrders(orderData.userId);
         return { success: true, message: response.message };
       }

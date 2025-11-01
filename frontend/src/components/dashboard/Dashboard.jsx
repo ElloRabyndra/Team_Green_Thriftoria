@@ -111,8 +111,9 @@ const Dashboard = () => {
         <Avatar className="w-14 h-14 rounded-full overflow-hidden">
           <AvatarImage
             src={`${
-              user?.profile_picture ||
-              "https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg"
+              user?.profile_picture !== "https://i.pravatar.cc/150"
+                ? user.profile_picture
+                : "https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg"
             }`}
           ></AvatarImage>
         </Avatar>

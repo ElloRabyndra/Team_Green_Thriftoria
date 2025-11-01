@@ -14,11 +14,13 @@ import CheckoutDetail from "./CheckoutDetail";
 import { Textarea } from "../ui/textarea";
 import { toast } from "react-toastify";
 import { useOrders } from "@/hooks/useOrders";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
   const checkoutData = location.state;
+  const { removeFromCart } = useProducts();
   const [qrisPreview, setQrisPreview] = useState(
     "https://img.freepik.com/free-vector/scan-me-qr-code_78370-2915.jpg?semt=ais_hybrid&w=740&q=80"
   );
@@ -114,7 +116,7 @@ export default function Checkout() {
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
       const orderData = {
@@ -133,13 +135,24 @@ export default function Checkout() {
           price: item.price,
         })),
       };
-      makeOrder(orderData);
+
+      const result = await makeOrder(orderData);
+
+      if (result.success) {
+        // Hapus items dari cart
+        for (const item of selectedItems) {
+          await removeFromCart(userId, item.id);
+        }
+        toast.success("Created Order successfully!");
+        navigate("/dashboard/orders");
+      } else {
+        toast.error(result.message || "Failed to create order");
+      }
     } catch (error) {
       console.error("Checkout error:", error);
+      toast.error("An error occurred while creating order");
     } finally {
       setIsSubmitting(false);
-      toast.success("Created Order successfully!");
-      navigate("/dashboard/orders");
     }
   };
 

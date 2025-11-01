@@ -14,7 +14,7 @@ const api = axios.create({
 });
 
 // Delay helper untuk simulasi network request
-const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // ==================== AUTH ENDPOINTS ====================
 export const register = async (email, username, password) => {
@@ -107,7 +107,9 @@ export const getAllProduct = async () => {
 export const getProductByCategory = async (category) => {
   if (USE_DUMMY) {
     await delay();
-    const filtered = dummyStore.products.filter((p) => p.category === category);
+    const filtered = dummyStore.products.filter(
+      (p) => p.category.toLowerCase() === category
+    );
     return { success: true, data: filtered };
   }
 
@@ -165,7 +167,7 @@ export const addProduct = async (
       category,
       label,
       description,
-      image: image || "https://via.placeholder.com/300",
+      image: "https://www.svgrepo.com/show/508699/landscape-placeholder.svg",
       price: parseFloat(price),
       stock: parseInt(stock),
     };

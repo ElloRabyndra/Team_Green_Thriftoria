@@ -14,7 +14,7 @@ export const dummyStore = {
   products: [
     {
       id: 1,
-      shopId: 1,
+      shopId: 4,
       name: "Blue & Black Check Shirt",
       category: "Fashion",
       label: "mens-shirts",
@@ -40,7 +40,7 @@ export const dummyStore = {
     },
     {
       id: 3,
-      shopId: 1,
+      shopId: 4,
       name: "Man Plaid Shirt",
       category: "Fashion",
       label: "mens-shirts",
@@ -79,7 +79,7 @@ export const dummyStore = {
     },
     {
       id: 6,
-      shopId: 2,
+      shopId: 4,
       name: "Nike Air Jordan 1 Red And Black",
       category: "Fashion",
       label: "mens-shoes",
@@ -92,7 +92,7 @@ export const dummyStore = {
     },
     {
       id: 7,
-      shopId: 2,
+      shopId: 4,
       name: "Nike Baseball Cleats",
       category: "Fashion",
       label: "mens-shoes",
@@ -118,7 +118,7 @@ export const dummyStore = {
     },
     {
       id: 9,
-      shopId: 2,
+      shopId: 4,
       name: "Sports Sneakers Off White & Red",
       category: "Fashion",
       label: "mens-shoes",
@@ -131,7 +131,7 @@ export const dummyStore = {
     },
     {
       id: 10,
-      shopId: 2,
+      shopId: 4,
       name: "Sports Sneakers Off White Red",
       category: "Fashion",
       label: "mens-shoes",
@@ -144,7 +144,7 @@ export const dummyStore = {
     },
     {
       id: 11,
-      shopId: 2,
+      shopId: 4,
       name: "iPhone 5s",
       category: "Others",
       label: "smartphones",
@@ -157,7 +157,7 @@ export const dummyStore = {
     },
     {
       id: 16,
-      shopId: 2,
+      shopId: 4,
       name: "Annibale Colombo Bed",
       category: "Others",
       label: "furniture",
@@ -170,7 +170,7 @@ export const dummyStore = {
     },
     {
       id: 12,
-      shopId: 2,
+      shopId: 4,
       name: "iPhone 6",
       category: "Others",
       label: "smartphones",
@@ -209,7 +209,7 @@ export const dummyStore = {
     },
     {
       id: 18,
-      shopId: 2,
+      shopId: 4,
       name: "Bedside Table African Cherry",
       category: "Others",
       label: "furniture",
@@ -248,7 +248,7 @@ export const dummyStore = {
     },
     {
       id: 15,
-      shopId: 2,
+      shopId: 4,
       name: "Oppo A57",
       category: "Others",
       label: "smartphones",
@@ -261,7 +261,7 @@ export const dummyStore = {
     },
     {
       id: 20,
-      shopId: 2,
+      shopId: 4,
       name: "Wooden Bathroom Sink With Mirror",
       category: "Others",
       label: "furniture",

@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useOutletContext } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { editProductSchema } from "./Schema";
-import { ArrowLeft, Upload, Save } from "lucide-react";
+import { ArrowLeft, Edit3, Save, Upload } from "lucide-react";
 import { Button } from "../ui/button";
+import Loading from "../ui/loading";
+import Empty from "../ui/Empty";
 import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function AddProduct() {
-  const { user, logout, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
+  const { addNewProduct, loading: productLoading } = useProducts();
   const navigate = useNavigate();
-  const { products, loading, addToCart } = useOutletContext();
   const [previewImage, setPreviewImage] = useState(null);
 
   // State untuk menyimpan nilai yang diformat untuk tampilan
@@ -29,20 +32,13 @@ export default function AddProduct() {
     resolver: zodResolver(editProductSchema),
     defaultValues: {
       label: "",
-      title: "",
+      name: "",
       price: "",
       stock: "",
       category: "fashion",
       description: "",
     },
   });
-
-  const nameInputRef = useRef(null);
-
-  // Redirect ke login jika tidak ada user setelah loading selesai
-  useEffect(() => {
-    if (!isLoading && !user) logout();
-  }, [isLoading, user]);
 
   // Redirect jika bukan seller
   useEffect(() => {
@@ -51,27 +47,13 @@ export default function AddProduct() {
     }
   }, [isLoading, user, navigate]);
 
-  // Focus ke input title saat component mount
-  useEffect(() => {
-    setTimeout(() => {
-      nameInputRef.current?.focus();
-    }, 100);
-  }, []);
-
   const formatPrice = (value) => {
     if (!value && value !== 0) return "";
-
-    // Convert ke string jika berupa number
     const stringValue = value.toString();
-
-    // Hapus semua karakter non-digit
     const numericValue = stringValue.replace(/\D/g, "");
-
-    // Format dengan titik sebagai pemisah ribuan
     return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  // Fungsi untuk menghapus format (titik) dan mendapatkan nilai asli
   const removeFormat = (value) => {
     if (!value) return "";
     return value.toString().replace(/\./g, "");
@@ -81,10 +63,7 @@ export default function AddProduct() {
     const inputValue = e.target.value;
     const numericValue = removeFormat(inputValue);
     const formattedValue = formatPrice(numericValue);
-
-    // Update tampilan
     setFormattedPrice(formattedValue);
-    // Update nilai form dengan nilai asli (tanpa format)
     setValue("price", numericValue);
   };
 
@@ -92,10 +71,7 @@ export default function AddProduct() {
     const inputValue = e.target.value;
     const numericValue = removeFormat(inputValue);
     const formattedValue = formatPrice(numericValue);
-
-    // Update tampilan
     setFormattedStock(formattedValue);
-    // Update nilai form dengan nilai asli (tanpa format)
     setValue("stock", numericValue);
   };
 
@@ -103,36 +79,53 @@ export default function AddProduct() {
     const file = e.target.files[0];
 
     if (file) {
-      // Validasi file type
       const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
         toast.error("Please select a valid image file (JPEG, JPG, PNG)");
-        // Reset input file
         e.target.value = "";
         return;
       }
 
-      // Validasi file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast.error("File size must be less than 5MB");
-        // Reset input file
         e.target.value = "";
         return;
       }
 
-      // Jika validasi berhasil, update preview
       setPreviewImage(URL.createObjectURL(file));
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log("Submitted data:", data);
-    toast.success("Product added successfully!");
-    // Reset form dan preview setelah berhasil
-    reset();
-    setPreviewImage(null);
-    setFormattedPrice("");
-    setFormattedStock("");
+
+    const { name, category, label, description, image, price, stock } = data;
+
+    const result = await addNewProduct({
+      shopId: user.id, // nanti ganti ke shopId
+      name,
+      category,
+      label,
+      description,
+      image: image?.[0],
+      price,
+      stock,
+    });
+
+    if (result.success) {
+      toast.success("Product added successfully!");
+      reset();
+      setPreviewImage(null);
+      setFormattedPrice("");
+      setFormattedStock("");
+      navigate("/dashboard/my-products");
+    } else {
+      toast.error("Failed to add product");
+    }
+  };
+
+  const onError = () => {
+    toast.error("Please fill all fields correctly!");
   };
 
   return (
@@ -141,7 +134,7 @@ export default function AddProduct() {
       <div className="mb-4">
         <Button
           variant="ghost"
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/dashboard/my-products")}
           className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -151,13 +144,17 @@ export default function AddProduct() {
 
       {/* Product Detail */}
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit, onError)}
         className="flex flex-col lg:flex-row lg:justify-center gap-6 lg:mt-12"
       >
         {/* Product Images */}
         <div className="relative group flex justify-center">
           {/* Main Image or Upload Placeholder */}
-          <div className="overflow-hidden w-full max-w-sm max-h-96 sm:w-80 lg:w-96 rounded-2xl bg-card/70 flex items-center justify-center">
+          <div
+            className={`${
+              previewImage ? "" : "bg-card/70"
+            } overflow-hidden w-full max-w-sm max-h-96 sm:w-80 lg:w-96 rounded-2xl flex items-center justify-center`}
+          >
             {previewImage ? (
               <img
                 src={previewImage}
@@ -165,12 +162,12 @@ export default function AddProduct() {
                 className="w-full h-full object-cover rounded-lg"
                 onError={(e) => {
                   e.target.src =
-                    "https://via.placeholder.com/500x500?text=No+Image";
+                    "https://www.svgrepo.com/show/508699/landscape-placeholder.svg";
                 }}
               />
             ) : (
               <label
-                htmlFor="thumbnail"
+                htmlFor="image"
                 className="flex flex-col items-center justify-center w-full h-96 cursor-pointer bg-transparent hover:bg-card/90 transition-colors"
               >
                 <Upload className="h-16 w-16 text-gray-400 mb-4" />
@@ -189,7 +186,7 @@ export default function AddProduct() {
           {previewImage && (
             <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center rounded-2xl">
               <label
-                htmlFor="thumbnail"
+                htmlFor="image"
                 className="bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-200 hover:shadow-xl cursor-pointer"
                 title="Change Product Image"
               >
@@ -199,8 +196,8 @@ export default function AddProduct() {
           )}
 
           <input
-            {...register("thumbnail")}
-            id="thumbnail"
+            {...register("image")}
+            id="image"
             type="file"
             accept="image/*"
             className="hidden"
@@ -221,11 +218,10 @@ export default function AddProduct() {
               className="text-sm text-gray-500 uppercase font-medium border-none outline-none w-full bg-transparent"
             />
             <input
-              {...register("title")}
-              ref={nameInputRef}
-              id="title"
+              {...register("name")}
+              id="name"
               type="text"
-              placeholder="Insert Title..."
+              placeholder="Insert Name..."
               autoComplete="off"
               className="text-xl sm:text-2xl font-bold mt-1 border-none outline-none w-full bg-transparent"
             />
@@ -308,7 +304,7 @@ export default function AddProduct() {
                 className="w-full flex items-center justify-center gap-2 h-12 text-base cursor-pointer"
               >
                 <Save className="h-5 w-5" />
-                Add Product
+                {productLoading ? "Saving..." : "Save Product"}
               </Button>
             </div>
           )}
