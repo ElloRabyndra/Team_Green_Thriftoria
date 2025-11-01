@@ -102,7 +102,7 @@ export default function AddProduct() {
     const { name, category, label, description, image, price, stock } = data;
 
     const result = await addNewProduct({
-      shop_id: user.id, // nanti ganti ke shop_id
+      shop_id: (user.Shop?.id || user.id), // nanti ganti ke user.Shop.id
       name,
       category,
       label,

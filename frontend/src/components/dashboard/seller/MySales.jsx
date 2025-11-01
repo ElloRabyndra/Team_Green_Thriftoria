@@ -20,7 +20,7 @@ const MySales = () => {
         navigate(-1);
         return;
       }
-      fetchSales(user.id); // nanti ganti ke shop_id
+      fetchSales((user.Shop?.id || user.id)); // nanti ganti ke user.Shop.id
     }
   }, [isLoading, user, navigate]);
 

@@ -218,7 +218,7 @@ const OrderDetail = () => {
                   {/* Jika status cancelPending dan dibatalkan oleh seller */}
                   {orderDetail.status_shipping === "cancelPending" &&
                     ((orderDetail.cancelBy === "seller" &&
-                      orderDetail.shop_id !== user.id) || //  nanti ganti ke user.shop jadi user.shop_id
+                      orderDetail.shop_id !== (user.Shop?.id || user.id)) || //  nanti ganti ke user.Shop.id
                       (orderDetail.cancelBy === "seller" &&
                         user.role === "buyer")) && (
                       <div className="flex items-center gap-1 ml-2">
