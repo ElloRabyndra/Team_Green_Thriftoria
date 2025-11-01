@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, Trash2, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
@@ -9,61 +9,78 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { allUsers } from "@/database/dummy";
-
-// Badge component untuk role
-function RoleBadge({ role }) {
-  const isSeller = role === "Seller";
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
-        isSeller
-          ? "bg-primary/10 text-primary"
-          : "bg-secondary text-secondary-foreground"
-      }`}
-    >
-      {role}
-    </span>
-  );
-}
+import { useAdmin } from "@/hooks/useAdmin";
+import Loading from "@/components/ui/loading";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { toast } from "react-toastify";
 
 // Buyer List Component
 const BuyerList = () => {
+  const { userList, loading, fetchUserList, deleteUser } = useAdmin();
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState(allUsers);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  // Fetch User List
+  useEffect(() => {
+    fetchUserList();
+  }, []);
+
+  // Set filtered users
+  useEffect(() => {
+    if (userList) {
+      // Filter user kecuali admin
+      setFilteredUsers(userList.filter((user) => user.role !== "admin"));
+    }
+  }, [userList]);
+
+  // Handle Search
   const handleSearch = (e) => {
     e.preventDefault();
     setIsSearching(true);
 
     if (searchQuery.trim() === "") {
-      setFilteredUsers(allUsers);
+      setFilteredUsers(userList.filter((user) => user.role !== "admin"));
     } else {
-      const filtered = allUsers.filter((user) =>
+      const filtered = userList.filter((user) =>
         user.username.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredUsers(filtered);
+      setFilteredUsers(filtered.filter((user) => user.role !== "admin"));
     }
   };
 
+  // Handle Search Change
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
 
     // Reset to all users if search is cleared
     if (value.trim() === "") {
-      setFilteredUsers(allUsers);
+      setFilteredUsers(userList);
       setIsSearching(false);
     }
   };
 
-  const handleView = (user) => {
-    console.log("View user:", user);
+  // Delete User
+  const handleDeleteUser = async (user_id) => {
+    try {
+      const response = await deleteUser(user_id);
+      if (response.success) {
+        toast.success(response.message);
+        fetchUserList();
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      toast.error(response.message);
+      console.error("Error deleting user:", error);
+    }
   };
 
-  const handleDelete = (user) => {};
-
+  // Loading state
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -172,26 +189,24 @@ const BuyerList = () => {
 
                       {/* Role - Always visible */}
                       <TableCell>
-                        <RoleBadge role={user.role} />
+                        <span className="bg-primary/10 text-primary inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap">
+                          {user.role}
+                        </span>
                       </TableCell>
 
                       {/* Action - Always visible */}
                       <TableCell>
                         <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => handleView(user)}
-                            className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors"
-                            title="View Details"
+                          <ConfirmDialog
+                            onConfirm={() => handleDeleteUser(user.id)}
                           >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user)}
-                            className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
-                            title="Delete User"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                            <button
+                              className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+                              title="Delete User"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </ConfirmDialog>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -209,7 +224,7 @@ const BuyerList = () => {
               Showing {filteredUsers.length}{" "}
               {isSearching ? "result(s)" : "user(s)"}
             </p>
-            <p>Total Users: {allUsers.length}</p>
+            <p>Total Users: {userList.length}</p>
           </div>
         )}
       </div>

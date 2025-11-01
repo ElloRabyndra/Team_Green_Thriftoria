@@ -17,11 +17,12 @@ import { Label } from "@/components/ui/label";
 import ErrorMessage from "../../ErrorMessage";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
+import { useShop } from "@/hooks/useShop";
 
 const RegisterShop = () => {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
+  const { loading, createNewShop } = useShop();
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [qrisFile, setQrisFile] = useState(null);
   const [qrisPreview, setQrisPreview] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -38,11 +39,6 @@ const RegisterShop = () => {
     resolver: zodResolver(registerShopSchema),
   });
 
-  // Redirect ke login jika tidak ada user setelah loading selesai
-  useEffect(() => {
-    if (!isLoading && !user) logout();
-  }, [isLoading, user]);
-
   // Redirect jika bukan buyer
   useEffect(() => {
     if (!isLoading && user && user.role !== "buyer") {
@@ -50,15 +46,6 @@ const RegisterShop = () => {
       // atau navigate("/products") untuk ke homepage
     }
   }, [isLoading, user, navigate]);
-
-  // Set default value email dari user yang sedang login
-  useEffect(() => {
-    if (user) {
-      if (user.email) setValue("name", user.username);
-      if (user.phone) setValue("phone", user.phone);
-      if (user.address) setValue("address", user.address);
-    }
-  }, [user, setValue]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -69,7 +56,7 @@ const RegisterShop = () => {
         setError("qris_picture", {
           type: "manual",
           message: "Please select a valid image file (JPEG, PNG)",
-        })
+        });
         return;
       }
 
@@ -78,7 +65,7 @@ const RegisterShop = () => {
         setError("qris_picture", {
           type: "manual",
           message: "File size must be less than 5MB",
-        })
+        });
         return;
       }
 
@@ -105,9 +92,19 @@ const RegisterShop = () => {
     }
   };
 
-  const onSubmit = (data) => {
-    console.log(data);
-    toast.success("Shop registered successfully!");
+  const onSubmit = async (data) => {
+    console.log("Added Shop Data:", data);
+    try {
+      const shopData = { user_id: user.id, ...data };
+      await createNewShop(shopData);
+      reset();
+      setQrisFile(null);
+    } catch (error) {
+      console.error("Shop update error:", error);
+      toast.error("Shop update failed!");
+    } finally {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -140,7 +137,7 @@ const RegisterShop = () => {
                   type="text"
                   placeholder="Insert Shop Name..."
                   autoComplete="off"
-                  disabled={isSubmitting}
+                  disabled={loading}
                 />
                 {errors.shop_name && (
                   <ErrorMessage ErrorMessage={errors.shop_name.message} />
@@ -155,7 +152,7 @@ const RegisterShop = () => {
                   type="text"
                   placeholder="Insert Shop Phone..."
                   autoComplete="off"
-                  disabled={isSubmitting}
+                  disabled={loading}
                 />
                 {errors.shop_telephone && (
                   <ErrorMessage ErrorMessage={errors.shop_telephone.message} />
@@ -170,7 +167,7 @@ const RegisterShop = () => {
                   type="text"
                   placeholder="Insert Shop Address..."
                   autoComplete="off"
-                  disabled={isSubmitting}
+                  disabled={loading}
                 />
                 {errors.shop_address && (
                   <ErrorMessage ErrorMessage={errors.shop_address.message} />
@@ -185,7 +182,7 @@ const RegisterShop = () => {
                   type="text"
                   placeholder="e.g. BCA: 1234567890 - Seller"
                   autoComplete="off"
-                  disabled={isSubmitting}
+                  disabled={loading}
                 />
                 {errors.account_number && (
                   <ErrorMessage ErrorMessage={errors.account_number.message} />
@@ -272,9 +269,9 @@ const RegisterShop = () => {
               <Button
                 type="submit"
                 className="w-full cursor-pointer"
-                disabled={isSubmitting}
+                disabled={loading}
               >
-                {isSubmitting ? "Registering..." : "Register Shop"}
+                {loading ? "Registering..." : "Register Shop"}
               </Button>
             </div>
           </form>

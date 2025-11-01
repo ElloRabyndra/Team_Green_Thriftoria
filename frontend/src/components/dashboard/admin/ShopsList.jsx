@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, Trash2, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
@@ -9,12 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { allShops } from "@/database/dummy";
 import { Link } from "react-router";
+import { useAdmin } from "@/hooks/useAdmin";
+import Loading from "@/components/ui/loading";
 
 // Badge component untuk status
 function StatusBadge({ status_admin }) {
-  const isAccept = status_admin === "Accept";
+  const isAccept = status_admin === "accept";
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -30,32 +31,44 @@ function StatusBadge({ status_admin }) {
 
 // Buyer List Component
 const ShopsList = () => {
-  const acceptShop = allShops.filter((shop) => shop.status_admin === "Accept");
+  const { shopList, loading, fetchShopList } = useAdmin();
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredShops, setFilteredShops] = useState(acceptShop);
+  const [filteredShops, setFilteredShops] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  // Fetch Shop List
+  useEffect(() => {
+    fetchShopList();
+  }, []);
+
+  //  Set filtered shops
+  useEffect(() => {
+    setFilteredShops(shopList);
+  }, [shopList]);
+
+  // Handle search
   const handleSearch = (e) => {
     e.preventDefault();
     setIsSearching(true);
 
     if (searchQuery.trim() === "") {
-      setFilteredShops(acceptShop);
+      setFilteredShops(shopList);
     } else {
-      const filtered = acceptShop.filter((shop) =>
+      const filtered = shopList.filter((shop) =>
         shop.shop_name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredShops(filtered);
     }
   };
 
+  // Handle search change
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchQuery(value);
 
     // Reset to all shops if search is cleared
     if (value.trim() === "") {
-      setFilteredShops(acceptShop);
+      setFilteredShops(shopList);
       setIsSearching(false);
     }
   };
@@ -65,6 +78,11 @@ const ShopsList = () => {
   };
 
   const handleDelete = (shop) => {};
+
+  // Loading state
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">

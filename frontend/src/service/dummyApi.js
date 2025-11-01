@@ -513,7 +513,8 @@ export const createShop = async (shopData) => {
       shop_telephone: shopData.shop_telephone,
       shop_address: shopData.shop_address,
       account_number: shopData.account_number,
-      qris_picture: shopData.qris_picture,
+      qris_picture:
+        "https://png.pngtree.com/png-vector/20191027/ourmid/pngtree-qr-code-vector-hidden-text-or-url-scanning-smartphone-technology-isolated-png-image_1886134.jpg",
       created_at: new Date().toISOString(),
       status_admin: "pending",
     };
@@ -552,6 +553,8 @@ export const editShop = async (shop_id, shopData) => {
   if (USE_DUMMY) {
     await delay();
     const index = dummyStore.shops.findIndex((s) => s.id === shop_id);
+    shopData.qris_picture =
+      "https://png.pngtree.com/png-vector/20191027/ourmid/pngtree-qr-code-vector-hidden-text-or-url-scanning-smartphone-technology-isolated-png-image_1886134.jpg";
     if (index !== -1) {
       dummyStore.shops[index] = { ...dummyStore.shops[index], ...shopData };
       return {
@@ -689,6 +692,17 @@ export const getAllUser = async () => {
   }
 
   const response = await api.get("/admin/users");
+  return response.data;
+};
+
+export const deleteUser = async (user_id) => {
+  if (USE_DUMMY) {
+    await delay();
+    dummyStore.users = dummyStore.users.filter((u) => u.id !== user_id);
+    return { success: true, message: "User deleted" };
+  }
+
+  const response = await api.delete(`/admin/users/${user_id}`);
   return response.data;
 };
 

@@ -37,7 +37,9 @@ export default function ProductList() {
     if (products.length === 0) return;
     // if (user.Shop) {
     setProductList(
-      products.filter((product) => product.shop_id !== user.id) // nanti ganti ke shop_id
+      products.filter(
+        (product) => product.shop_id !== (user.Shop?.id || user.id)
+      ) // nanti ganti ke user.Shop.id
     );
     // } else {
     //   setProductList(products);
@@ -63,7 +65,7 @@ export default function ProductList() {
             product={product}
             onAddToCart={handleAddToCart}
             role={user.role}
-            shop_id={user.id} // nanti ganti ke shop_id
+            shop_id={(user.Shop?.id || user.id)} // nanti ganti ke user.Shop.id
           />
         ))}
       </div>

@@ -17,9 +17,12 @@ import { Label } from "@/components/ui/label";
 import ErrorMessage from "@/components/ErrorMessage";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
+import Loading from "@/components/ui/loading";
+import { useShop } from "@/hooks/useShop";
 
 const MyShop = () => {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
+  const { shop, loading, fetchDetailShop, updateShop } = useShop();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [qrisFile, setQrisFile] = useState(null);
@@ -29,15 +32,12 @@ const MyShop = () => {
   const [showPreview, setShowPreview] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Dummy data shop - ini nanti diganti dengan data real dari API/state
-  const shopData = {
-    shop_name: "Toko Serbaguna Jaya",
-    shop_telephone: "08123456789",
-    shop_address: "Jl. Merdeka No. 123, Jakarta Pusat",
-    account_number: "1234567890",
-    qris_picture:
-      "https://png.pngtree.com/png-vector/20191027/ourmid/pngtree-qr-code-vector-hidden-text-or-url-scanning-smartphone-technology-isolated-png-image_1886134.jpg",
-  };
+  // Fetch detail shop
+  useEffect(() => {
+    if (user) {
+      fetchDetailShop(user.Shop?.id || user.id); // nanti ganti ke user.Shop.id
+    }
+  }, [user]);
 
   const {
     register,
@@ -51,17 +51,6 @@ const MyShop = () => {
     resolver: zodResolver(editShopSchema),
   });
 
-  // Watch untuk real-time preview di UI
-  const shop_nameValue = watch("shop_name");
-  const shop_telephoneValue = watch("shop_telephone");
-  const shop_addressValue = watch("shop_address");
-  const account_numberValue = watch("account_number");
-
-  // Redirect ke login jika tidak ada user setelah loading selesai
-  useEffect(() => {
-    if (!isLoading && !user) logout();
-  }, [isLoading, user]);
-
   // Redirect jika bukan seller
   useEffect(() => {
     if (!isLoading && user && user.role !== "seller") {
@@ -69,20 +58,20 @@ const MyShop = () => {
     }
   }, [isLoading, user, navigate]);
 
-  // Set default values dari shopData
+  // Set default values dari shop
   useEffect(() => {
-    if (shopData) {
-      setValue("shop_name", shopData.shop_name);
-      setValue("shop_telephone", shopData.shop_telephone);
-      setValue("shop_address", shopData.shop_address);
-      setValue("account_number", shopData.account_number);
+    if (shop) {
+      setValue("shop_name", shop.shop_name);
+      setValue("shop_telephone", shop.shop_telephone);
+      setValue("shop_address", shop.shop_address);
+      setValue("account_number", shop.account_number);
 
       // Set QRIS preview dari data existing
-      if (shopData.qris_picture) {
-        setQrisPreview(shopData.qris_picture);
+      if (shop.qris_picture) {
+        setQrisPreview(shop.qris_picture);
       }
     }
-  }, [setValue]);
+  }, [setValue, shop]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -129,13 +118,13 @@ const MyShop = () => {
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
     console.log("Updated Shop Data:", data);
 
     try {
-      // Simulasi update shop
-      // Di sini nanti akan ada logic untuk update shop ke API
+      // Update Shop
+      await updateShop(shop.id, data);
 
       // Reset form dengan nilai yang baru diupdate
       reset({
@@ -148,8 +137,6 @@ const MyShop = () => {
 
       // Clear file state tapi tetap tampilkan preview yang sudah diupdate
       setQrisFile(null);
-
-      toast.success("Shop updated successfully!");
     } catch (error) {
       console.error("Shop update error:", error);
       toast.error("Shop update failed!");
@@ -168,20 +155,11 @@ const MyShop = () => {
   }, [qrisPreview]);
 
   // Loading state
-  if (isLoading) {
-    return (
-      <div className="px-4 sm:px-6 -mt-4">
-        <div className="flex justify-center items-center min-h-[200px]">
-          <div>Loading shop data...</div>
-        </div>
-      </div>
-    );
+  if (isLoading || loading) {
+    return <Loading />;
   }
 
-  if (!user) {
-    return null;
-  }
-
+  console.log(shop);
   return (
     <div className="px-4 sm:px-6 -mt-4">
       {/* Back Button */}

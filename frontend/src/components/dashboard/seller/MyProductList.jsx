@@ -29,7 +29,7 @@ const MyProductList = () => {
   // Filter produk penjual
   useEffect(() => {
     if (products.length === 0) return;
-    setMyProducts(products.filter((p) => p.shop_id === user.id)); // nanti ganti ke shop_id
+    setMyProducts(products.filter((p) => p.shop_id === (user.Shop?.id || user.id))); // nanti ganti ke user.Shop.id
   }, [products]);
 
   if (productLoading) {
@@ -76,7 +76,7 @@ const MyProductList = () => {
                 product={product}
                 onRemoveProduct={handleRemoveProduct}
                 role={user.role} // Sementara
-                shop_id={user.id} // nanti ganti ke shop_id
+                shop_id={(user.Shop?.id || user.id)} // nanti ganti ke user.Shop.id
               />
             ))}
           </div>

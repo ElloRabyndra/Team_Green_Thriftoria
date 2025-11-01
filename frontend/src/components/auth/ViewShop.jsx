@@ -1,94 +1,37 @@
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { MapPin, Phone, Store } from "lucide-react";
 import Empty from "@/components/ui/Empty";
 import ProductCard from "../product/ProductCard";
-
-const dummyShops = [
-  {
-    id: 1,
-    user_id: 1,
-    userName: "John Doe",
-    shop_name: "Premium Fashion Store",
-    shop_address: "Jl. Contoh, Jakarta, Indonesia",
-    shop_telephone: "+62 812 3456 7890",
-  },
-];
-
-const dummyProducts = [
-  {
-    id: 101,
-    name: "Elegant Blazer",
-    price: 350000,
-    thumbnail: "https://picsum.photos/seed/blazer/400/400",
-    shop_name: "Premium Fashion Store",
-  },
-  {
-    id: 102,
-    name: "Casual T-Shirt",
-    price: 120000,
-    thumbnail: "https://picsum.photos/seed/tshirt/400/400",
-    shop_name: "Premium Fashion Store",
-  },
-  {
-    id: 103,
-    name: "Leather Shoes",
-    price: 450000,
-    thumbnail: "https://picsum.photos/seed/shoes/400/400",
-    shop_name: "Premium Fashion Store",
-  },
-];
+import Loading from "../ui/loading";
+import { useShop } from "@/hooks/useShop";
+import { useProducts } from "@/hooks/useProducts";
 
 const ViewShop = () => {
   const { shopId } = useParams();
-  const [shop, setShop] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { shop, loading, fetchDetailShop } = useShop(shopId);
+  const {
+    products,
+    loading: productLoading,
+    addToCart,
+    removeProduct,
+  } = useProducts();
+  const [shopProducts, setShopProducts] = useState([]);
 
+  // Fetch Detail Shop
   useEffect(() => {
-    const fetchShopData = async () => {
-      setLoading(true);
-      try {
-        // --- Ganti URL API di sini nanti ---
-        const res = await fetch(`/api/shops/${shopId}`);
-        if (!res.ok) throw new Error("Failed to fetch shop data");
-
-        const data = await res.json();
-        setShop(data.shop);
-        setProducts(data.products || []);
-      } catch (err) {
-        console.error("Error fetching shop data:", err);
-        // fallback ke dummy data
-        const foundShop = dummyShops.find((s) => s.id === Number(shopId));
-        if (foundShop) {
-          setShop(foundShop);
-          setProducts(dummyProducts);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchShopData();
+    fetchDetailShop(Number(shopId));
   }, [shopId]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh] text-muted-foreground">
-        Loading shop details...
-      </div>
-    );
-  }
+  // Filter produk penjual
+  useEffect(() => {
+    if (products.length === 0) return;
+    setShopProducts(products.filter((p) => p.shop_id === Number(shopId)));
+  }, [products]);
 
-  if (!shop) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <Empty message="Shop not found." />
-      </div>
-    );
-  }
+  // Loading state
+  if (loading || productLoading) return <Loading />;
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -100,12 +43,6 @@ const ViewShop = () => {
               <Store className="w-6 h-6 text-primary" />
               {shop.shop_name}
             </h1>
-            <p className="text-sm text-muted-foreground mt-2">
-              Owner:{" "}
-              <span className="font-medium text-foreground">
-                {shop.userName}
-              </span>
-            </p>
             <div className="mt-3 space-y-2 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
@@ -125,6 +62,21 @@ const ViewShop = () => {
             Product List
           </h1>
         </div>
+        {/* Menampilkan produk penjual */}
+        {shopProducts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {shopProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                addToCart={addToCart}
+                removeProduct={removeProduct}
+              />
+            ))}
+          </div>
+        ) : (
+          <Empty>Product not found</Empty>
+        )}
       </section>
     </div>
   );
