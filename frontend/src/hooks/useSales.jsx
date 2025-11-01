@@ -9,13 +9,12 @@ export const useSales = () => {
   // State Utama
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSale, setSelectedSale] = useState(null);
 
   // Fetch Semua Sales (Pesanan yang masuk ke toko)
-  const fetchSales = async (shopId) => {
+  const fetchSales = async (shop_id) => {
     setLoading(true);
     try {
-      const response = await getAllSales(shopId);
+      const response = await getAllSales(shop_id);
       if (response.success) {
         setSales(response.data || []);
       }
@@ -28,11 +27,11 @@ export const useSales = () => {
   };
 
   // Terima / Tolak Pembayaran
-  const handlePayment = async (orderId, isAccepted, shopId) => {
+  const handlePayment = async (order_id, isAccepted, user_id) => {
     try {
-      const response = await acceptPayment(orderId, isAccepted);
+      const response = await acceptPayment(order_id, isAccepted);
       if (response.success) {
-        await fetchSales(shopId); // Refresh data setelah perubahan
+        await fetchOrders(user_id);
       }
       return response;
     } catch (error) {
@@ -42,11 +41,11 @@ export const useSales = () => {
   };
 
   // Ubah Status Pengiriman
-  const updateShippingStatus = async (orderId, statusShipping, shopId) => {
+  const updateShippingStatus = async (order_id, status_shipping, user_id) => {
     try {
-      const response = await changeStatusShipping(orderId, statusShipping);
+      const response = await changeStatusShipping(order_id, status_shipping);
       if (response.success) {
-        await fetchSales(shopId);
+        await fetchOrders(user_id);
       }
       return response;
     } catch (error) {
@@ -55,19 +54,12 @@ export const useSales = () => {
     }
   };
 
-  // Pilih / Reset Detail Sale
-  const selectSale = (sale) => setSelectedSale(sale);
-  const resetSelectedSale = () => setSelectedSale(null);
-
   // Return Semua yang Diperlukan
   return {
     sales,
     loading,
-    selectedSale,
     fetchSales,
     handlePayment,
     updateShippingStatus,
-    selectSale,
-    resetSelectedSale,
   };
 };

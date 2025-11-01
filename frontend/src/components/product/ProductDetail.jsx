@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, useOutletContext } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
-import { getDetailProduct } from "@/service/dummyApi";
+import { useProducts } from "@/hooks/useProducts";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { Button } from "../ui/button";
 import Loading from "../ui/loading";
@@ -10,35 +10,19 @@ import { toast } from "react-toastify";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const { user, logout, isLoading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { addToCart } = useOutletContext();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const {
+    productDetail,
+    getProductDetail,
+    loading: productLoading,
+    addToCart,
+  } = useProducts();
 
+  // Ambil data produk
   useEffect(() => {
-    fetchProductDetail();
+    if (id) getProductDetail(Number(id));
   }, [id]);
-
-  const fetchProductDetail = async () => {
-    setLoading(true);
-    try {
-      const response = await getDetailProduct(parseInt(id));
-      if (response.success) {
-        setProduct(response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching product detail:", error);
-      setProduct(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Redirect ke login jika tidak ada user setelah loading selesai
-  useEffect(() => {
-    if (!isLoading && !user) logout();
-  }, [isLoading, user]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
@@ -50,7 +34,12 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = async () => {
-    const success = await addToCart(product);
+    if (!user?.id) {
+      console.error("User not logged in");
+      toast.error("Please login first");
+      return;
+    }
+    const success = await addToCart(user.id, product);
     if (success) {
       toast.success("Product added to cart!");
     } else {
@@ -58,7 +47,7 @@ export default function ProductDetail() {
     }
   };
 
-  if (loading) {
+  if (productLoading) {
     return (
       <div className="flex items-center justify-center min-h-96">
         <Loading />
@@ -66,7 +55,7 @@ export default function ProductDetail() {
     );
   }
 
-  if (!product) {
+  if (!productDetail) {
     return (
       <>
         {/* Back Button */}
@@ -106,12 +95,12 @@ export default function ProductDetail() {
           {/* Main Image */}
           <div className="overflow-hidden w-60 sm:w-80 lg:w-96 p-0">
             <img
-              src={product.image}
-              alt={product.name}
+              src={productDetail.image}
+              alt={productDetail.name}
               className="w-full h-full object-cover"
               onError={(e) => {
                 e.target.src =
-                  "https://via.placeholder.com/500x500?text=No+Image";
+                  "https://www.svgrepo.com/show/508699/landscape-placeholder.svg";
               }}
             />
           </div>
@@ -122,21 +111,23 @@ export default function ProductDetail() {
           {/* Product Name and Label */}
           <div>
             <span className="text-sm text-gray-500 uppercase font-medium">
-              {product.label}
+              {productDetail.label}
             </span>
             <h1 className="text-2xl md:text-2xl font-bold mt-1">
-              {product.name}
+              {productDetail.name}
             </h1>
           </div>
 
           {/* Price */}
           <div className="space-y-2">
             <div className="text-2xl md:text-3xl font-bold text-primary">
-              {formatPrice(product.price)}
+              {formatPrice(productDetail.price)}
             </div>
             <div className="text-sm text-gray-600">
               Stock:{" "}
-              <span className="font-medium">{product.stock} available</span>
+              <span className="font-medium">
+                {productDetail.stock} available
+              </span>
             </div>
           </div>
 
@@ -144,7 +135,7 @@ export default function ProductDetail() {
           <div>
             <h3 className="text-lg font-semibold mb-2">Description</h3>
             <p className="text-gray-500 leading-relaxed">
-              {product.description}
+              {productDetail.description}
             </p>
           </div>
 

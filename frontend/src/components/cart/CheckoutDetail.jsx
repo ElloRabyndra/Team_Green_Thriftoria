@@ -7,7 +7,7 @@ export default function CheckoutDetail({
   subtotal,
   deliveryFee,
   total,
-  shopName,
+  shop_name,
 }) {
   const navigate = useNavigate();
   // Fungsi untuk format harga
@@ -44,7 +44,7 @@ export default function CheckoutDetail({
             className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"
           >
             <Store className="h-4 w-4" />
-            <span className="font-medium capitalize">{shopName}</span>
+            <span className="font-medium capitalize">{shop_name}</span>
           </Link>
 
           {/* Selected Items */}

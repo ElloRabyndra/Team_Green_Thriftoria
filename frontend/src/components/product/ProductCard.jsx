@@ -5,7 +5,13 @@ import { toast } from "react-toastify";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 // ProductCard Component
-export default function ProductCard({ product, onAddToCart, role = "buyer" }) {
+export default function ProductCard({
+  product,
+  onAddToCart = async () => {},
+  onRemoveProduct = async () => {},
+  role = "buyer",
+  shop_id = null,
+}) {
   // Fungsi untuk format harga
   const formatPrice = (price) => {
     return new Intl.NumberFormat("id-ID", {
@@ -25,13 +31,22 @@ export default function ProductCard({ product, onAddToCart, role = "buyer" }) {
     }
   };
 
+  const handleDeleteProduct = async (product_id) => {
+    const success = await onRemoveProduct(product_id);
+    if (success) {
+      toast.success("Product deleted successfully!");
+    } else {
+      toast.error("Failed to delete product");
+    }
+  };
+
   return (
     <div className="relative group">
       {/* Delete/Cancel Button - positioned outside card, only visible on hover */}
-      {role === "seller" && (
+      {role === "seller" && product.shop_id === shop_id && (
         <ConfirmDialog
           onConfirm={() => {
-            toast.success("Order cancelled!");
+            handleDeleteProduct(product.id);
           }}
         >
           <button
@@ -43,7 +58,7 @@ export default function ProductCard({ product, onAddToCart, role = "buyer" }) {
         </ConfirmDialog>
       )}
       <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
-        {role === "seller" ? (
+        {role === "seller" && product.shop_id === shop_id ? (
           <Link
             to={`/dashboard/edit-product/${product.id}`}
             className="relative overflow-hidden group block"
@@ -53,7 +68,8 @@ export default function ProductCard({ product, onAddToCart, role = "buyer" }) {
               alt={product.name}
               className="w-full h-48 object-cover transition-transform duration-300"
               onError={(e) => {
-                e.target.src = "https://i.sstatic.net/y9DpT.jpg";
+                e.target.src =
+                  "https://www.svgrepo.com/show/508699/landscape-placeholder.svg";
               }}
             />
 
@@ -77,7 +93,8 @@ export default function ProductCard({ product, onAddToCart, role = "buyer" }) {
               alt={product.name}
               className="w-full h-48 object-cover transition-transform duration-300"
               onError={(e) => {
-                e.target.src = "https://i.sstatic.net/y9DpT.jpg";
+                e.target.src =
+                  "https://www.svgrepo.com/show/508699/landscape-placeholder.svg";
               }}
             />
           </Link>
@@ -108,7 +125,8 @@ export default function ProductCard({ product, onAddToCart, role = "buyer" }) {
           </div>
 
           {/* Tombol berbeda berdasarkan role */}
-          {role === "buyer" ? (
+          {(role === "seller" && product.shop_id !== shop_id) ||
+          role === "buyer" ? (
             <button
               className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 px-4 rounded-lg transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               onClick={() => handleAddToCart()}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   createOrder,
   getAllOrder,
@@ -8,21 +8,25 @@ import {
   rejectCancel,
   acceptCancel,
 } from "@/service/dummyApi";
-import { useOutletContext } from "react-router";
+import { useProducts } from "./useProducts";
+import { useAuth } from "./useAuth";
+import { toast } from "react-toastify";
 
 export const useOrders = () => {
+  const { user } = useAuth();
+  const { removeFromCart: removeFromCartHook } = useProducts();
+
   // State Utama
   const [orders, setOrders] = useState([]);
   const [orderHistory, setOrderHistory] = useState([]);
   const [orderDetail, setOrderDetail] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { removeFromCart } = useOutletContext();
 
   // Fetch Semua Order Aktif
-  const fetchOrders = async (userId) => {
+  const fetchOrders = async (user_id) => {
     setLoading(true);
     try {
-      const response = await getAllOrder(userId);
+      const response = await getAllOrder(user_id);
       if (response.success) {
         setOrders(response.data || []);
       }
@@ -35,10 +39,10 @@ export const useOrders = () => {
   };
 
   // Fetch Riwayat Order
-  const fetchOrderHistory = async (userId) => {
+  const fetchOrderHistory = async (user_id) => {
     setLoading(true);
     try {
-      const response = await getAllOrderHistory(userId);
+      const response = await getAllOrderHistory(user_id);
       if (response.success) {
         setOrderHistory(response.data || []);
       }
@@ -51,12 +55,14 @@ export const useOrders = () => {
   };
 
   // Fetch Detail Order
-  const fetchOrderDetail = async (orderId) => {
+  const fetchOrderDetail = async (order_id) => {
     setLoading(true);
     try {
-      const response = await getOrderDetail(orderId);
-      if (response.success) {
-        setOrderDetail(response.data || null);
+      const response = await getOrderDetail(order_id);
+      if (response.success && response.data.id) {
+        setOrderDetail(response.data);
+      } else {
+        setOrderDetail(null);
       }
     } catch (error) {
       console.error("Error fetching order detail:", error);
@@ -71,11 +77,13 @@ export const useOrders = () => {
     try {
       const response = await createOrder(orderData);
       if (response.success) {
-        // Hapus cart
-        orderData.orderItems.forEach((item) => {
-          removeFromCart(item.id);
-        });
-        await fetchOrders(orderData.userId);
+        // Hapus cart items menggunakan user_id dari user context
+        if (user?.id) {
+          for (const item of orderData.orderItems) {
+            await removeFromCartHook(user.id, item.id);
+          }
+        }
+        await fetchOrders(orderData.user_id);
         return { success: true, message: response.message };
       }
       return { success: false, message: "Gagal membuat order" };
@@ -86,12 +94,12 @@ export const useOrders = () => {
   };
 
   // Ajukan Pembatalan Order
-  const requestCancel = async (orderId, userRole, userId) => {
-    console.log(orderId, userRole, userId);
+  const requestCancel = async (order_id, userRole, user_id) => {
     try {
-      const response = await cancelOrder(orderId, userRole);
+      const response = await cancelOrder(order_id, userRole);
       if (response.success) {
-        await fetchOrders(userId);
+        await fetchOrders(user_id);
+        toast.success("Cancel request submitted!");
         console.log(response);
       }
       return response;
@@ -102,12 +110,12 @@ export const useOrders = () => {
   };
 
   // Terima Pembatalan
-  const approveCancel = async (orderId, userId) => {
+  const approveCancel = async (order_id, user_id) => {
     try {
-      const response = await acceptCancel(orderId);
+      const response = await acceptCancel(order_id);
       if (response.success) {
-        await fetchOrders(userId);
-        await fetchOrderHistory(userId);
+        await fetchOrders(user_id);
+        await fetchOrderHistory(user_id);
       }
       return response;
     } catch (error) {
@@ -117,11 +125,11 @@ export const useOrders = () => {
   };
 
   // Tolak Pembatalan
-  const denyCancel = async (orderId, userId) => {
+  const denyCancel = async (order_id, user_id) => {
     try {
-      const response = await rejectCancel(orderId);
+      const response = await rejectCancel(order_id);
       if (response.success) {
-        await fetchOrders(userId);
+        await fetchOrders(user_id);
       }
       return response;
     } catch (error) {

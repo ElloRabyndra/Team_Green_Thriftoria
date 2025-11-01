@@ -14,7 +14,7 @@ const api = axios.create({
 });
 
 // Delay helper untuk simulasi network request
-const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // ==================== AUTH ENDPOINTS ====================
 export const register = async (email, username, password) => {
@@ -27,7 +27,7 @@ export const register = async (email, username, password) => {
       telephone: null,
       address: null,
       role: "buyer",
-      profilePicture: null,
+      profile_picture: null,
     };
     dummyStore.users.push(newUser);
     return { success: true, message: "Register berhasil", data: newUser };
@@ -60,21 +60,21 @@ export const login = async (email, password) => {
 };
 
 // ==================== USER PROFILE ENDPOINTS ====================
-export const getDetailUser = async (userId) => {
+export const getDetailUser = async (user_id) => {
   if (USE_DUMMY) {
     await delay();
-    const user = dummyStore.users.find((u) => u.id === userId);
+    const user = dummyStore.users.find((u) => u.id === user_id);
     return { success: true, data: user };
   }
 
-  const response = await api.get(`/user/${userId}`);
+  const response = await api.get(`/user/${user_id}`);
   return response.data;
 };
 
-export const editProfile = async (userId, profileData) => {
+export const editProfile = async (user_id, profileData) => {
   if (USE_DUMMY) {
     await delay();
-    const userIndex = dummyStore.users.findIndex((u) => u.id === userId);
+    const userIndex = dummyStore.users.findIndex((u) => u.id === user_id);
     if (userIndex !== -1) {
       dummyStore.users[userIndex] = {
         ...dummyStore.users[userIndex],
@@ -89,7 +89,7 @@ export const editProfile = async (userId, profileData) => {
     throw new Error("User tidak ditemukan");
   }
 
-  const response = await api.put(`/user/${userId}`, profileData);
+  const response = await api.put(`/user/${user_id}`, profileData);
   return response.data;
 };
 
@@ -107,7 +107,9 @@ export const getAllProduct = async () => {
 export const getProductByCategory = async (category) => {
   if (USE_DUMMY) {
     await delay();
-    const filtered = dummyStore.products.filter((p) => p.category === category);
+    const filtered = dummyStore.products.filter(
+      (p) => p.category.toLowerCase() === category
+    );
     return { success: true, data: filtered };
   }
 
@@ -128,19 +130,19 @@ export const searchProduct = async (query) => {
   return response.data;
 };
 
-export const getDetailProduct = async (productId) => {
+export const getDetailProduct = async (product_id) => {
   if (USE_DUMMY) {
     await delay();
-    const product = dummyStore.products.find((p) => p.id === productId);
+    const product = dummyStore.products.find((p) => p.id === product_id);
     return { success: true, data: product };
   }
 
-  const response = await api.get(`/products/${productId}`);
+  const response = await api.get(`/products/${product_id}`);
   return response.data;
 };
 
 export const addProduct = async (
-  shopId,
+  shop_id,
   name,
   category,
   label,
@@ -160,12 +162,12 @@ export const addProduct = async (
 
     const newProduct = {
       id: newId,
-      shopId,
+      shop_id,
       name,
       category,
       label,
       description,
-      image: image || "https://via.placeholder.com/300",
+      image: "https://www.svgrepo.com/show/508699/landscape-placeholder.svg",
       price: parseFloat(price),
       stock: parseInt(stock),
     };
@@ -180,7 +182,7 @@ export const addProduct = async (
   }
 
   const response = await api.post("/products", {
-    shopId,
+    shop_id,
     name,
     category,
     label,
@@ -192,10 +194,10 @@ export const addProduct = async (
   return response.data;
 };
 
-export const editProduct = async (productId, productData) => {
+export const editProduct = async (product_id, productData) => {
   if (USE_DUMMY) {
     await delay();
-    const index = dummyStore.products.findIndex((p) => p.id === productId);
+    const index = dummyStore.products.findIndex((p) => p.id === product_id);
     if (index !== -1) {
       dummyStore.products[index] = {
         ...dummyStore.products[index],
@@ -210,70 +212,72 @@ export const editProduct = async (productId, productData) => {
     throw new Error("Product tidak ditemukan");
   }
 
-  const response = await api.put(`/products/${productId}`, productData);
+  const response = await api.put(`/products/${product_id}`, productData);
   return response.data;
 };
 
-export const deleteProduct = async (productId) => {
+export const deleteProduct = async (product_id) => {
   if (USE_DUMMY) {
     await delay();
-    dummyStore.products = dummyStore.products.filter((p) => p.id !== productId);
+    dummyStore.products = dummyStore.products.filter(
+      (p) => p.id !== product_id
+    );
     return { success: true, message: "Product deleted" };
   }
 
-  const response = await api.delete(`/products/${productId}`);
+  const response = await api.delete(`/products/${product_id}`);
   return response.data;
 };
 
 // ==================== CART ENDPOINTS ====================
-export const addToCart = async (userId, productId) => {
+export const addToCart = async (user_id, product_id) => {
   if (USE_DUMMY) {
     await delay();
     const existing = dummyStore.cart.find(
-      (c) => c.userId === userId && c.productId === productId
+      (c) => c.user_id === user_id && c.product_id === product_id
     );
     if (existing) {
       existing.quantity += 1;
     } else {
       dummyStore.cart.push({
         id: dummyStore.cart.length + 1,
-        userId,
-        productId,
+        user_id,
+        product_id,
         quantity: 1,
       });
     }
     return { success: true, message: "Added to cart" };
   }
 
-  const response = await api.post("/cart", { userId, productId });
+  const response = await api.post("/cart", { user_id, product_id });
   return response.data;
 };
 
-export const getAllCart = async (userId) => {
+export const getAllCart = async (user_id) => {
   if (USE_DUMMY) {
     await delay();
     const userCart = dummyStore.cart
-      .filter((c) => c.userId === userId)
+      .filter((c) => c.user_id === user_id)
       .map((c) => {
-        const product = dummyStore.products.find((p) => p.id === c.productId);
-        const shop = dummyStore.shops.find((s) => s.id === product?.shopId);
+        const product = dummyStore.products.find((p) => p.id === c.product_id);
+        const shop = dummyStore.shops.find((s) => s.id === product?.shop_id);
         return {
           id: c.id,
-          userId: c.userId,
-          shopId: product?.shopId,
-          productId: c.productId,
+          user_id: c.user_id,
+          shop_id: product?.shop_id,
+          product_id: c.product_id,
           image: product?.image,
           name: product?.name,
           label: product?.label,
           quantity: c.quantity,
           price: product?.price,
-          shopName: shop?.shopName,
+          shop_name: shop?.shop_name,
         };
       });
     return { success: true, data: userCart };
   }
 
-  const response = await api.get(`/cart/${userId}`);
+  const response = await api.get(`/cart/${user_id}`);
   return response.data;
 };
 
@@ -307,21 +311,21 @@ export const deleteCartItem = async (cartId) => {
 export const createOrder = async (orderData) => {
   if (USE_DUMMY) {
     await delay();
-    const orderId = dummyStore.orders.length + 1;
+    const order_id = dummyStore.orders.length + 1;
     const newOrder = {
-      id: orderId,
-      userId: orderData.userId,
-      shopId: orderData.shopId,
+      id: order_id,
+      user_id: orderData.user_id,
+      shop_id: orderData.shop_id,
       recipient: orderData.recipient,
       telephone: orderData.telephone,
       address: orderData.address,
       note: orderData.note,
-      totalPrice: orderData.totalPrice,
-      proofPayment: orderData.proofPayment,
+      total_price: orderData.total_price,
+      proof_payment: orderData.proof_payment,
       cancelBy: null,
-      statusShipping: "awaitingPayment",
-      createdAt: new Date().toISOString(),
-      deletedAt: null,
+      status_shipping: "awaitingPayment",
+      created_at: new Date().toISOString(),
+      deleted_at: null,
     };
     dummyStore.orders.push(newOrder);
 
@@ -329,8 +333,8 @@ export const createOrder = async (orderData) => {
     orderData.orderItems.forEach((item) => {
       dummyStore.orderItems.push({
         id: dummyStore.orderItems.length + 1,
-        orderId: orderId,
-        productId: item.productId,
+        order_id: order_id,
+        product_id: item.product_id,
         quantity: item.quantity,
         price: item.price,
       });
@@ -342,80 +346,82 @@ export const createOrder = async (orderData) => {
   return response.data;
 };
 
-export const getAllOrder = async (userId) => {
+export const getAllOrder = async (user_id) => {
   if (USE_DUMMY) {
     await delay();
     const userOrders = dummyStore.orders
       .filter(
         (o) =>
-          o.userId === userId &&
-          !["delivered", "cancelled"].includes(o.statusShipping.toLowerCase())
+          o.user_id === user_id &&
+          !["delivered", "cancelled"].includes(o.status_shipping.toLowerCase())
       )
       .map((o) => {
-        const shop = dummyStore.shops.find((s) => s.id === o.shopId);
+        const shop = dummyStore.shops.find((s) => s.id === o.shop_id);
         const itemCount = dummyStore.orderItems.filter(
-          (oi) => oi.orderId === o.id
+          (oi) => oi.id === o.id
         ).length;
         return {
           id: o.id,
-          shopId: o.shopId,
-          shopName: shop?.shopName,
-          shopPhone: shop?.shopTelephone,
-          createdAt: o.createdAt,
-          totalPrice: o.totalPrice,
-          statusShipping: o.statusShipping,
+          shop_id: o.shop_id,
+          shop_name: shop?.shop_name,
+          shop_telephone: shop?.shop_telephone,
+          created_at: o.created_at,
+          total_price: o.total_price,
+          status_shipping: o.status_shipping,
           productCount: itemCount,
         };
       });
     return { success: true, data: userOrders };
   }
 
-  const response = await api.get(`/orders/user/${userId}`);
+  const response = await api.get(`/orders/user/${user_id}`);
   return response.data;
 };
 
-export const getAllOrderHistory = async (userId) => {
+export const getAllOrderHistory = async (user_id) => {
   if (USE_DUMMY) {
     await delay();
     const userOrders = dummyStore.orders
       .filter(
         (o) =>
-          o.userId === userId &&
-          ["delivered", "cancelled"].includes(o.statusShipping.toLowerCase())
+          o.user_id === user_id &&
+          ["delivered", "cancelled"].includes(o.status_shipping.toLowerCase())
       )
       .map((o) => {
-        const shop = dummyStore.shops.find((s) => s.id === o.shopId);
+        const shop = dummyStore.shops.find((s) => s.id === o.shop_id);
         const itemCount = dummyStore.orderItems.filter(
-          (oi) => oi.orderId === o.id
+          (oi) => oi.order_id === o.id
         ).length;
         return {
-          orderId: o.id,
-          shopId: o.shopId,
-          shopName: shop?.shopName,
-          shopPhone: shop?.shopTelephone,
-          createdAt: o.createdAt,
-          totalPrice: o.totalPrice,
-          statusShipping: o.statusShipping,
+          id: o.id,
+          shop_id: o.shop_id,
+          shop_name: shop?.shop_name,
+          shop_telephone: shop?.shop_telephone,
+          created_at: o.created_at,
+          total_price: o.total_price,
+          status_shipping: o.status_shipping,
           productCount: itemCount,
         };
       });
     return { success: true, data: userOrders };
   }
 
-  const response = await api.get(`/orders/history/${userId}`);
+  const response = await api.get(`/orders/history/${user_id}`);
   return response.data;
 };
 
-export const getOrderDetail = async (orderId) => {
+export const getOrderDetail = async (order_id) => {
   if (USE_DUMMY) {
     await delay();
-    const order = dummyStore.orders.find((o) => o.id === orderId);
-    const shop = dummyStore.shops.find((s) => s.id === order?.shopId);
+    const order = dummyStore.orders.find((o) => o.id === order_id);
+    const shop = dummyStore.shops.find((s) => s.id === order?.shop_id);
     const items = dummyStore.orderItems
-      .filter((oi) => oi.orderId === orderId)
+      .filter((oi) => oi.order_id === order_id)
       .map((oi) => {
-        const product = dummyStore.products.find((p) => p.id === oi.productId);
+        const product = dummyStore.products.find((p) => p.id === oi.product_id);
         return {
+          id: oi.id,
+          product_id: oi.product_id,
           name: product?.name,
           label: product?.label,
           quantity: oi.quantity,
@@ -427,72 +433,72 @@ export const getOrderDetail = async (orderId) => {
     return {
       success: true,
       data: {
-        orderId: order?.id,
-        shopId: order?.shopId,
-        shopName: shop?.shopName,
-        shopPhone: shop?.shopTelephone,
+        id: order?.id,
+        shop_id: order?.shop_id,
+        shop_name: shop?.shop_name,
+        shop_telephone: shop?.shop_telephone,
         recipient: order?.recipient,
         telephone: order?.telephone,
         address: order?.address,
         note: order?.note,
-        createdAt: order?.createdAt,
-        statusShipping: order?.statusShipping,
+        created_at: order?.created_at,
+        status_shipping: order?.status_shipping,
         cancelBy: order?.cancelBy,
-        totalPrice: order?.totalPrice,
+        total_price: order?.total_price,
         orderItems: items,
       },
     };
   }
 
-  const response = await api.get(`/orders/${orderId}`);
+  const response = await api.get(`/orders/${order_id}`);
   return response.data;
 };
 
-export const cancelOrder = async (orderId, userRole) => {
+export const cancelOrder = async (order_id, userRole) => {
   if (USE_DUMMY) {
     await delay();
-    const order = dummyStore.orders.find((o) => o.id === orderId);
+    const order = dummyStore.orders.find((o) => o.id === order_id);
     if (order) {
-      order.statusShipping = "cancelPending";
+      order.status_shipping = "cancelPending";
       order.cancelBy = userRole;
       return { success: true, message: "Cancel request submitted" };
     }
     throw new Error("Order tidak ditemukan");
   }
 
-  const response = await api.put(`/orders/${orderId}/cancel`, { userRole });
+  const response = await api.put(`/orders/${order_id}/cancel`, { userRole });
   return response.data;
 };
 
-export const rejectCancel = async (orderId) => {
+export const rejectCancel = async (order_id) => {
   if (USE_DUMMY) {
     await delay();
-    const order = dummyStore.orders.find((o) => o.id === orderId);
+    const order = dummyStore.orders.find((o) => o.id === order_id);
     if (order) {
-      order.statusShipping = "prepared";
+      order.status_shipping = "prepared";
       order.cancelBy = null;
       return { success: true, message: "Cancel request rejected" };
     }
     throw new Error("Order tidak ditemukan");
   }
 
-  const response = await api.put(`/orders/${orderId}/reject-cancel`);
+  const response = await api.put(`/orders/${order_id}/reject-cancel`);
   return response.data;
 };
 
-export const acceptCancel = async (orderId) => {
+export const acceptCancel = async (order_id) => {
   if (USE_DUMMY) {
     await delay();
-    const order = dummyStore.orders.find((o) => o.id === orderId);
+    const order = dummyStore.orders.find((o) => o.id === order_id);
     if (order) {
-      order.statusShipping = "cancelled";
-      order.deletedAt = new Date().toISOString();
+      order.status_shipping = "cancelled";
+      order.deleted_at = new Date().toISOString();
       return { success: true, message: "Order cancelled" };
     }
     throw new Error("Order tidak ditemukan");
   }
 
-  const response = await api.put(`/orders/${orderId}/accept-cancel`);
+  const response = await api.put(`/orders/${order_id}/accept-cancel`);
   return response.data;
 };
 
@@ -502,14 +508,14 @@ export const createShop = async (shopData) => {
     await delay();
     const newShop = {
       id: dummyStore.shops.length + 1,
-      userId: shopData.userId,
-      shopName: shopData.shopName,
-      shopTelephone: shopData.shopTelephone,
-      shopAddress: shopData.shopAddress,
-      accountNumber: shopData.accountNumber,
-      qrisPicture: shopData.qrisPicture,
-      createdAt: new Date().toISOString(),
-      statusAdmin: "pending",
+      user_id: shopData.user_id,
+      shop_name: shopData.shop_name,
+      shop_telephone: shopData.shop_telephone,
+      shop_address: shopData.shop_address,
+      account_number: shopData.account_number,
+      qris_picture: shopData.qris_picture,
+      created_at: new Date().toISOString(),
+      status_admin: "pending",
     };
     dummyStore.shops.push(newShop);
     return {
@@ -523,11 +529,11 @@ export const createShop = async (shopData) => {
   return response.data;
 };
 
-export const getDetailShop = async (shopId) => {
+export const getDetailShop = async (shop_id) => {
   if (USE_DUMMY) {
     await delay();
-    const shop = dummyStore.shops.find((s) => s.id === shopId);
-    const user = dummyStore.users.find((u) => u.id === shop?.userId);
+    const shop = dummyStore.shops.find((s) => s.id === shop_id);
+    const user = dummyStore.users.find((u) => u.id === shop?.user_id);
     return {
       success: true,
       data: {
@@ -538,14 +544,14 @@ export const getDetailShop = async (shopId) => {
     };
   }
 
-  const response = await api.get(`/shops/${shopId}`);
+  const response = await api.get(`/shops/${shop_id}`);
   return response.data;
 };
 
-export const editShop = async (shopId, shopData) => {
+export const editShop = async (shop_id, shopData) => {
   if (USE_DUMMY) {
     await delay();
-    const index = dummyStore.shops.findIndex((s) => s.id === shopId);
+    const index = dummyStore.shops.findIndex((s) => s.id === shop_id);
     if (index !== -1) {
       dummyStore.shops[index] = { ...dummyStore.shops[index], ...shopData };
       return {
@@ -557,47 +563,47 @@ export const editShop = async (shopId, shopData) => {
     throw new Error("Shop tidak ditemukan");
   }
 
-  const response = await api.put(`/shops/${shopId}`, shopData);
+  const response = await api.put(`/shops/${shop_id}`, shopData);
   return response.data;
 };
 
 // ==================== SALES ENDPOINTS (SELLER) ====================
-export const getAllSales = async (shopId) => {
+export const getAllSales = async (shop_id) => {
   if (USE_DUMMY) {
     await delay();
     const shopOrders = dummyStore.orders
-      .filter((o) => o.shopId === shopId)
+      .filter((o) => o.shop_id === shop_id)
       .map((o) => {
         const itemCount = dummyStore.orderItems.filter(
-          (oi) => oi.orderId === o.id
+          (oi) => oi.order_id === o.id
         ).length;
         return {
-          orderId: o.id,
-          shopId: o.shopId,
+          id: o.id,
+          shop_id: o.shop_id,
           recipient: o.recipient,
           telephone: o.telephone,
-          createdAt: o.createdAt,
-          totalPrice: o.totalPrice,
-          statusShipping: o.statusShipping,
+          created_at: o.created_at,
+          total_price: o.total_price,
+          status_shipping: o.status_shipping,
           productCount: itemCount,
         };
       });
     return { success: true, data: shopOrders };
   }
 
-  const response = await api.get(`/sales/shop/${shopId}`);
+  const response = await api.get(`/sales/shop/${shop_id}`);
   return response.data;
 };
 
-export const acceptPayment = async (orderId, status) => {
+export const acceptPayment = async (order_id, status) => {
   if (USE_DUMMY) {
     await delay();
-    const order = dummyStore.orders.find((o) => o.id === orderId);
+    const order = dummyStore.orders.find((o) => o.id === order_id);
     if (order) {
       if (status) {
-        order.statusShipping = "prepared";
+        order.status_shipping = "prepared";
       } else {
-        order.statusShipping = "cancelled";
+        order.status_shipping = "cancelled";
         order.cancelBy = "seller";
       }
       return {
@@ -608,26 +614,23 @@ export const acceptPayment = async (orderId, status) => {
     throw new Error("Order tidak ditemukan");
   }
 
-  const response = await api.put(`/sales/${orderId}/payment`, { status });
+  const response = await api.put(`/sales/${order_id}/payment`, { status });
   return response.data;
 };
 
-export const changeStatusShipping = async (orderId, statusShipping) => {
+export const changeStatusShipping = async (order_id, status_shipping) => {
   if (USE_DUMMY) {
     await delay();
-    const order = dummyStore.orders.find((o) => o.id === orderId);
+    const order = dummyStore.orders.find((o) => o.id === order_id);
     if (order) {
-      order.statusShipping = statusShipping;
-      if (statusShipping === "cancelPending") {
-        order.cancelBy = "seller";
-      }
+      order.status_shipping = status_shipping;
       return { success: true, message: "Status updated" };
     }
     throw new Error("Order tidak ditemukan");
   }
 
-  const response = await api.put(`/sales/${orderId}/status`, {
-    statusShipping,
+  const response = await api.put(`/sales/${order_id}/status`, {
+    status_shipping,
   });
   return response.data;
 };
@@ -636,7 +639,9 @@ export const changeStatusShipping = async (orderId, statusShipping) => {
 export const getAllShop = async () => {
   if (USE_DUMMY) {
     await delay();
-    const accepted = dummyStore.shops.filter((s) => s.statusAdmin === "accept");
+    const accepted = dummyStore.shops.filter(
+      (s) => s.status_admin === "accept"
+    );
     return { success: true, data: accepted };
   }
 
@@ -647,7 +652,9 @@ export const getAllShop = async () => {
 export const getRequestShop = async () => {
   if (USE_DUMMY) {
     await delay();
-    const pending = dummyStore.shops.filter((s) => s.statusAdmin === "pending");
+    const pending = dummyStore.shops.filter(
+      (s) => s.status_admin === "pending"
+    );
     return { success: true, data: pending };
   }
 
@@ -655,13 +662,13 @@ export const getRequestShop = async () => {
   return response.data;
 };
 
-export const acceptRequestShop = async (shopId, status) => {
+export const acceptRequestShop = async (shop_id, status) => {
   if (USE_DUMMY) {
     await delay();
-    const index = dummyStore.shops.findIndex((s) => s.id === shopId);
+    const index = dummyStore.shops.findIndex((s) => s.id === shop_id);
     if (index !== -1) {
       if (status) {
-        dummyStore.shops[index].statusAdmin = "accept";
+        dummyStore.shops[index].status_admin = "accept";
         return { success: true, message: "Shop approved" };
       } else {
         dummyStore.shops.splice(index, 1);
@@ -671,7 +678,7 @@ export const acceptRequestShop = async (shopId, status) => {
     throw new Error("Shop tidak ditemukan");
   }
 
-  const response = await api.put(`/admin/shops/${shopId}/approve`, { status });
+  const response = await api.put(`/admin/shops/${shop_id}/approve`, { status });
   return response.data;
 };
 

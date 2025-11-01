@@ -188,7 +188,15 @@ const Routing = () => {
             />
           </Route>
           <Route
-            path="/products"
+            path="/products/:category?"
+            element={
+              <ProtectedRoute>
+                <ProductList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/search/:query"
             element={
               <ProtectedRoute>
                 <ProductList />

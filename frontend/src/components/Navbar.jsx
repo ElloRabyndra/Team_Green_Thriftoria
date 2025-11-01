@@ -1,23 +1,21 @@
+import { useState } from "react";
 import { Menu, Search, X } from "lucide-react";
 import ToggleButton from "./theme/ToggleButton";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Link, useNavigate } from "react-router";
+import { useProducts } from "@/hooks/useProducts";
 
-export default function NavBar({
-  isMobileMenuOpen,
-  setIsMobileMenuOpen,
-  searchQuery,
-  setSearchQuery,
-  searchProducts,
-}) {
+export default function NavBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
   const navigate = useNavigate();
+  const { searchQuery, setSearchQuery, changeCategory } = useProducts();
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    searchQuery.trim() && searchProducts(searchQuery);
-    navigate("/products");
+    searchQuery.trim() && navigate(`products/search/${searchQuery}`);
     isMobileMenuOpen && setIsMobileMenuOpen(false);
   };
+
   return (
     <Card className="p-0 block rounded-none border-none shadow-xs border-b sticky top-0 z-50">
       <div className="mx-auto px-4">

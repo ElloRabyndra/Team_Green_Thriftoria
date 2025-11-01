@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate, useOutletContext } from "react-router";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { editProductSchema } from "./Schema";
@@ -9,13 +9,18 @@ import Loading from "../ui/loading";
 import Empty from "../ui/Empty";
 import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
-import { ConfirmDialog } from "../ui/ConfirmDialog";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const { user, logout, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-  const { products, loading, addToCart } = useOutletContext();
+  const {
+    productDetail,
+    getProductDetail,
+    loading: productLoading,
+    editExistingProduct,
+  } = useProducts();
   const [product, setProduct] = useState(null);
 
   // State untuk menyimpan nilai yang diformat untuk tampilan
@@ -33,13 +38,6 @@ export default function ProductDetail() {
     resolver: zodResolver(editProductSchema),
   });
 
-  const nameInputRef = useRef(null);
-
-  // Redirect ke login jika tidak ada user setelah loading selesai
-  useEffect(() => {
-    if (!isLoading && !user) logout();
-  }, [isLoading, user]);
-
   // Redirect jika bukan seller
   useEffect(() => {
     if (!isLoading && user && user.role !== "seller") {
@@ -48,40 +46,34 @@ export default function ProductDetail() {
     }
   }, [isLoading, user, navigate]);
 
-  // Set product ketika id berubah
+  // Ambil product detail
   useEffect(() => {
-    if (products.length > 0) {
-      const foundProduct = products.find(
-        (product) => product.id === parseInt(id)
+    if (id) getProductDetail(Number(id));
+  }, [id]);
+
+  // Set product detail
+  useEffect(() => {
+    if (productDetail) {
+      setProduct(productDetail);
+
+      setValue("label", productDetail.label);
+      setValue("name", productDetail.name);
+
+      const originalPrice = productDetail.price.toString();
+      const originalStock = (productDetail.stock || 0).toString();
+
+      setValue("price", originalPrice);
+      setValue("stock", originalStock);
+      setValue(
+        "category",
+        productDetail.category ? productDetail.category.toLowerCase() : "others"
       );
-      if (foundProduct) {
-        setProduct(foundProduct);
+      setValue("description", productDetail.description);
 
-        // Set form values setelah product ditemukan
-        setValue("label", foundProduct.category.replace("-", " "));
-        setValue("name", foundProduct.name);
-
-        // Set nilai asli untuk form (tanpa format)
-        const originalPrice = (foundProduct.price * 15000).toString();
-        const originalStock = (foundProduct.stock || 0).toString();
-
-        setValue("price", originalPrice);
-        setValue("stock", originalStock);
-        setValue("category", foundProduct.category ? "others" : "fashion");
-        setValue("description", foundProduct.description);
-
-        // Set nilai yang diformat untuk tampilan
-        setFormattedPrice(formatPrice(originalPrice));
-        setFormattedStock(formatPrice(originalStock));
-
-        setTimeout(() => {
-          // set defaut value name
-          nameInputRef.current.value = foundProduct.name;
-          nameInputRef.current?.focus();
-        }, 100);
-      }
+      setFormattedPrice(formatPrice(originalPrice));
+      setFormattedStock(formatPrice(originalStock));
     }
-  }, [id, products]);
+  }, [productDetail]);
 
   const formatPrice = (value) => {
     if (!value && value !== 0) return "";
@@ -153,12 +145,20 @@ export default function ProductDetail() {
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log("Submitted data:", data);
-    toast.success("Product updated successfully!");
+    const result = await editExistingProduct(Number(id), data);
+    if (result.success) {
+      toast.success("Product updated successfully!");
+      navigate("/dashboard/my-products");
+    }
   };
 
-  if (loading) {
+  const onError = () => {
+    toast.error("Please fill all fields correctly!");
+  };
+
+  if (productLoading) {
     return (
       <div className="flex items-center justify-center min-h-96">
         <Loading />
@@ -173,7 +173,7 @@ export default function ProductDetail() {
         <div className="mb-2">
           <Button
             variant="ghost"
-            onClick={() => navigate("/products")}
+            onClick={() => navigate("/dashboard/my-products")}
             className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -191,7 +191,7 @@ export default function ProductDetail() {
       <div className="mb-4">
         <Button
           variant="ghost"
-          onClick={() => navigate("/products")}
+          onClick={() => navigate("/dashboard/my-products")}
           className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -201,7 +201,7 @@ export default function ProductDetail() {
 
       {/* Product Detail */}
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit, onError)}
         className="flex flex-col lg:flex-row lg:justify-center gap-6 lg:mt-12"
       >
         {/* Product Images */}
@@ -216,7 +216,7 @@ export default function ProductDetail() {
               className="w-full h-full object-cover rounded-lg"
               onError={(e) => {
                 e.target.src =
-                  "https://via.placeholder.com/500x500?text=No+Image";
+                  "https://www.svgrepo.com/show/508699/landscape-placeholder.svg";
               }}
             />
           </div>
@@ -255,7 +255,6 @@ export default function ProductDetail() {
             />
             <input
               {...register("name")}
-              ref={nameInputRef}
               id="name"
               type="text"
               placeholder="Insert Title..."

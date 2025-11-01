@@ -9,15 +9,12 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useProducts } from "@/hooks/useProducts";
 import { useEffect } from "react";
 
-export default function SideBar({
-  isMobileMenuOpen,
-  selectedCategory,
-  changeCategory,
-  cart,
-}) {
+export default function SideBar({ isMobileMenuOpen }) {
   const { user, logout, isLoading } = useAuth();
+  const { cart, loadCart } = useProducts();
   const location = useLocation();
   const isActive = (path) => location.pathname.startsWith(path);
   const isSpecialPage =
@@ -30,6 +27,13 @@ export default function SideBar({
   useEffect(() => {
     if (!isLoading && !user) logout();
   }, [user, isLoading]);
+
+  // Load cart ketika cart berubah
+  useEffect(() => {
+    if (user?.id) {
+      loadCart(user.id);
+    }
+  }, [cart, user?.id]);
 
   return (
     <Card
@@ -45,7 +49,7 @@ export default function SideBar({
           <Link
             to="/profile"
             className={`${
-              (isActive("/profile") || isActive("/shop"))
+              isActive("/profile") || isActive("/shop")
                 ? "bg-secondary/50 text-primary"
                 : "hover:bg-secondary/50"
             } w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-200 hover:bg-secondary/50 cursor-pointer`}
@@ -90,9 +94,11 @@ export default function SideBar({
           <div className="space-y-2">
             <Link
               to="/products"
-              onClick={() => changeCategory("All")}
               className={`${
-                !isSpecialPage && selectedCategory === "All"
+                !isSpecialPage &&
+                (location.pathname === "/products" ||
+                  location.pathname.startsWith("/product/") ||
+                  location.pathname.startsWith("/products/search"))
                   ? "bg-secondary/50 text-primary"
                   : "hover:bg-secondary/50"
               } w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer`}
@@ -101,10 +107,9 @@ export default function SideBar({
               <span>All</span>
             </Link>
             <Link
-              to="/products"
-              onClick={() => changeCategory("Fashion")}
+              to="/products/fashion"
               className={`${
-                !isSpecialPage && selectedCategory === "Fashion"
+                !isSpecialPage && location.pathname === "/products/fashion"
                   ? "bg-secondary/50 text-primary"
                   : "hover:bg-secondary/50"
               } w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer`}
@@ -113,10 +118,9 @@ export default function SideBar({
               <span>Fashion</span>
             </Link>
             <Link
-              to="/products"
-              onClick={() => changeCategory("Others")}
+              to="/products/others"
               className={`${
-                !isSpecialPage && selectedCategory === "Others"
+                !isSpecialPage && location.pathname === "/products/others"
                   ? "bg-secondary/50 text-primary"
                   : "hover:bg-secondary/50"
               } w-full flex items-center gap-3 p-3 rounded-lg cursor-pointer`}

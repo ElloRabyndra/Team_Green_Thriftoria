@@ -4,48 +4,29 @@ import Empty from "@/components/ui/Empty";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { sampleOrders } from "@/database/dummy";
 import SaleCard from "./SaleCard";
+import { useSales } from "@/hooks/useSales";
+import Loading from "@/components/ui/loading";
 
 const MySales = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
-  const [sales, setSales] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch orders (sementara pakai dummy)
-  const fetchOrders = async () => {
-    try {
-      // TODO: Ganti bagian ini nanti dengan request ke endpoint getAllOrder
-      // Contoh nanti:
-      // const response = await fetch("/api/orders");
-      // const data = await response.json();
-      // setOrders(data);
-
-      // Sekarang masih dummy:
-      setSales(sampleOrders);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load orders");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { sales, loading, fetchSales } = useSales();
 
   // Panggil fetchOrders setelah user terautentikasi
   useEffect(() => {
     if (!isLoading && user) {
-      if (user.role !== "buyer" && user.role !== "seller") {
+      if (user.role !== "seller") {
         navigate(-1);
         return;
       }
-      fetchOrders();
+      fetchSales(user.id); // nanti ganti ke shop_id
     }
   }, [isLoading, user, navigate]);
 
   // Loading state
   if (loading) {
-    return <div className="p-4">Loading...</div>;
+    return <Loading />;
   }
 
   return (

@@ -31,11 +31,11 @@ const MyShop = () => {
 
   // Dummy data shop - ini nanti diganti dengan data real dari API/state
   const shopData = {
-    shopName: "Toko Serbaguna Jaya",
-    shopTelephone: "08123456789",
-    shopAddress: "Jl. Merdeka No. 123, Jakarta Pusat",
-    accountNumber: "1234567890",
-    qrisPicture:
+    shop_name: "Toko Serbaguna Jaya",
+    shop_telephone: "08123456789",
+    shop_address: "Jl. Merdeka No. 123, Jakarta Pusat",
+    account_number: "1234567890",
+    qris_picture:
       "https://png.pngtree.com/png-vector/20191027/ourmid/pngtree-qr-code-vector-hidden-text-or-url-scanning-smartphone-technology-isolated-png-image_1886134.jpg",
   };
 
@@ -52,10 +52,10 @@ const MyShop = () => {
   });
 
   // Watch untuk real-time preview di UI
-  const shopNameValue = watch("shopName");
-  const shopTelephoneValue = watch("shopTelephone");
-  const shopAddressValue = watch("shopAddress");
-  const accountNumberValue = watch("accountNumber");
+  const shop_nameValue = watch("shop_name");
+  const shop_telephoneValue = watch("shop_telephone");
+  const shop_addressValue = watch("shop_address");
+  const account_numberValue = watch("account_number");
 
   // Redirect ke login jika tidak ada user setelah loading selesai
   useEffect(() => {
@@ -72,14 +72,14 @@ const MyShop = () => {
   // Set default values dari shopData
   useEffect(() => {
     if (shopData) {
-      setValue("shopName", shopData.shopName);
-      setValue("shopTelephone", shopData.shopTelephone);
-      setValue("shopAddress", shopData.shopAddress);
-      setValue("accountNumber", shopData.accountNumber);
+      setValue("shop_name", shopData.shop_name);
+      setValue("shop_telephone", shopData.shop_telephone);
+      setValue("shop_address", shopData.shop_address);
+      setValue("account_number", shopData.account_number);
 
       // Set QRIS preview dari data existing
-      if (shopData.qrisPicture) {
-        setQrisPreview(shopData.qrisPicture);
+      if (shopData.qris_picture) {
+        setQrisPreview(shopData.qris_picture);
       }
     }
   }, [setValue]);
@@ -90,7 +90,7 @@ const MyShop = () => {
       // Validasi file type
       const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
-        setError("qrisPicture", {
+        setError("qris_picture", {
           type: "manual",
           message: "Please select a valid image file (JPEG, PNG)",
         });
@@ -99,7 +99,7 @@ const MyShop = () => {
 
       // Validasi file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError("qrisPicture", {
+        setError("qris_picture", {
           type: "manual",
           message: "File size must be less than 5MB",
         });
@@ -110,7 +110,7 @@ const MyShop = () => {
 
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
-      setValue("qrisPicture", dataTransfer.files, {
+      setValue("qris_picture", dataTransfer.files, {
         shouldValidate: true,
       });
 
@@ -139,11 +139,11 @@ const MyShop = () => {
 
       // Reset form dengan nilai yang baru diupdate
       reset({
-        shopName: data.shopName,
-        shopTelephone: data.shopTelephone,
-        shopAddress: data.shopAddress,
-        accountNumber: data.accountNumber,
-        qrisPicture: undefined, // Clear file input setelah submit
+        shop_name: data.shop_name,
+        shop_telephone: data.shop_telephone,
+        shop_address: data.shop_address,
+        account_number: data.account_number,
+        qris_picture: undefined, // Clear file input setelah submit
       });
 
       // Clear file state tapi tetap tampilkan preview yang sudah diupdate
@@ -205,62 +205,62 @@ const MyShop = () => {
             <div className="flex flex-col gap-6">
               {/* Shop Name */}
               <div className="grid gap-2">
-                <Label htmlFor="shopName">Shop Name</Label>
+                <Label htmlFor="shop_name">Shop Name</Label>
                 <Input
-                  {...register("shopName")}
-                  id="shopName"
+                  {...register("shop_name")}
+                  id="shop_name"
                   type="text"
                   placeholder="Insert Shop Name..."
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.shopName && (
-                  <ErrorMessage ErrorMessage={errors.shopName.message} />
+                {errors.shop_name && (
+                  <ErrorMessage ErrorMessage={errors.shop_name.message} />
                 )}
               </div>
               {/* Phone */}
               <div className="grid gap-2">
-                <Label htmlFor="shopTelephone">Phone Number</Label>
+                <Label htmlFor="shop_telephone">Phone Number</Label>
                 <Input
-                  {...register("shopTelephone")}
-                  id="shopTelephone"
+                  {...register("shop_telephone")}
+                  id="shop_telephone"
                   type="text"
                   placeholder="Insert Shop Phone..."
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.shopTelephone && (
-                  <ErrorMessage ErrorMessage={errors.shopTelephone.message} />
+                {errors.shop_telephone && (
+                  <ErrorMessage ErrorMessage={errors.shop_telephone.message} />
                 )}
               </div>
               {/* Address */}
               <div className="grid gap-2">
-                <Label htmlFor="shopAddress">Address</Label>
+                <Label htmlFor="shop_address">Address</Label>
                 <Input
-                  {...register("shopAddress")}
-                  id="shopAddress"
+                  {...register("shop_address")}
+                  id="shop_address"
                   type="text"
                   placeholder="Insert Shop Address..."
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.shopAddress && (
-                  <ErrorMessage ErrorMessage={errors.shopAddress.message} />
+                {errors.shop_address && (
+                  <ErrorMessage ErrorMessage={errors.shop_address.message} />
                 )}
               </div>
               {/* Bank */}
               <div className="grid gap-2">
-                <Label htmlFor="accountNumber">Bank Account</Label>
+                <Label htmlFor="account_number">Bank Account</Label>
                 <Input
-                  {...register("accountNumber")}
-                  id="accountNumber"
+                  {...register("account_number")}
+                  id="account_number"
                   type="text"
                   placeholder="e.g. BCA: 1234567890 - Seller"
                   autoComplete="off"
                   disabled={isSubmitting}
                 />
-                {errors.accountNumber && (
-                  <ErrorMessage ErrorMessage={errors.accountNumber.message} />
+                {errors.account_number && (
+                  <ErrorMessage ErrorMessage={errors.account_number.message} />
                 )}
               </div>
               {/* Qris */}
@@ -274,7 +274,7 @@ const MyShop = () => {
                     {/* Input QRIS Picture Button */}
                     <div className="flex-1">
                       <input
-                        {...register("qrisPicture")}
+                        {...register("qris_picture")}
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
@@ -307,8 +307,8 @@ const MyShop = () => {
                       Preview
                     </button>
                   </div>
-                  {errors.qrisPicture && (
-                    <ErrorMessage ErrorMessage={errors.qrisPicture.message} />
+                  {errors.qris_picture && (
+                    <ErrorMessage ErrorMessage={errors.qris_picture.message} />
                   )}
                 </div>
 

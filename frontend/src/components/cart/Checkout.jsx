@@ -14,11 +14,13 @@ import CheckoutDetail from "./CheckoutDetail";
 import { Textarea } from "../ui/textarea";
 import { toast } from "react-toastify";
 import { useOrders } from "@/hooks/useOrders";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
   const checkoutData = location.state;
+  const { removeFromCart } = useProducts();
   const [qrisPreview, setQrisPreview] = useState(
     "https://img.freepik.com/free-vector/scan-me-qr-code_78370-2915.jpg?semt=ais_hybrid&w=740&q=80"
   );
@@ -46,13 +48,13 @@ export default function Checkout() {
   }
 
   const {
-    userId,
-    shopId,
+    user_id,
+    shop_id,
     selectedItems,
     subtotal,
     deliveryFee,
     total,
-    shopName,
+    shop_name,
   } = checkoutData;
 
   const {
@@ -72,7 +74,7 @@ export default function Checkout() {
       // Validasi file type
       const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
-        setError("proofPayment", {
+        setError("proof_payment", {
           type: "manual",
           message: "Please select a valid image file (JPEG, PNG)",
         });
@@ -81,7 +83,7 @@ export default function Checkout() {
 
       // Validasi file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError("proofPayment", {
+        setError("proof_payment", {
           type: "manual",
           message: "File size must be less than 5MB",
         });
@@ -92,7 +94,7 @@ export default function Checkout() {
 
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
-      setValue("proofPayment", dataTransfer.files, {
+      setValue("proof_payment", dataTransfer.files, {
         shouldValidate: true,
       });
 
@@ -114,32 +116,43 @@ export default function Checkout() {
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
       const orderData = {
-        userId: userId,
-        shopId: shopId,
+        user_id: user_id,
+        shop_id: shop_id,
         recipient: data.recipient,
         telephone: data.telephone,
         address: data.address,
         note: data.note,
-        totalPrice: total,
-        proofPayment: proofPaymentFile,
+        total_price: total,
+        proof_payment: proofPaymentFile,
         orderItems: selectedItems.map((item) => ({
           id: item.id,
-          productId: item.id,
+          product_id: item.id,
           quantity: item.quantity,
           price: item.price,
         })),
       };
-      makeOrder(orderData);
+
+      const result = await makeOrder(orderData);
+
+      if (result.success) {
+        // Hapus items dari cart
+        for (const item of selectedItems) {
+          await removeFromCart(user_id, item.id);
+        }
+        toast.success("Created Order successfully!");
+        navigate("/dashboard/orders");
+      } else {
+        toast.error(result.message || "Failed to create order");
+      }
     } catch (error) {
       console.error("Checkout error:", error);
+      toast.error("An error occurred while creating order");
     } finally {
       setIsSubmitting(false);
-      toast.success("Created Order successfully!");
-      navigate("/dashboard/orders");
     }
   };
 
@@ -254,11 +267,11 @@ export default function Checkout() {
                     {/* Preview Overlay/Popup */}
                     {showQrisPreview && qrisPreview && (
                       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                        <Card className="relative rounded-lg p-4 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
+                        <Card className="relative rounded-lg p-6 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
                           {/* Close Button */}
                           <button
                             onClick={() => setShowQrisPreview(false)}
-                            className="absolute top-2 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
+                            className="absolute top-5 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
                           >
                             <X className="h-4 w-4" />
                           </button>
@@ -266,7 +279,7 @@ export default function Checkout() {
                           {/* Image */}
                           <div className="text-center">
                             <h3 className="text-lg font-semibold mb-4 text-card-foreground">
-                              QRIS Payment Picture Preview
+                              QRIS Payment Preview
                             </h3>
                             <img
                               src={qrisPreview}
@@ -290,16 +303,16 @@ export default function Checkout() {
                       {/* Input Proof Payment Button */}
                       <div className="flex-1">
                         <input
-                          {...register("proofPayment")}
+                          {...register("proof_payment")}
                           ref={fileInputRef}
                           type="file"
                           accept="image/*"
                           onChange={handleFileChange}
                           className="hidden"
-                          id="proofPayment"
+                          id="proof_payment"
                         />
                         <label
-                          htmlFor="proofPayment"
+                          htmlFor="proof_payment"
                           className="flex items-center justify-center gap-2 w-full px-4 py-2 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-card text-card-foreground"
                         >
                           <Upload className="h-4 w-4" />
@@ -325,9 +338,9 @@ export default function Checkout() {
                         Preview
                       </button>
                     </div>
-                    {errors.proofPayment && (
+                    {errors.proof_payment && (
                       <ErrorMessage
-                        ErrorMessage={errors.proofPayment.message}
+                        ErrorMessage={errors.proof_payment.message}
                       />
                     )}
                   </div>
@@ -335,11 +348,11 @@ export default function Checkout() {
                   {/* Preview Overlay/Popup */}
                   {showProofPaymentPreview && qrisPreview && (
                     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                      <Card className="relative rounded-lg p-4 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
+                      <Card className="relative rounded-lg p-6 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
                         {/* Close Button */}
                         <button
                           onClick={() => setShowProofPaymentPreview(false)}
-                          className="absolute top-2 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
+                          className="absolute top-5 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
                         >
                           <X className="h-4 w-4" />
                         </button>
@@ -347,7 +360,7 @@ export default function Checkout() {
                         {/* Image */}
                         <div className="text-center">
                           <h3 className="text-lg font-semibold mb-4 text-card-foreground">
-                            Proof Payment Picture Preview
+                            Proof Payment Preview
                           </h3>
                           <img
                             src={proofPaymentPreview}
@@ -369,7 +382,7 @@ export default function Checkout() {
             subtotal={subtotal}
             deliveryFee={deliveryFee}
             total={total}
-            shopName={shopName}
+            shop_name={shop_name}
           />
         </aside>
       </form>

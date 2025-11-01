@@ -13,8 +13,8 @@ import { allShops } from "@/database/dummy";
 import { Link } from "react-router";
 
 // Badge component untuk status
-function StatusBadge({ statusAdmin }) {
-  const isAccept = statusAdmin === "Accept";
+function StatusBadge({ status_admin }) {
+  const isAccept = status_admin === "Accept";
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
@@ -23,14 +23,14 @@ function StatusBadge({ statusAdmin }) {
           : "bg-secondary text-secondary-foreground"
       }`}
     >
-      {statusAdmin}
+      {status_admin}
     </span>
   );
 }
 
 // Buyer List Component
 const ShopsList = () => {
-  const acceptShop = allShops.filter((shop) => shop.statusAdmin === "Accept");
+  const acceptShop = allShops.filter((shop) => shop.status_admin === "Accept");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredShops, setFilteredShops] = useState(acceptShop);
   const [isSearching, setIsSearching] = useState(false);
@@ -43,7 +43,7 @@ const ShopsList = () => {
       setFilteredShops(acceptShop);
     } else {
       const filtered = acceptShop.filter((shop) =>
-        shop.shopName.toLowerCase().includes(searchQuery.toLowerCase())
+        shop.shop_name.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredShops(filtered);
     }
@@ -166,7 +166,7 @@ const ShopsList = () => {
                       {/* ShopName - Always visible */}
                       <TableCell className="font-medium">
                         <div className="truncate max-w-[130px] sm:max-w-[170px]">
-                          {shop.shopName}
+                          {shop.shop_name}
                         </div>
                       </TableCell>
 
@@ -179,19 +179,19 @@ const ShopsList = () => {
 
                       {/* Telephone - Hidden below md */}
                       <TableCell className="hidden md:table-cell text-muted-foreground">
-                        {shop.shopPhone}
+                        {shop.shop_telephone}
                       </TableCell>
 
                       {/* Address - Hidden below lg */}
                       <TableCell className="hidden xl:table-cell text-muted-foreground">
                         <div className="truncate max-w-[210px]">
-                          {shop.shopAddress}
+                          {shop.shop_address}
                         </div>
                       </TableCell>
 
                       {/* Status - Always visible */}
                       <TableCell>
-                        <StatusBadge statusAdmin={shop.statusAdmin} />
+                        <StatusBadge status_admin={shop.status_admin} />
                       </TableCell>
 
                       {/* Action - Always visible */}

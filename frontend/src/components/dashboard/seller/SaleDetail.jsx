@@ -1,10 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, Phone, ShoppingBag, Store, Check, X, ChevronDown } from "lucide-react";
+import {
+  ArrowLeft,
+  Phone,
+  ShoppingBag,
+  Store,
+  Check,
+  X,
+  ChevronDown,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { sampleOrders, orderItems } from "@/database/dummy";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/loading";
+import { useSales } from "@/hooks/useSales";
+import { useOrders } from "@/hooks/useOrders";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { toast } from "react-toastify";
 
 const SaleDetail = () => {
   const navigate = useNavigate();
@@ -13,29 +27,62 @@ const SaleDetail = () => {
   const [sale, setSale] = useState(null);
   const [currentSaleItem, setCurrentSaleItem] = useState([]);
   const [curentStatusShipped, setCurrentStatusShipped] = useState("");
+  const [proofPaymentPreview, setProofPaymentPreview] = useState(
+    "https://public.bnbstatic.com/image/cms/article/body/202302/d9f75be540977a5782c30a277ff180b1.jpeg"
+  );
+  const [showProofPaymentPreview, setShowProofPaymentPreview] = useState(false);
 
-  // Ambil detail order dan item
+  // Ambil data dan fungsi dari useOrders
+  const {
+    orderDetail,
+    requestCancel,
+    approveCancel,
+    denyCancel,
+    fetchOrderDetail,
+    loading: orderLoading,
+  } = useOrders();
+
+  const { handlePayment, updateShippingStatus } = useSales();
+
+  // Ambil detail order saat saleId berubah
   useEffect(() => {
-    if (!saleId) return;
-
-    const id = Number(saleId);
-    const foundSale = sampleOrders.find((order) => order.id === id);
-    const items = orderItems.filter((item) => item.orderId === id);
-
-    if (foundSale) {
-      setSale(foundSale);
-      console.log(items);
-      setCurrentSaleItem(items);
-      setCurrentStatusShipped(foundSale.statusShipping);
-    }
+    if (saleId) fetchOrderDetail(Number(saleId));
   }, [saleId]);
 
-  // Redirect jika bukan buyer atau seller
+  // set currenStatusShipped
   useEffect(() => {
-    if (!isLoading && user && user.role !== "buyer" && user.role !== "seller") {
-      navigate(-1);
+    if (orderDetail) {
+      setCurrentStatusShipped(orderDetail.status_shipping);
     }
+  }, [orderDetail]);
+
+  // Redirect jika bukan seller
+  useEffect(() => {
+    if (!isLoading && user && user.role !== "seller") navigate(-1);
   }, [isLoading, user, navigate]);
+
+  if (orderLoading && !orderDetail) {
+    return <Loading />;
+  }
+
+  if (!orderDetail) {
+    return (
+      <>
+        {/* Back Button */}
+        <div className="mb-2">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/dashboard")}
+            className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </div>
+        <Empty>No Sale found</Empty>
+      </>
+    );
+  }
 
   // Fungsi untuk format harga
   const formatPrice = (price) => {
@@ -55,6 +102,49 @@ const SaleDetail = () => {
       month: "short",
       year: "numeric",
     }).format(date);
+  };
+
+  const handleQrisPreviewClick = () => {
+    if (proofPaymentPreview) {
+      setShowProofPaymentPreview(true);
+    }
+  };
+
+  const handleRequestCancel = async (order_id, role, user_id) => {
+    await requestCancel(order_id, role, user_id);
+    await fetchOrderDetail(order_id);
+  };
+
+  const handleApprove = async (order_id, user_id, status_shipping) => {
+    if (status_shipping === "cancelPending") {
+      await approveCancel(order_id, user_id);
+      toast.success("Cancel request approved!");
+    } else if (status_shipping === "awaitingPayment") {
+      await handlePayment(order_id, true, user_id);
+      toast.success("Payment accepted!");
+    }
+    await fetchOrderDetail(order_id);
+  };
+
+  const handleDeny = async (order_id, user_id, status_shipping) => {
+    if (status_shipping === "cancelPending") {
+      await denyCancel(order_id, user_id);
+      toast.success("Cancel request denied!");
+    } else if (status_shipping === "awaitingPayment") {
+      await handlePayment(order_id, false, user_id);
+      toast.success("Payment rejected!");
+    }
+    await fetchOrderDetail(order_id);
+  };
+
+  const handleUpdateShippingStatus = async (
+    order_id,
+    status_shipping,
+    user_id
+  ) => {
+    await updateShippingStatus(order_id, status_shipping, user_id);
+    await fetchOrderDetail(order_id);
+    toast.success("Status updated!");
   };
 
   // Konfigurasi status
@@ -87,13 +177,6 @@ const SaleDetail = () => {
       color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
     },
   };
-  if (!sale) {
-    return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
-        Loading sale details...
-      </div>
-    );
-  }
 
   return (
     <section className="space-y-4 md:ml-4">
@@ -101,7 +184,7 @@ const SaleDetail = () => {
       <div className="mb-4">
         <Button
           variant="ghost"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-600 hover:bg-secondary/50"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -115,14 +198,20 @@ const SaleDetail = () => {
           <Card className="w-full min-w-80 md:min-w-96">
             <CardHeader className="flex items-center justify-between gap-2">
               <CardTitle>Order Information</CardTitle>
-              {/* Tombol Cancel hanya muncul jika statusShipping bukan cancelled atau cancelPending */}
-              {sale.statusShipping !== "cancelled" &&
-                sale.statusShipping !== "cancelPending" &&
-                sale.statusShipping !== "delivered" &&
-                sale.statusShipping !== "awaitingPayment" && (
-                  <button className="text-sm hover:text-red-400 hover:underline cursor-pointer">
-                    Cancel Order
-                  </button>
+              {/* Tombol Cancel hanya muncul jika status_shipping bukan cancelled atau cancelPending */}
+              {orderDetail.status_shipping !== "cancelled" &&
+                orderDetail.status_shipping !== "cancelPending" &&
+                orderDetail.status_shipping !== "delivered" &&
+                orderDetail.status_shipping !== "awaitingPayment" && (
+                  <ConfirmDialog
+                    onConfirm={() =>
+                      handleRequestCancel(orderDetail.id, user.role, user.id)
+                    }
+                  >
+                    <button className="text-sm hover:text-red-400 hover:underline cursor-pointer">
+                      Cancel Order
+                    </button>
+                  </ConfirmDialog>
                 )}
             </CardHeader>
             <CardContent>
@@ -130,56 +219,131 @@ const SaleDetail = () => {
                 {/* Recipient */}
                 <div>
                   <p className="text-sm text-muted-foreground">Recipient:</p>
-                  <p className="font-medium">{sale.recipient}</p>
+                  <p className="font-medium">{orderDetail.recipient}</p>
                 </div>
                 {/* Telephone */}
                 <div>
                   <p className="text-sm text-muted-foreground">Telephone:</p>
-                  <p className="font-medium">{sale.telephone}</p>
+                  <p className="font-medium">{orderDetail.telephone}</p>
                 </div>
                 {/* Shipping Address */}
                 <div>
                   <p className="text-sm text-muted-foreground">
                     Shipping Address:
                   </p>
-                  <p className="font-medium">{sale.address}</p>
+                  <p className="font-medium">{orderDetail.address}</p>
                 </div>
                 {/* Note */}
                 <div>
                   <p className="text-sm text-muted-foreground">Note:</p>
-                  <p className="font-medium max-w-sm">{sale.note}</p>
+                  <p className="font-medium max-w-sm">{orderDetail.note}</p>
                 </div>
+
                 {/* Order Date */}
                 <div>
                   <p className="text-sm text-muted-foreground">Order Date:</p>
-                  <p className="font-medium">{formatDate(sale.orderDate)}</p>
+                  <p className="font-medium">
+                    {formatDate(orderDetail.created_at)}
+                  </p>
+                </div>
+
+                {/* Proof Payment */}
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Proof Payment:
+                  </p>
+                  {/* Preview Button */}
+                  <button
+                    type="button"
+                    onClick={handleQrisPreviewClick}
+                    disabled={!proofPaymentPreview}
+                    className={`px-6 py-2 rounded-lg border transition-colors font-medium text-sm border-border bg-muted text-muted-foreground ${
+                      proofPaymentPreview
+                        ? " cursor-pointer"
+                        : "cursor-not-allowed"
+                    }`}
+                  >
+                    Proof Payment Preview
+                  </button>
+                  {/* Preview Overlay/Popup */}
+                  {showProofPaymentPreview && proofPaymentPreview && (
+                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                      <Card className="relative rounded-lg p-6 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
+                        {/* Close Button */}
+                        <button
+                          onClick={() => setShowProofPaymentPreview(false)}
+                          className="absolute top-5 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+
+                        {/* Image */}
+                        <div className="text-center">
+                          <h3 className="text-lg font-semibold mb-4 text-card-foreground">
+                            Proof Payment Preview
+                          </h3>
+                          <img
+                            src={proofPaymentPreview}
+                            alt="QRIS Preview"
+                            className="max-w-full max-h-[70vh] object-contain rounded-lg border"
+                          />
+                        </div>
+                      </Card>
+                    </div>
+                  )}
                 </div>
 
                 {/* Status Badge */}
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-muted-foreground">Status:</p>
-                  {(sale.statusShipping === "cancelPending" &&
-                    sale.cancelBy === "buyer") ||
-                  sale.statusShipping === "awaitingPayment" ? (
+                  {orderDetail.status_shipping === "cancelPending" ||
+                  orderDetail.status_shipping === "cancelled" ||
+                  orderDetail.status_shipping === "awaitingPayment" ? (
                     <div className="flex items-center gap-1">
                       <span
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${
-                          statusConfig[sale.statusShipping].color
+                          statusConfig[orderDetail.status_shipping].color
                         }`}
                       >
-                        <span>{statusConfig[sale.statusShipping].label}</span>
+                        <span>
+                          {statusConfig[orderDetail.status_shipping].label}
+                        </span>
                       </span>
-                      <div className="flex items-center gap-1 ml-2">
-                        {/* Tombol Setuju */}
-                        <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
-                          <Check size={16} />
-                        </button>
+                      {((orderDetail.status_shipping === "cancelPending" &&
+                        orderDetail.cancelBy === "buyer") ||
+                        orderDetail.status_shipping === "awaitingPayment") && (
+                        <div className="flex items-center gap-1 ml-2">
+                          {/* Tombol Setuju */}
+                          <ConfirmDialog
+                            onConfirm={() =>
+                              handleApprove(
+                                orderDetail.id,
+                                user.id,
+                                orderDetail.status_shipping
+                              )
+                            }
+                          >
+                            <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
+                              <Check size={16} />
+                            </button>
+                          </ConfirmDialog>
 
-                        {/* Tombol Tolak */}
-                        <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-                          <X size={16} />
-                        </button>
-                      </div>
+                          {/* Tombol Tolak */}
+                          <ConfirmDialog
+                            onConfirm={() =>
+                              handleDeny(
+                                orderDetail.id,
+                                user.id,
+                                orderDetail.status_shipping
+                              )
+                            }
+                          >
+                            <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+                              <X size={16} />
+                            </button>
+                          </ConfirmDialog>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
@@ -194,15 +358,22 @@ const SaleDetail = () => {
                             statusConfig[curentStatusShipped]?.color || ""
                           }`}
                         >
-                          {Object.entries(statusConfig).map(([key, val]) => (
-                            <option
-                              key={key}
-                              value={key}
-                              className="bg-popover text-popover-foreground border-0 outline-none"
-                            >
-                              {val.label}
-                            </option>
-                          ))}
+                          {Object.entries(statusConfig)
+                            .filter(
+                              ([key]) =>
+                                key !== "cancelPending" &&
+                                key !== "cancelled" &&
+                                key !== "awaitingPayment"
+                            )
+                            .map(([key, val]) => (
+                              <option
+                                key={key}
+                                value={key}
+                                className="bg-popover text-popover-foreground border-0 outline-none"
+                              >
+                                {val.label}
+                              </option>
+                            ))}
                         </select>
 
                         {/* Ikon panah dari Lucide */}
@@ -211,10 +382,13 @@ const SaleDetail = () => {
 
                       {/* Tombol Save */}
                       <button
-                        onClick={() => {
-                          // nanti bisa diganti dengan update API
-                          console.log("Status saved:", sale.statusShipping);
-                        }}
+                        onClick={() =>
+                          handleUpdateShippingStatus(
+                            orderDetail.id,
+                            curentStatusShipped,
+                            user.id
+                          )
+                        }
                         className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors cursor-pointer"
                       >
                         <Check size={16} className="mr-1" />
@@ -243,20 +417,20 @@ const SaleDetail = () => {
                 >
                   <Store className="h-4 w-4" />
                   <span className="font-medium capitalize">
-                    {sale.shopName}
+                    {orderDetail.shop_name}
                   </span>
                 </Link>
                 {/* Telephone */}
                 <div className="flex items-center gap-2 ml-1 mt-1 text-muted-foreground">
                   <Phone className="h-3 w-3" />
                   <span className="text-xs text-muted-foreground">
-                    {sale.shopPhone}
+                    {orderDetail.shop_telephone}
                   </span>
                 </div>
 
                 {/* Selected Items */}
                 <div className="mt-4 space-y-3 max-h-48 overflow-y-auto pr-2">
-                  {currentSaleItem.map((item) => (
+                  {orderDetail.orderItems.map((item) => (
                     <div key={item.id} className="flex items-center gap-3">
                       <img
                         src={item.image}
@@ -275,7 +449,7 @@ const SaleDetail = () => {
                           {item.label.replace("-", " ")} • Qty: {item.quantity}
                         </p>
                         <p className="text-xs font-medium text-primary">
-                          {formatPrice(item.price * item.quantity * 15000)}
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
                     </div>
@@ -288,7 +462,7 @@ const SaleDetail = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">
-                    {formatPrice(sale.totalPrice * 15000 - 30000)}
+                    {formatPrice(orderDetail.total_price - 30000)}
                   </span>
                 </div>
 
@@ -301,7 +475,7 @@ const SaleDetail = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-lg font-bold text-primary">
-                      {formatPrice(sale.totalPrice * 15000)}
+                      {formatPrice(orderDetail.total_price)}
                     </span>
                   </div>
                 </div>

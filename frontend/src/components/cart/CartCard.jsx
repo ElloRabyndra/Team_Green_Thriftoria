@@ -46,7 +46,7 @@ export default function CartCard({
           </p>
           <p className="flex gap-2 items-center text-muted-foreground text-sm font-medium capitalize">
             <Store className="h-4 w-4" />
-            {cartItem.shopName}
+            {cartItem.shop_name}
           </p>
         </div>
         <p className="text-sm font-semibold md:text-base text-primary">

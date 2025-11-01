@@ -14,7 +14,7 @@ export const checkoutSchema = z.object({
     .min(1, "Address is required")
     .min(5, "Address must be at least 5 characters"),
   note: z.string().optional().or(z.literal("")),
-  proofPayment: z
+  proof_payment: z
     .any()
     .refine((files) => files?.length === 1, {
       message: "Proof payment is required",

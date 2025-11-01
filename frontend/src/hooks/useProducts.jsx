@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
-import { 
-  getAllProduct, 
-  getProductByCategory, 
+import {
+  getAllProduct,
+  getProductByCategory,
   searchProduct,
   getAllCart,
   addToCart as addToCartApi,
   updateCartQuantity,
-  deleteCartItem
+  deleteCartItem,
+  addProduct,
+  editProduct,
+  deleteProduct,
+  getDetailProduct,
 } from "@/service/dummyApi";
 
 // Daftar kategori yang tersedia
@@ -16,11 +20,12 @@ export const othersCategory = ["Others"];
 
 export const useProducts = () => {
   const [products, setProducts] = useState([]);
+  const [productDetail, setProductDetail] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [cart, setCart] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [total_price, setTotalPrice] = useState(0);
 
   // Fetch products saat component mount atau kategori berubah
   useEffect(() => {
@@ -29,22 +34,25 @@ export const useProducts = () => {
 
   // Hitung total price saat cart berubah
   useEffect(() => {
-    const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const total = cart.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
     setTotalPrice(total);
   }, [cart]);
 
-  // Function untuk fetch products
+  // ==================== PRODUCT ====================
   const fetchProducts = async () => {
     setLoading(true);
     try {
       let response;
-      
-      if (selectedCategory === "All") {
+
+      if (selectedCategory === "all") {
         response = await getAllProduct();
       } else {
         response = await getProductByCategory(selectedCategory);
       }
-      
+
       if (response.success) {
         setProducts(response.data || []);
       }
@@ -56,7 +64,6 @@ export const useProducts = () => {
     }
   };
 
-  // Function untuk search products
   const searchProducts = async (query) => {
     if (!query.trim()) {
       fetchProducts();
@@ -77,10 +84,89 @@ export const useProducts = () => {
     }
   };
 
-  // Function untuk load cart berdasarkan userId
-  const loadCart = async (userId) => {
+  const getProductDetail = async (id) => {
+    setLoading(true);
     try {
-      const response = await getAllCart(userId);
+      const response = await getDetailProduct(Number(id));
+      if (response.success) {
+        setProductDetail(response.data || null);
+      }
+    } catch (error) {
+      console.error("Error fetching product detail:", error);
+      setProductDetail(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addNewProduct = async ({
+    shop_id,
+    name,
+    category,
+    label,
+    description,
+    image,
+    price,
+    stock,
+  }) => {
+    try {
+      const response = await addProduct(
+        shop_id,
+        name,
+        category,
+        label,
+        description,
+        "https://www.svgrepo.com/show/508699/landscape-placeholder.svg",
+        price,
+        stock
+      );
+
+      if (response.success) {
+        await fetchProducts();
+        return { success: true, message: response.message };
+      }
+    } catch (error) {
+      console.error("Error adding product:", error);
+      return { success: false, message: "Failed to add product" };
+    }
+  };
+
+  const editExistingProduct = async (product_id, updatedData) => {
+    try {
+      const productData = {
+        ...updatedData,
+        image: "https://www.svgrepo.com/show/508699/landscape-placeholder.svg", // abaikan file image asli
+      };
+
+      const response = await editProduct(product_id, productData);
+
+      if (response.success) {
+        await fetchProducts();
+        return { success: true, message: response.message };
+      }
+    } catch (error) {
+      console.error("Error editing product:", error);
+      return { success: false, message: "Failed to edit product" };
+    }
+  };
+
+  const removeProduct = async (product_id) => {
+    try {
+      const response = await deleteProduct(product_id);
+      if (response.success) {
+        await fetchProducts();
+        return { success: true, message: response.message };
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      return { success: false, message: "Failed to delete product" };
+    }
+  };
+
+  // ==================== CART ====================
+  const loadCart = async (user_id) => {
+    try {
+      const response = await getAllCart(user_id);
       if (response.success) {
         setCart(response.data || []);
       }
@@ -90,13 +176,11 @@ export const useProducts = () => {
     }
   };
 
-  // Function untuk menambahkan produk ke cart
-  const addToCart = async (userId, product) => {
+  const addToCart = async (user_id, product) => {
     try {
-      const response = await addToCartApi(userId, product.id);
+      const response = await addToCartApi(user_id, product.id);
       if (response.success) {
-        // Reload cart setelah berhasil menambahkan
-        await loadCart(userId);
+        await loadCart(user_id);
         return true;
       }
     } catch (error) {
@@ -105,47 +189,41 @@ export const useProducts = () => {
     }
   };
 
-  // Function untuk update quantity di cart
-  const updateQuantity = async (userId, cartId, quantity) => {
+  const updateQuantity = async (user_id, cartId, quantity) => {
     try {
       if (quantity < 1) {
-        // Jika quantity < 1, hapus item
-        await removeFromCart(userId, cartId);
+        await removeFromCart(user_id, cartId);
         return;
       }
 
       const response = await updateCartQuantity(cartId, quantity);
       if (response.success) {
-        await loadCart(userId);
+        await loadCart(user_id);
       }
     } catch (error) {
       console.error("Error updating quantity:", error);
     }
   };
 
-  // Function untuk increase quantity
-  const increaseQuantity = async (userId, cartItem) => {
-    await updateQuantity(userId, cartItem.id, cartItem.quantity + 1);
+  const increaseQuantity = async (user_id, cartItem) => {
+    await updateQuantity(user_id, cartItem.id, cartItem.quantity + 1);
   };
 
-  // Function untuk decrease quantity
-  const decreaseQuantity = async (userId, cartItem) => {
-    await updateQuantity(userId, cartItem.id, cartItem.quantity - 1);
+  const decreaseQuantity = async (user_id, cartItem) => {
+    await updateQuantity(user_id, cartItem.id, cartItem.quantity - 1);
   };
 
-  // Function untuk menghapus produk dari cart
-  const removeFromCart = async (userId, cartId) => {
+  const removeFromCart = async (user_id, cartId) => {
     try {
       const response = await deleteCartItem(cartId);
       if (response.success) {
-        await loadCart(userId);
+        await loadCart(user_id);
       }
     } catch (error) {
       console.error("Error removing from cart:", error);
     }
   };
 
-  // Function untuk mengubah kategori
   const changeCategory = (category) => {
     setSelectedCategory(category);
     setSearchQuery("");
@@ -153,8 +231,10 @@ export const useProducts = () => {
 
   return {
     products,
+    productDetail,
+    getProductDetail,
     cart,
-    totalPrice,
+    total_price,
     loading,
     selectedCategory,
     searchQuery,
@@ -169,5 +249,8 @@ export const useProducts = () => {
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
+    addNewProduct,
+    editExistingProduct,
+    removeProduct,
   };
 };
