@@ -61,6 +61,11 @@ export const updateProfileApi = (data) => {
   });
 };
 
+// Fungsi API untuk menghapus User
+export const deleteUserApi = (id) => {
+  return api.delete(`/user/${id}`);
+};
+
 // ==================== PRODUCT ENDPOINTS ====================
 export const getAllProduct = async () => {
   const response = await api.get("/products");
