@@ -19,6 +19,7 @@ import { useSales } from "@/hooks/useSales";
 import { useOrders } from "@/hooks/useOrders";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { toast } from "react-toastify";
+import { SlideIn } from "@/components/animations/SlideIn";
 
 const SaleDetail = () => {
   const navigate = useNavigate();
@@ -195,293 +196,299 @@ const SaleDetail = () => {
       <div className="flex flex-col xl:flex-row gap-6">
         {/* Sale Info */}
         <main className="w-full xl:w-1/2">
-          <Card className="w-full min-w-80 md:min-w-96">
-            <CardHeader className="flex items-center justify-between gap-2">
-              <CardTitle>Order Information</CardTitle>
-              {/* Tombol Cancel hanya muncul jika status_shipping bukan cancelled atau cancelPending */}
-              {orderDetail.status_shipping !== "cancelled" &&
-                orderDetail.status_shipping !== "cancelPending" &&
-                orderDetail.status_shipping !== "delivered" &&
-                orderDetail.status_shipping !== "awaitingPayment" && (
-                  <ConfirmDialog
-                    onConfirm={() =>
-                      handleRequestCancel(orderDetail.id, user.role, user.id)
-                    }
-                  >
-                    <button className="text-sm hover:text-red-400 hover:underline cursor-pointer">
-                      Cancel Order
-                    </button>
-                  </ConfirmDialog>
-                )}
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-4">
-                {/* Recipient */}
-                <div>
-                  <p className="text-sm text-muted-foreground">Recipient:</p>
-                  <p className="font-medium">{orderDetail.recipient}</p>
-                </div>
-                {/* Telephone */}
-                <div>
-                  <p className="text-sm text-muted-foreground">Telephone:</p>
-                  <p className="font-medium">{orderDetail.telephone}</p>
-                </div>
-                {/* Shipping Address */}
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Shipping Address:
-                  </p>
-                  <p className="font-medium">{orderDetail.address}</p>
-                </div>
-                {/* Note */}
-                <div>
-                  <p className="text-sm text-muted-foreground">Note:</p>
-                  <p className="font-medium max-w-sm">{orderDetail.note}</p>
-                </div>
-
-                {/* Order Date */}
-                <div>
-                  <p className="text-sm text-muted-foreground">Order Date:</p>
-                  <p className="font-medium">
-                    {formatDate(orderDetail.created_at)}
-                  </p>
-                </div>
-
-                {/* Proof Payment */}
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Proof Payment:
-                  </p>
-                  {/* Preview Button */}
-                  <button
-                    type="button"
-                    onClick={handleQrisPreviewClick}
-                    disabled={!proofPaymentPreview}
-                    className={`px-6 py-2 rounded-lg border transition-colors font-medium text-sm border-border bg-muted text-muted-foreground ${
-                      proofPaymentPreview
-                        ? " cursor-pointer"
-                        : "cursor-not-allowed"
-                    }`}
-                  >
-                    Proof Payment Preview
-                  </button>
-                  {/* Preview Overlay/Popup */}
-                  {showProofPaymentPreview && proofPaymentPreview && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                      <Card className="relative rounded-lg p-6 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
-                        {/* Close Button */}
-                        <button
-                          onClick={() => setShowProofPaymentPreview(false)}
-                          className="absolute top-5 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-
-                        {/* Image */}
-                        <div className="text-center">
-                          <h3 className="text-lg font-semibold mb-4 text-card-foreground">
-                            Proof Payment Preview
-                          </h3>
-                          <img
-                            src={proofPaymentPreview}
-                            alt="QRIS Preview"
-                            className="max-w-full max-h-[70vh] object-contain rounded-lg border"
-                          />
-                        </div>
-                      </Card>
-                    </div>
+          <SlideIn direction="right">
+            <Card className="w-full min-w-80 md:min-w-96">
+              <CardHeader className="flex items-center justify-between gap-2">
+                <CardTitle>Order Information</CardTitle>
+                {/* Tombol Cancel hanya muncul jika status_shipping bukan cancelled atau cancelPending */}
+                {orderDetail.status_shipping !== "cancelled" &&
+                  orderDetail.status_shipping !== "cancelPending" &&
+                  orderDetail.status_shipping !== "delivered" &&
+                  orderDetail.status_shipping !== "awaitingPayment" && (
+                    <ConfirmDialog
+                      onConfirm={() =>
+                        handleRequestCancel(orderDetail.id, user.role, user.id)
+                      }
+                    >
+                      <button className="text-sm hover:text-red-400 hover:underline cursor-pointer">
+                        Cancel Order
+                      </button>
+                    </ConfirmDialog>
                   )}
-                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-4">
+                  {/* Recipient */}
+                  <div>
+                    <p className="text-sm text-muted-foreground">Recipient:</p>
+                    <p className="font-medium">{orderDetail.recipient}</p>
+                  </div>
+                  {/* Telephone */}
+                  <div>
+                    <p className="text-sm text-muted-foreground">Telephone:</p>
+                    <p className="font-medium">{orderDetail.telephone}</p>
+                  </div>
+                  {/* Shipping Address */}
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Shipping Address:
+                    </p>
+                    <p className="font-medium">{orderDetail.address}</p>
+                  </div>
+                  {/* Note */}
+                  <div>
+                    <p className="text-sm text-muted-foreground">Note:</p>
+                    <p className="font-medium max-w-sm">{orderDetail.note}</p>
+                  </div>
 
-                {/* Status Badge */}
-                <div className="flex items-center gap-2">
-                  <p className="text-sm text-muted-foreground">Status:</p>
-                  {orderDetail.status_shipping === "cancelPending" ||
-                  orderDetail.status_shipping === "cancelled" ||
-                  orderDetail.status_shipping === "awaitingPayment" ? (
-                    <div className="flex items-center gap-1">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${
-                          statusConfig[orderDetail.status_shipping].color
-                        }`}
-                      >
-                        <span>
-                          {statusConfig[orderDetail.status_shipping].label}
-                        </span>
-                      </span>
-                      {((orderDetail.status_shipping === "cancelPending" &&
-                        orderDetail.cancelBy === "buyer") ||
-                        orderDetail.status_shipping === "awaitingPayment") && (
-                        <div className="flex items-center gap-1 ml-2">
-                          {/* Tombol Setuju */}
-                          <ConfirmDialog
-                            onConfirm={() =>
-                              handleApprove(
-                                orderDetail.id,
-                                user.id,
-                                orderDetail.status_shipping
-                              )
-                            }
-                          >
-                            <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
-                              <Check size={16} />
-                            </button>
-                          </ConfirmDialog>
+                  {/* Order Date */}
+                  <div>
+                    <p className="text-sm text-muted-foreground">Order Date:</p>
+                    <p className="font-medium">
+                      {formatDate(orderDetail.created_at)}
+                    </p>
+                  </div>
 
-                          {/* Tombol Tolak */}
-                          <ConfirmDialog
-                            onConfirm={() =>
-                              handleDeny(
-                                orderDetail.id,
-                                user.id,
-                                orderDetail.status_shipping
-                              )
-                            }
+                  {/* Proof Payment */}
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Proof Payment:
+                    </p>
+                    {/* Preview Button */}
+                    <button
+                      type="button"
+                      onClick={handleQrisPreviewClick}
+                      disabled={!proofPaymentPreview}
+                      className={`px-6 py-2 rounded-lg border transition-colors font-medium text-sm border-border bg-muted text-muted-foreground ${
+                        proofPaymentPreview
+                          ? " cursor-pointer"
+                          : "cursor-not-allowed"
+                      }`}
+                    >
+                      Proof Payment Preview
+                    </button>
+                    {/* Preview Overlay/Popup */}
+                    {showProofPaymentPreview && proofPaymentPreview && (
+                      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                        <Card className="relative rounded-lg p-6 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
+                          {/* Close Button */}
+                          <button
+                            onClick={() => setShowProofPaymentPreview(false)}
+                            className="absolute top-5 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
                           >
-                            <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-                              <X size={16} />
-                            </button>
-                          </ConfirmDialog>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      {/* Select Status */}
-                      <div className="relative inline-block">
-                        <select
-                          value={curentStatusShipped}
-                          onChange={(e) =>
-                            setCurrentStatusShipped(e.target.value)
-                          }
-                          className={`appearance-none px-3 pr-8 py-1.5 rounded-full text-sm font-medium  bg-background text-foreground focus:outline-none transition-colors cursor-pointer ${
-                            statusConfig[curentStatusShipped]?.color || ""
+                            <X className="h-4 w-4" />
+                          </button>
+
+                          {/* Image */}
+                          <div className="text-center">
+                            <h3 className="text-lg font-semibold mb-4 text-card-foreground">
+                              Proof Payment Preview
+                            </h3>
+                            <img
+                              src={proofPaymentPreview}
+                              alt="QRIS Preview"
+                              className="max-w-full max-h-[70vh] object-contain rounded-lg border"
+                            />
+                          </div>
+                        </Card>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Status Badge */}
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-muted-foreground">Status:</p>
+                    {orderDetail.status_shipping === "cancelPending" ||
+                    orderDetail.status_shipping === "cancelled" ||
+                    orderDetail.status_shipping === "awaitingPayment" ? (
+                      <div className="flex items-center gap-1">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${
+                            statusConfig[orderDetail.status_shipping].color
                           }`}
                         >
-                          {Object.entries(statusConfig)
-                            .filter(
-                              ([key]) =>
-                                key !== "cancelPending" &&
-                                key !== "cancelled" &&
-                                key !== "awaitingPayment"
-                            )
-                            .map(([key, val]) => (
-                              <option
-                                key={key}
-                                value={key}
-                                className="bg-popover text-popover-foreground border-0 outline-none"
-                              >
-                                {val.label}
-                              </option>
-                            ))}
-                        </select>
+                          <span>
+                            {statusConfig[orderDetail.status_shipping].label}
+                          </span>
+                        </span>
+                        {((orderDetail.status_shipping === "cancelPending" &&
+                          orderDetail.cancelBy === "buyer") ||
+                          orderDetail.status_shipping ===
+                            "awaitingPayment") && (
+                          <div className="flex items-center gap-1 ml-2">
+                            {/* Tombol Setuju */}
+                            <ConfirmDialog
+                              onConfirm={() =>
+                                handleApprove(
+                                  orderDetail.id,
+                                  user.id,
+                                  orderDetail.status_shipping
+                                )
+                              }
+                            >
+                              <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
+                                <Check size={16} />
+                              </button>
+                            </ConfirmDialog>
 
-                        {/* Ikon panah dari Lucide */}
-                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                            {/* Tombol Tolak */}
+                            <ConfirmDialog
+                              onConfirm={() =>
+                                handleDeny(
+                                  orderDetail.id,
+                                  user.id,
+                                  orderDetail.status_shipping
+                                )
+                              }
+                            >
+                              <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+                                <X size={16} />
+                              </button>
+                            </ConfirmDialog>
+                          </div>
+                        )}
                       </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        {/* Select Status */}
+                        <div className="relative inline-block">
+                          <select
+                            value={curentStatusShipped}
+                            onChange={(e) =>
+                              setCurrentStatusShipped(e.target.value)
+                            }
+                            className={`appearance-none px-3 pr-8 py-1.5 rounded-full text-sm font-medium  bg-background text-foreground focus:outline-none transition-colors cursor-pointer ${
+                              statusConfig[curentStatusShipped]?.color || ""
+                            }`}
+                          >
+                            {Object.entries(statusConfig)
+                              .filter(
+                                ([key]) =>
+                                  key !== "cancelPending" &&
+                                  key !== "cancelled" &&
+                                  key !== "awaitingPayment"
+                              )
+                              .map(([key, val]) => (
+                                <option
+                                  key={key}
+                                  value={key}
+                                  className="bg-popover text-popover-foreground border-0 outline-none"
+                                >
+                                  {val.label}
+                                </option>
+                              ))}
+                          </select>
 
-                      {/* Tombol Save */}
-                      <button
-                        onClick={() =>
-                          handleUpdateShippingStatus(
-                            orderDetail.id,
-                            curentStatusShipped,
-                            user.id
-                          )
-                        }
-                        className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors cursor-pointer"
-                      >
-                        <Check size={16} className="mr-1" />
-                        <span className="text-sm font-medium">Save</span>
-                      </button>
-                    </div>
-                  )}
+                          {/* Ikon panah dari Lucide */}
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        </div>
+
+                        {/* Tombol Save */}
+                        <button
+                          onClick={() =>
+                            handleUpdateShippingStatus(
+                              orderDetail.id,
+                              curentStatusShipped,
+                              user.id
+                            )
+                          }
+                          className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors cursor-pointer"
+                        >
+                          <Check size={16} className="mr-1" />
+                          <span className="text-sm font-medium">Save</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </SlideIn>
         </main>
 
         {/* Checkout Summary */}
         <aside className="w-full xl:w-1/2">
-          <Card className="p-6 sticky top-4">
-            <div className="space-y-6">
-              {/* Header */}
-              <div className="border-b pb-4">
-                <h2 className="text-xl font-semibold">Order Summary</h2>
+          <SlideIn direction="left">
+            <Card className="p-6 sticky top-4">
+              <div className="space-y-6">
+                {/* Header */}
+                <div className="border-b pb-4">
+                  <h2 className="text-xl font-semibold">Order Summary</h2>
 
-                {/* Shop Name */}
-                <Link
-                  to={`/shop/${1}`}
-                  className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"
-                >
-                  <Store className="h-4 w-4" />
-                  <span className="font-medium capitalize">
-                    {orderDetail.shop_name}
-                  </span>
-                </Link>
-                {/* Telephone */}
-                <div className="flex items-center gap-2 ml-1 mt-1 text-muted-foreground">
-                  <Phone className="h-3 w-3" />
-                  <span className="text-xs text-muted-foreground">
-                    {orderDetail.shop_telephone}
-                  </span>
-                </div>
-
-                {/* Selected Items */}
-                <div className="mt-4 space-y-3 max-h-48 overflow-y-auto pr-2">
-                  {orderDetail.orderItems.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-12 h-12 object-cover rounded-md flex-shrink-0"
-                        onError={(e) => {
-                          e.target.src =
-                            "https://via.placeholder.com/48x48?text=No+Image";
-                        }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-sm truncate">
-                          {item.name}
-                        </h3>
-                        <p className="text-xs text-muted-foreground capitalize">
-                          {item.label.replace("-", " ")} • Qty: {item.quantity}
-                        </p>
-                        <p className="text-xs font-medium text-primary">
-                          {formatPrice(item.price * item.quantity)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price Breakdown */}
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium">
-                    {formatPrice(orderDetail.total_price - 30000)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Delivery Fee</span>
-                  <span className="font-medium">{formatPrice(30000)}</span>
-                </div>
-
-                <div className="border-t pt-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold">Total</span>
-                    <span className="text-lg font-bold text-primary">
-                      {formatPrice(orderDetail.total_price)}
+                  {/* Shop Name */}
+                  <Link
+                    to={`/shop/${1}`}
+                    className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"
+                  >
+                    <Store className="h-4 w-4" />
+                    <span className="font-medium capitalize">
+                      {orderDetail.shop_name}
                     </span>
+                  </Link>
+                  {/* Telephone */}
+                  <div className="flex items-center gap-2 ml-1 mt-1 text-muted-foreground">
+                    <Phone className="h-3 w-3" />
+                    <span className="text-xs text-muted-foreground">
+                      {orderDetail.shop_telephone}
+                    </span>
+                  </div>
+
+                  {/* Selected Items */}
+                  <div className="mt-4 space-y-3 max-h-48 overflow-y-auto pr-2">
+                    {orderDetail.orderItems.map((item) => (
+                      <div key={item.id} className="flex items-center gap-3">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-12 h-12 object-cover rounded-md flex-shrink-0"
+                          onError={(e) => {
+                            e.target.src =
+                              "https://via.placeholder.com/48x48?text=No+Image";
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-sm truncate">
+                            {item.name}
+                          </h3>
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {item.label.replace("-", " ")} • Qty:{" "}
+                            {item.quantity}
+                          </p>
+                          <p className="text-xs font-medium text-primary">
+                            {formatPrice(item.price * item.quantity)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Price Breakdown */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="font-medium">
+                      {formatPrice(orderDetail.total_price - 30000)}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Delivery Fee</span>
+                    <span className="font-medium">{formatPrice(30000)}</span>
+                  </div>
+
+                  <div className="border-t pt-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold">Total</span>
+                      <span className="text-lg font-bold text-primary">
+                        {formatPrice(orderDetail.total_price)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </SlideIn>
         </aside>
       </div>
     </section>

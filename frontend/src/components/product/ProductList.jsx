@@ -5,6 +5,7 @@ import RenderProduct from "./RenderProduct";
 import Empty from "../ui/Empty";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
+import { SlideIn } from "../animations/SlideIn";
 
 export default function ProductList() {
   const { category, query } = useParams();
@@ -55,14 +56,15 @@ export default function ProductList() {
     <>
       {ProductList.length === 0 && <Empty>No products found</Empty>}
       <div className="px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {ProductList.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onAddToCart={handleAddToCart}
-            role={user.role}
-            shop_id={(user.Shop?.id || user.id)} // nanti ganti ke user.Shop.id
-          />
+        {ProductList.map((product, index) => (
+          <SlideIn key={product.id} direction="up" delay={index * 0.09}>
+            <ProductCard
+              product={product}
+              onAddToCart={handleAddToCart}
+              role={user.role}
+              shop_id={user.Shop?.id || user.id} // nanti ganti ke user.Shop.id
+            />
+          </SlideIn>
         ))}
       </div>
     </>

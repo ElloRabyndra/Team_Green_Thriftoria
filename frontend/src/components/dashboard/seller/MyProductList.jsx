@@ -6,6 +6,7 @@ import Empty from "@/components/ui/Empty";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
+import { SlideIn } from "@/components/animations/SlideIn";
 
 const MyProductList = () => {
   const { user, isLoading } = useAuth();
@@ -29,7 +30,9 @@ const MyProductList = () => {
   // Filter produk penjual
   useEffect(() => {
     if (products.length === 0) return;
-    setMyProducts(products.filter((p) => p.shop_id === (user.Shop?.id || user.id))); // nanti ganti ke user.Shop.id
+    setMyProducts(
+      products.filter((p) => p.shop_id === (user.Shop?.id || user.id))
+    ); // nanti ganti ke user.Shop.id
   }, [products]);
 
   if (productLoading) {
@@ -70,14 +73,15 @@ const MyProductList = () => {
             </h1>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {myProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onRemoveProduct={handleRemoveProduct}
-                role={user.role} // Sementara
-                shop_id={(user.Shop?.id || user.id)} // nanti ganti ke user.Shop.id
-              />
+            {myProducts.map((product, index) => (
+              <SlideIn key={product.id} direction="up">
+                <ProductCard
+                  product={product}
+                  onRemoveProduct={handleRemoveProduct}
+                  role={user.role} // Sementara
+                  shop_id={user.Shop?.id || user.id} // nanti ganti ke user.Shop.id
+                />
+              </SlideIn>
             ))}
           </div>
         </section>

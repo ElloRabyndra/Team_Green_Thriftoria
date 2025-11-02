@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useOrders } from "@/hooks/useOrders";
 import Loading from "@/components/ui/loading";
+import { SlideIn } from "@/components/animations/SlideIn";
 
 const MyOrder = () => {
   const navigate = useNavigate();
@@ -41,7 +42,9 @@ const MyOrder = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
           {orders.map((order) => (
-            <OrderCard key={order.id} order={order} />
+            <SlideIn key={order.id} direction="down" >
+              <OrderCard order={order} />
+            </SlideIn>
           ))}
         </div>
       )}

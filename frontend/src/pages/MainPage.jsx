@@ -6,7 +6,6 @@ import { Outlet } from "react-router";
 
 export default function MainPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user } = useAuth();
 
   return (
     <section className="min-h-screen">

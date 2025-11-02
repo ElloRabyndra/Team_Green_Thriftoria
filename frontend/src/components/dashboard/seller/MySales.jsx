@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import SaleCard from "./SaleCard";
 import { useSales } from "@/hooks/useSales";
 import Loading from "@/components/ui/loading";
+import { SlideIn } from "@/components/animations/SlideIn";
 
 const MySales = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const MySales = () => {
         navigate(-1);
         return;
       }
-      fetchSales((user.Shop?.id || user.id)); // nanti ganti ke user.Shop.id
+      fetchSales(user.Shop?.id || user.id); // nanti ganti ke user.Shop.id
     }
   }, [isLoading, user, navigate]);
 
@@ -40,7 +41,9 @@ const MySales = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
           {sales.map((sale) => (
-            <SaleCard key={sale.id} sale={sale} />
+            <SlideIn key={sale.id} direction="down">
+              <SaleCard sale={sale} />
+            </SlideIn>
           ))}
         </div>
       )}
