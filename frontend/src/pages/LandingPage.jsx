@@ -48,7 +48,7 @@ const LandingPage = () => {
               <Button
                 size="lg"
                 className="group text-base px-8 py-6 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 cursor-pointer"
-                onClick={() => navigate("/products")}
+                onClick={() => navigate("/login")}
               >
                 Start Exploring Thriftoria
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />

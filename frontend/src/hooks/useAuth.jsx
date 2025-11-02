@@ -83,10 +83,10 @@ export const AuthProvider = ({ children }) => {
         try {
             await logoutApi(); 
             setUser(null);
-            navigate('/login'); 
+            navigate('/'); 
         } catch (error) {
             setUser(null); 
-            navigate('/login');
+            navigate('/');
         }
     };
 
