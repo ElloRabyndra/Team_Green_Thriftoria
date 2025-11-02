@@ -6,12 +6,19 @@ import Empty from "../ui/Empty";
 import CartCard from "./CartCard";
 import CartDetail from "./CartDetail";
 import Loading from "../ui/loading";
+import { SlideIn } from "../animations/SlideIn";
 
 export default function CartList() {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-  const { cart, loading, loadCart, increaseQuantity, decreaseQuantity, removeFromCart } =
-    useProducts();
+  const {
+    cart,
+    loading,
+    loadCart,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+  } = useProducts();
 
   // State untuk track items yang dipilih (array of cart IDs)
   const [selectedCartIds, setSelectedCartIds] = useState([]);
@@ -113,25 +120,33 @@ export default function CartList() {
           <div className="flex flex-col xl:flex-row gap-6">
             <main className="w-full xl:w-1/2">
               <ul className="mt-4 space-y-4">
-                {cart.map((cartItem) => (
-                  <li key={cartItem.id}>
-                    <CartCard
-                      cartItem={cartItem}
-                      isSelected={selectedCartIds.includes(cartItem.id)}
-                      onSelect={handleSelectCart}
-                      increaseQuantity={handleIncreaseQuantity}
-                      decreaseQuantity={handleDecreaseQuantity}
-                      removeFromCart={handleRemoveFromCart}
-                    />
-                  </li>
+                {cart.map((cartItem, index) => (
+                  <SlideIn
+                    key={cartItem.id}
+                    direction="up"
+                    delay={index * 0.05}
+                  >
+                    <li>
+                      <CartCard
+                        cartItem={cartItem}
+                        isSelected={selectedCartIds.includes(cartItem.id)}
+                        onSelect={handleSelectCart}
+                        increaseQuantity={handleIncreaseQuantity}
+                        decreaseQuantity={handleDecreaseQuantity}
+                        removeFromCart={handleRemoveFromCart}
+                      />
+                    </li>
+                  </SlideIn>
                 ))}
               </ul>
             </main>
             <aside className="mt-4 w-full xl:w-1/2">
-              <CartDetail
-                selectedItems={selectedCartItems}
-                selectedItemsPrice={selectedItemsPrice}
-              />
+              <SlideIn direction="left">
+                <CartDetail
+                  selectedItems={selectedCartItems}
+                  selectedItemsPrice={selectedItemsPrice}
+                />
+              </SlideIn>
             </aside>
           </div>
         </div>

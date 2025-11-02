@@ -10,9 +10,9 @@ export default function ProtectedRoute({ children }) {
     return null;
   }
 
-  // Redirect ke halaman login dengan menyimpan lokasi sebelumnya
+  // Redirect ke halaman landing page 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   // Jika sudah login, tampilkan children

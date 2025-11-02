@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import DashboardCard from "./DashboardCard";
 import { Card, CardContent } from "../ui/card";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { SlideIn } from "../animations/SlideIn";
 
 const Dashboard = () => {
   const { user, isLoading, logout } = useAuth();
@@ -103,36 +104,39 @@ const Dashboard = () => {
         </p>
       </div>
 
-      <Card
-        className={
-          "w-full -mt-4 min-w-80 md:min-w-md p-5 flex-row items-center gap-0 mb-6"
-        }
-      >
-        <Avatar className="w-14 h-14 rounded-full overflow-hidden">
-          <AvatarImage
-            src={`${
-              user?.profile_picture !== "https://i.pravatar.cc/150"
-                ? user.profile_picture
-                : "https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg"
-            }`}
-          ></AvatarImage>
-        </Avatar>
-        <CardContent className="px-4">
-          <h1 className="text-md font-semibold">{user.username}</h1>
-          <p className="text-sm font-medium text-gray-500">{user?.email}</p>
-        </CardContent>
-      </Card>
+      <SlideIn direction="up">
+        <Card
+          className={
+            "w-full -mt-4 min-w-80 md:min-w-md p-5 flex-row items-center gap-0 mb-6"
+          }
+        >
+          <Avatar className="w-14 h-14 rounded-full overflow-hidden">
+            <AvatarImage
+              src={`${
+                user?.profile_picture !== "https://i.pravatar.cc/150"
+                  ? user.profile_picture
+                  : "https://i.pinimg.com/1200x/77/00/70/7700709ac1285b907c498a70fbccea5e.jpg"
+              }`}
+            ></AvatarImage>
+          </Avatar>
+          <CardContent className="px-4">
+            <h1 className="text-md font-semibold">{user.username}</h1>
+            <p className="text-sm font-medium text-gray-500">{user?.email}</p>
+          </CardContent>
+        </Card>
+      </SlideIn>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {currentMenu.map((menu) => (
-          <DashboardCard
-            key={menu.id}
-            title={menu.title}
-            description={menu.description}
-            route={menu.route}
-            iconName={menu.iconName}
-            colorClass={menu.colorClass}
-          />
+        {currentMenu.map((menu, index) => (
+          <SlideIn key={menu.id} direction="up">
+            <DashboardCard
+              title={menu.title}
+              description={menu.description}
+              route={menu.route}
+              iconName={menu.iconName}
+              colorClass={menu.colorClass}
+            />
+          </SlideIn>
         ))}
       </div>
     </section>

@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
 import Loading from "@/components/ui/loading";
 import { useShop } from "@/hooks/useShop";
+import { SlideIn } from "@/components/animations/SlideIn";
 
 const MyShop = () => {
   const { user, isLoading } = useAuth();
@@ -173,163 +174,171 @@ const MyShop = () => {
           Back to Dashboard
         </Button>
       </div>
-      <Card className="w-full min-w-80 md:min-w-md">
-        <CardHeader className="flex items-center justify-between gap-2">
-          <CardTitle>Edit Shop Profile</CardTitle>
-          <CardAction></CardAction>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex flex-col gap-6">
-              {/* Shop Name */}
-              <div className="grid gap-2">
-                <Label htmlFor="shop_name">Shop Name</Label>
-                <Input
-                  {...register("shop_name")}
-                  id="shop_name"
-                  type="text"
-                  placeholder="Insert Shop Name..."
-                  autoComplete="off"
-                  disabled={isSubmitting}
-                />
-                {errors.shop_name && (
-                  <ErrorMessage ErrorMessage={errors.shop_name.message} />
-                )}
-              </div>
-              {/* Phone */}
-              <div className="grid gap-2">
-                <Label htmlFor="shop_telephone">Phone Number</Label>
-                <Input
-                  {...register("shop_telephone")}
-                  id="shop_telephone"
-                  type="text"
-                  placeholder="Insert Shop Phone..."
-                  autoComplete="off"
-                  disabled={isSubmitting}
-                />
-                {errors.shop_telephone && (
-                  <ErrorMessage ErrorMessage={errors.shop_telephone.message} />
-                )}
-              </div>
-              {/* Address */}
-              <div className="grid gap-2">
-                <Label htmlFor="shop_address">Address</Label>
-                <Input
-                  {...register("shop_address")}
-                  id="shop_address"
-                  type="text"
-                  placeholder="Insert Shop Address..."
-                  autoComplete="off"
-                  disabled={isSubmitting}
-                />
-                {errors.shop_address && (
-                  <ErrorMessage ErrorMessage={errors.shop_address.message} />
-                )}
-              </div>
-              {/* Bank */}
-              <div className="grid gap-2">
-                <Label htmlFor="account_number">Bank Account</Label>
-                <Input
-                  {...register("account_number")}
-                  id="account_number"
-                  type="text"
-                  placeholder="e.g. BCA: 1234567890 - Seller"
-                  autoComplete="off"
-                  disabled={isSubmitting}
-                />
-                {errors.account_number && (
-                  <ErrorMessage ErrorMessage={errors.account_number.message} />
-                )}
-              </div>
-              {/* Qris */}
-              <div className="space-y-4">
-                {/* Input Field */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    QRIS Payment Picture
-                  </label>
-                  <div className="flex gap-2 mt-2">
-                    {/* Input QRIS Picture Button */}
-                    <div className="flex-1">
-                      <input
-                        {...register("qris_picture")}
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                        id="qris-input"
-                      />
-                      <label
-                        htmlFor="qris-input"
-                        className="flex items-center justify-center gap-2 w-full px-4 py-2 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-card text-card-foreground"
-                      >
-                        <Upload className="h-4 w-4" />
-                        <span className="text-sm font-medium">
-                          {qrisFile ? qrisFile.name : "Update QRIS"}
-                        </span>
-                      </label>
-                    </div>
+      <SlideIn direction="left">
+        <Card className="w-full min-w-80 md:min-w-md">
+          <CardHeader className="flex items-center justify-between gap-2">
+            <CardTitle>Edit Shop Profile</CardTitle>
+            <CardAction></CardAction>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-6">
+                {/* Shop Name */}
+                <div className="grid gap-2">
+                  <Label htmlFor="shop_name">Shop Name</Label>
+                  <Input
+                    {...register("shop_name")}
+                    id="shop_name"
+                    type="text"
+                    placeholder="Insert Shop Name..."
+                    autoComplete="off"
+                    disabled={isSubmitting}
+                  />
+                  {errors.shop_name && (
+                    <ErrorMessage ErrorMessage={errors.shop_name.message} />
+                  )}
+                </div>
+                {/* Phone */}
+                <div className="grid gap-2">
+                  <Label htmlFor="shop_telephone">Phone Number</Label>
+                  <Input
+                    {...register("shop_telephone")}
+                    id="shop_telephone"
+                    type="text"
+                    placeholder="Insert Shop Phone..."
+                    autoComplete="off"
+                    disabled={isSubmitting}
+                  />
+                  {errors.shop_telephone && (
+                    <ErrorMessage
+                      ErrorMessage={errors.shop_telephone.message}
+                    />
+                  )}
+                </div>
+                {/* Address */}
+                <div className="grid gap-2">
+                  <Label htmlFor="shop_address">Address</Label>
+                  <Input
+                    {...register("shop_address")}
+                    id="shop_address"
+                    type="text"
+                    placeholder="Insert Shop Address..."
+                    autoComplete="off"
+                    disabled={isSubmitting}
+                  />
+                  {errors.shop_address && (
+                    <ErrorMessage ErrorMessage={errors.shop_address.message} />
+                  )}
+                </div>
+                {/* Bank */}
+                <div className="grid gap-2">
+                  <Label htmlFor="account_number">Bank Account</Label>
+                  <Input
+                    {...register("account_number")}
+                    id="account_number"
+                    type="text"
+                    placeholder="e.g. BCA: 1234567890 - Seller"
+                    autoComplete="off"
+                    disabled={isSubmitting}
+                  />
+                  {errors.account_number && (
+                    <ErrorMessage
+                      ErrorMessage={errors.account_number.message}
+                    />
+                  )}
+                </div>
+                {/* Qris */}
+                <div className="space-y-4">
+                  {/* Input Field */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">
+                      QRIS Payment Picture
+                    </label>
+                    <div className="flex gap-2 mt-2">
+                      {/* Input QRIS Picture Button */}
+                      <div className="flex-1">
+                        <input
+                          {...register("qris_picture")}
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="hidden"
+                          id="qris-input"
+                        />
+                        <label
+                          htmlFor="qris-input"
+                          className="flex items-center justify-center gap-2 w-full px-4 py-2 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-card text-card-foreground"
+                        >
+                          <Upload className="h-4 w-4" />
+                          <span className="text-sm font-medium">
+                            {qrisFile ? qrisFile.name : "Update QRIS"}
+                          </span>
+                        </label>
+                      </div>
 
-                    {/* Preview Button */}
-                    <button
-                      type="button"
-                      onClick={handlePreviewClick}
-                      disabled={!qrisPreview}
-                      className={`px-6 py-2 rounded-lg border transition-colors font-medium text-sm ${
-                        qrisPreview
-                          ? "border-primary bg-primary/10 text-primary hover:bg-primary/20"
-                          : "border-border bg-muted text-muted-foreground cursor-not-allowed"
-                      }`}
-                    >
-                      Preview
-                    </button>
+                      {/* Preview Button */}
+                      <button
+                        type="button"
+                        onClick={handlePreviewClick}
+                        disabled={!qrisPreview}
+                        className={`px-6 py-2 rounded-lg border transition-colors font-medium text-sm ${
+                          qrisPreview
+                            ? "border-primary bg-primary/10 text-primary hover:bg-primary/20"
+                            : "border-border bg-muted text-muted-foreground cursor-not-allowed"
+                        }`}
+                      >
+                        Preview
+                      </button>
+                    </div>
+                    {errors.qris_picture && (
+                      <ErrorMessage
+                        ErrorMessage={errors.qris_picture.message}
+                      />
+                    )}
                   </div>
-                  {errors.qris_picture && (
-                    <ErrorMessage ErrorMessage={errors.qris_picture.message} />
+
+                  {/* Preview Overlay/Popup */}
+                  {showPreview && qrisPreview && (
+                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                      <Card className="relative rounded-lg p-4 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
+                        {/* Close Button */}
+                        <button
+                          onClick={() => setShowPreview(false)}
+                          className="absolute top-2 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+
+                        {/* Image */}
+                        <div className="text-center">
+                          <h3 className="text-lg font-semibold mb-4 text-card-foreground">
+                            QRIS Payment Picture Preview
+                          </h3>
+                          <img
+                            src={qrisPreview}
+                            alt="QRIS Preview"
+                            className="max-w-full max-h-[70vh] object-contain rounded-lg border"
+                          />
+                        </div>
+                      </Card>
+                    </div>
                   )}
                 </div>
 
-                {/* Preview Overlay/Popup */}
-                {showPreview && qrisPreview && (
-                  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                    <Card className="relative rounded-lg p-4 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
-                      {/* Close Button */}
-                      <button
-                        onClick={() => setShowPreview(false)}
-                        className="absolute top-2 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-
-                      {/* Image */}
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-4 text-card-foreground">
-                          QRIS Payment Picture Preview
-                        </h3>
-                        <img
-                          src={qrisPreview}
-                          alt="QRIS Preview"
-                          className="max-w-full max-h-[70vh] object-contain rounded-lg border"
-                        />
-                      </div>
-                    </Card>
-                  </div>
-                )}
+                {/* Button */}
+                <Button
+                  type="submit"
+                  className="w-full cursor-pointer"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Updating..." : "Update Shop"}
+                </Button>
               </div>
-
-              {/* Button */}
-              <Button
-                type="submit"
-                className="w-full cursor-pointer"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Updating..." : "Update Shop"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+            </form>
+          </CardContent>
+        </Card>
+      </SlideIn>
     </div>
   );
 };
