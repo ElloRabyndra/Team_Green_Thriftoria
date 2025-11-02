@@ -33,6 +33,7 @@ export const dummyStore = {
     {
       id: 1,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Blue & Black Check Shirt",
       category: "Fashion",
       label: "mens-shirts",
@@ -46,6 +47,7 @@ export const dummyStore = {
     {
       id: 2,
       shop_id: 1,
+      shop_name: "Thrift Store 1",
       name: "Gigabyte Aorus Men Tshirt",
       category: "Fashion",
       label: "mens-shirts",
@@ -59,6 +61,7 @@ export const dummyStore = {
     {
       id: 3,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Man Plaid Shirt",
       category: "Fashion",
       label: "mens-shirts",
@@ -72,6 +75,7 @@ export const dummyStore = {
     {
       id: 4,
       shop_id: 1,
+      shop_name: "Thrift Store 1",
       name: "Man Short Sleeve Shirt",
       category: "Fashion",
       label: "mens-shirts",
@@ -85,6 +89,7 @@ export const dummyStore = {
     {
       id: 5,
       shop_id: 1,
+      shop_name: "Thrift Store 1",
       name: "Men Check Shirt",
       category: "Fashion",
       label: "mens-shirts",
@@ -98,6 +103,7 @@ export const dummyStore = {
     {
       id: 6,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Nike Air Jordan 1 Red And Black",
       category: "Fashion",
       label: "mens-shoes",
@@ -111,6 +117,7 @@ export const dummyStore = {
     {
       id: 7,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Nike Baseball Cleats",
       category: "Fashion",
       label: "mens-shoes",
@@ -124,6 +131,7 @@ export const dummyStore = {
     {
       id: 8,
       shop_id: 2,
+      shop_name: "Thrift Store 2",
       name: "Puma Future Rider Trainers",
       category: "Fashion",
       label: "mens-shoes",
@@ -137,6 +145,7 @@ export const dummyStore = {
     {
       id: 9,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Sports Sneakers Off White & Red",
       category: "Fashion",
       label: "mens-shoes",
@@ -150,6 +159,7 @@ export const dummyStore = {
     {
       id: 10,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Sports Sneakers Off White Red",
       category: "Fashion",
       label: "mens-shoes",
@@ -163,6 +173,7 @@ export const dummyStore = {
     {
       id: 11,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "iPhone 5s",
       category: "Others",
       label: "smartphones",
@@ -176,6 +187,7 @@ export const dummyStore = {
     {
       id: 16,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Annibale Colombo Bed",
       category: "Others",
       label: "furniture",
@@ -189,6 +201,7 @@ export const dummyStore = {
     {
       id: 12,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "iPhone 6",
       category: "Others",
       label: "smartphones",
@@ -202,6 +215,7 @@ export const dummyStore = {
     {
       id: 17,
       shop_id: 1,
+      shop_name: "Thrift Store 1",
       name: "Annibale Colombo Sofa",
       category: "Others",
       label: "furniture",
@@ -215,6 +229,7 @@ export const dummyStore = {
     {
       id: 13,
       shop_id: 1,
+      shop_name: "Thrift Store 1",
       name: "iPhone 13 Pro",
       category: "Others",
       label: "smartphones",
@@ -228,6 +243,7 @@ export const dummyStore = {
     {
       id: 18,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Bedside Table African Cherry",
       category: "Others",
       label: "furniture",
@@ -241,6 +257,7 @@ export const dummyStore = {
     {
       id: 14,
       shop_id: 1,
+      shop_name: "Thrift Store 1",
       name: "iPhone X",
       category: "Others",
       label: "smartphones",
@@ -254,6 +271,7 @@ export const dummyStore = {
     {
       id: 19,
       shop_id: 1,
+      shop_name: "Thrift Store 1",
       name: "Knoll Saarinen Executive Conference Chair",
       category: "Others",
       label: "furniture",
@@ -267,6 +285,7 @@ export const dummyStore = {
     {
       id: 15,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Oppo A57",
       category: "Others",
       label: "smartphones",
@@ -280,6 +299,7 @@ export const dummyStore = {
     {
       id: 20,
       shop_id: 4,
+      shop_name: "Thrift Store 3",
       name: "Wooden Bathroom Sink With Mirror",
       category: "Others",
       label: "furniture",

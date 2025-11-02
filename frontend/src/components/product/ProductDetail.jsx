@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
-import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Store } from "lucide-react";
 import { Button } from "../ui/button";
 import Loading from "../ui/loading";
 import Empty from "../ui/Empty";
@@ -34,12 +34,7 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = async () => {
-    if (!user?.id) {
-      console.error("User not logged in");
-      toast.error("Please login first");
-      return;
-    }
-    const success = await addToCart(user.id, product);
+    const success = await addToCart(user.id, productDetail);
     if (success) {
       toast.success("Product added to cart!");
     } else {
@@ -137,10 +132,21 @@ export default function ProductDetail() {
             <p className="text-gray-500 leading-relaxed">
               {productDetail.description}
             </p>
+            <Link
+              to={`/shop/${productDetail.shop_id}`}
+              className="mt-2 flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Store className="h-4 w-4" />
+              <span className="font-medium uppercase">
+                {productDetail.shop_name}
+              </span>
+            </Link>
           </div>
 
           {/* Action Buttons */}
-          {user.role === "buyer" && (
+          {(user.role === "buyer" ||
+            (user.role === "seller" &&
+              user.Shop?.id !== productDetail.shop_id)) && (
             <div className="space-y-3 mt-5">
               <Button
                 onClick={() => handleAddToCart()}

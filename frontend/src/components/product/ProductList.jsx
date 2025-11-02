@@ -35,15 +35,11 @@ export default function ProductList() {
   // Filter produk yang bukan seller jual
   useEffect(() => {
     if (products.length === 0) return;
-    // if (user.Shop) {
     setProductList(
       products.filter(
         (product) => product.shop_id !== (user.Shop?.id || user.id)
       ) // nanti ganti ke user.Shop.id
     );
-    // } else {
-    //   setProductList(products);
-    // }
   }, [products]);
 
   // Wrapper function untuk addToCart dengan user_id
