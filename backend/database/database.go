@@ -33,7 +33,7 @@ func Init() {
 }
 
 func Migrate() {
-	if err := DB.Debug().AutoMigrate(&models.User{}, &models.Product{}); err != nil {
+	if err := DB.Debug().AutoMigrate(&models.User{}, &models.Shop{}, &models.Product{}, &models.Order{}, &models.OrderItem{}, &models.CartItem{}); err != nil {
 		panic(err)
 	}
 	fmt.Println("Migrate Successfuly")
