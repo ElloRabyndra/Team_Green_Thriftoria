@@ -17,4 +17,4 @@ export default function ProtectedRoute({ children }) {
 
   // Jika sudah login, tampilkan children
   return children;
-};
+}
