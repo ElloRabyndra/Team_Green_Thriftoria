@@ -643,7 +643,7 @@ export const getAllShop = async () => {
   if (USE_DUMMY) {
     await delay();
     const accepted = dummyStore.shops.filter(
-      (s) => s.status_admin === "accept"
+      (s) => s.status_admin === "approve"
     );
     return { success: true, data: accepted };
   }

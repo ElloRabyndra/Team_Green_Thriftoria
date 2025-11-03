@@ -35,6 +35,8 @@ const ViewShop = () => {
   // Loading state
   if (loading || productLoading) return <Loading />;
 
+  if (!shop) return <Empty>Shop not found</Empty>;
+
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Header toko */}

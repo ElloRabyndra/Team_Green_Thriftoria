@@ -41,9 +41,7 @@ export default function Profile() {
   const emailValue = watch("email");
   const usernameValue = watch("username");
 
-  // Ganti useEffect lama (untuk set default value) dengan logika reset yang benar
   useEffect(() => {
-    // KRUSIAL: Reset form HANYA jika user sudah dimuat DAN nilai form belum diisi
     if (user && !isLoading) {
       reset({
         email: user.email || "",
