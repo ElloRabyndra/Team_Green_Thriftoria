@@ -5,7 +5,7 @@ import "time"
 type Shop struct {
 	ID          	uint      	`gorm:"primaryKey" json:"id"`
 	UserID      	uint      	`json:"user_id"`
-	User          	User      `json:"user" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+	User          	User      `json:"-" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 	ShopName        string    	`json:"shop_name"`
 	ShopTelephone   string    	`json:"shop_telephone"`
 	ShopAddress     string    	`json:"shop_address"`

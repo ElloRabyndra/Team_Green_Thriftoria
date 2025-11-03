@@ -80,7 +80,7 @@ func Login(c *fiber.Ctx) error{
 	}
 
 	var existingUser models.User
-	if err := database.DB.Where("email = ?", input.Email).First(&existingUser).Error; err != nil {
+	if err := database.DB.Preload("Shop").Where("email = ?", input.Email).First(&existingUser).Error; err != nil {
 		return c.Status(401).JSON(fiber.Map{"Message": "Email or Password not valid"})
 	}
 
