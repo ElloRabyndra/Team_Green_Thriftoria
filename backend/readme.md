@@ -199,3 +199,86 @@ Response (200 OK):
     "status": "success"
 }
 ```
+
+#### Get All Shop Approve (admin)
+
+GET http://localhost:3000/api/v1/shop/approve
+Response (200 OK):
+
+```json
+{
+  "data": [
+    {
+      "id": 5,
+      "user_id": 1,
+      "shop_name": "HalalMart",
+      "shop_telephone": "081278632253",
+      "shop_address": "Plaju no 15",
+      "account_number": "12312312312",
+      "qris_picture": "http://127.0.0.1:3000/assets/qris/1_1762109769226320600.jpg",
+      "status_admin": "approve",
+      "created_at": "2025-11-02T22:08:33.959+07:00"
+    },
+    {
+      "id": 8,
+      "user_id": 3,
+      "shop_name": "toko 2",
+      "shop_telephone": "081278632253",
+      "shop_address": "Plaju no 15",
+      "account_number": "12312312312",
+      "qris_picture": "http://127.0.0.1:3000/assets/qris/3_1762161995987024700.jpg",
+      "status_admin": "approve",
+      "created_at": "2025-11-03T16:26:35.989+07:00"
+    }
+  ],
+  "status": "success"
+}
+```
+
+#### Get All Shop Pending (admin)
+
+GET http://localhost:3000/api/v1/shop/pending
+Response (200 OK):
+
+```json
+{
+  "data": [
+    {
+      "id": 8,
+      "user_id": 3,
+      "shop_name": "toko 2",
+      "shop_telephone": "081278632253",
+      "shop_address": "Plaju no 15",
+      "account_number": "12312312312",
+      "qris_picture": "http://127.0.0.1:3000/assets/qris/3_1762161995987024700.jpg",
+      "status_admin": "pending",
+      "created_at": "2025-11-03T16:26:35.989+07:00"
+    }
+  ],
+  "status": "success"
+}
+```
+
+#### Accpet Request Shop (admin)
+
+GET http://localhost:3000/api/v1/shop/accept
+Request Body:
+```json
+    {
+      "shop_id": 8,
+      "status": true
+    }
+```
+
+Response (200 Created):
+```json
+    {
+      "data": {
+          "role": "seller",
+          "shop_id": 8,
+          "user_id": 3
+      },
+      "message": "Shop has been accepted and user role updated to seller",
+      "status": "success"
+    }
+```
