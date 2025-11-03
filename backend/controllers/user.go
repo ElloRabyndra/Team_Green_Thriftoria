@@ -14,6 +14,23 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func GetAllUsers(c *fiber.Ctx) error {
+	var users []models.User
+
+	if err := database.DB.Where("role != ?", "admin").Find(&users).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Failed to fetch users",
+			"error":   err.Error(),
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"status": "success",
+		"data":   users,
+	})
+}
+
 func GetProfile(c *fiber.Ctx) error {
 	userToken := c.Locals("user").(*jwt.Token)
 	claims := userToken.Claims.(jwt.MapClaims)
