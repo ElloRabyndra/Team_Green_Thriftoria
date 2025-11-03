@@ -35,6 +35,8 @@ const ViewShop = () => {
   // Loading state
   if (loading || productLoading) return <Loading />;
 
+  if (!shop) return <Empty>Shop not found</Empty>;
+
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Header toko */}
@@ -80,7 +82,9 @@ const ViewShop = () => {
               ))}
             </div>
           ) : (
-            <Empty>Product not found</Empty>
+            <div className="-mt-20">
+              <Empty>Product not found</Empty>
+            </div>
           )}
         </section>
       </SlideIn>

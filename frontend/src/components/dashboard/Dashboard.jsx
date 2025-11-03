@@ -94,7 +94,6 @@ const Dashboard = () => {
 
   // Get current user's menu
   const currentMenu = dashboardMenu[user.role] || dashboardMenu.buyer;
-
   return (
     <section className="p-4 py-0 ">
       <div className="mb-6">

@@ -133,14 +133,13 @@ const MyShop = () => {
         shop_telephone: data.shop_telephone,
         shop_address: data.shop_address,
         account_number: data.account_number,
-        qris_picture: undefined, // Clear file input setelah submit
+        qris_picture: data.qris_picture,
       });
 
       // Clear file state tapi tetap tampilkan preview yang sudah diupdate
       setQrisFile(null);
     } catch (error) {
       console.error("Shop update error:", error);
-      toast.error("Shop update failed!");
     } finally {
       setIsSubmitting(false);
     }
@@ -160,7 +159,6 @@ const MyShop = () => {
     return <Loading />;
   }
 
-  console.log(shop);
   return (
     <div className="px-4 sm:px-6 -mt-4">
       {/* Back Button */}
@@ -300,8 +298,8 @@ const MyShop = () => {
 
                   {/* Preview Overlay/Popup */}
                   {showPreview && qrisPreview && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                      <Card className="relative rounded-lg p-4 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
+                    <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
+                      <Card className="relative rounded-lg p-4 bg-popover max-w-sm max-h-[90vh] overflow-auto">
                         {/* Close Button */}
                         <button
                           onClick={() => setShowPreview(false)}

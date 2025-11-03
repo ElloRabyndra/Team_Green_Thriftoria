@@ -322,7 +322,8 @@ export const dummyStore = {
       qris_picture:
         "https://png.pngtree.com/png-vector/20191027/ourmid/pngtree-qr-code-vector-hidden-text-or-url-scanning-smartphone-technology-isolated-png-image_1886134.jpg",
       created_at: new Date().toISOString(),
-      status_admin: "accept",
+      status_admin: "approve",
+      email: "T4oNt@example.com",
     },
     {
       id: 2,
@@ -334,7 +335,8 @@ export const dummyStore = {
       qris_picture:
         "https://png.pngtree.com/png-vector/20191027/ourmid/pngtree-qr-code-vector-hidden-text-or-url-scanning-smartphone-technology-isolated-png-image_1886134.jpg",
       created_at: new Date().toISOString(),
-      status_admin: "accept",
+      status_admin: "approve",
+      email: "T4oNt@example.com",
     },
     {
       id: 4,
@@ -346,7 +348,8 @@ export const dummyStore = {
       qris_picture:
         "https://png.pngtree.com/png-vector/20191027/ourmid/pngtree-qr-code-vector-hidden-text-or-url-scanning-smartphone-technology-isolated-png-image_1886134.jpg",
       created_at: new Date().toISOString(),
-      status_admin: "accept",
+      status_admin: "approve",
+      email: "T4oNt@example.com",
     },
     {
       id: 5,
@@ -359,6 +362,7 @@ export const dummyStore = {
         "https://png.pngtree.com/png-vector/20191027/ourmid/pngtree-qr-code-vector-hidden-text-or-url-scanning-smartphone-technology-isolated-png-image_1886134.jpg",
       created_at: new Date().toISOString(),
       status_admin: "pending",
+      email: "T4oNt@example.com",
     },
     {
       id: 6,
@@ -371,6 +375,7 @@ export const dummyStore = {
         "https://png.pngtree.com/png-vector/20191027/ourmid/pngtree-qr-code-vector-hidden-text-or-url-scanning-smartphone-technology-isolated-png-image_1886134.jpg",
       created_at: new Date().toISOString(),
       status_admin: "pending",
+      email: "T4oNt@example.com",
     },
   ],
   cart: [],

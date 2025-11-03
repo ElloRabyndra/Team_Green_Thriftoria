@@ -5,7 +5,11 @@ import {
   acceptRequestShop,
   getAllUser,
 } from "@/service/dummyApi";
-import { deleteUserApi } from "@/service/api";
+import {
+  getAllShopApproveApi,
+  getAllShopPendingApi,
+  reviewShopRequestApi,
+} from "@/service/api";
 import { toast } from "react-toastify";
 
 export const useAdmin = () => {
@@ -31,7 +35,7 @@ export const useAdmin = () => {
       setLoading(false);
     }
   };
-
+  
   // Delete User
   const deleteUser = async (user_id) => {
     try {
@@ -57,9 +61,9 @@ export const useAdmin = () => {
   const fetchShopList = async () => {
     setLoading(true);
     try {
-      const response = await getAllShop();
-      if (response.success) {
-        setShopList(response.data);
+      const response = await getAllShopApproveApi();
+      if (response.status === 200) {
+        setShopList(response.data.data);
       } else {
         setShopList(null);
       }
@@ -75,9 +79,9 @@ export const useAdmin = () => {
   const fetchRequestShopList = async () => {
     setLoading(true);
     try {
-      const response = await getRequestShop();
-      if (response.success) {
-        setRequestShopList(response.data);
+      const response = await getAllShopPendingApi();
+      if (response.status === 200) {
+        setRequestShopList(response.data.data);
       } else {
         setRequestShopList(null);
       }
@@ -93,8 +97,8 @@ export const useAdmin = () => {
   const acceptRequest = async (shop_id, status) => {
     setLoading(true);
     try {
-      const response = await acceptRequestShop(shop_id, status);
-      if (response.success) {
+      const response = await reviewShopRequestApi(shop_id, status);
+      if (response.status === 200) {
         const message = status ? "Shop approved" : "Shop rejected";
         toast.success(message);
         fetchShopList();
