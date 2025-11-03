@@ -13,6 +13,143 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
+func GetAllShopApprove(c *fiber.Ctx) error {
+	var shops []models.Shop
+
+	if err := database.DB.Where("status_admin = ?", "approve").Find(&shops).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Failed to fetch shops",
+			"error":   err.Error(),
+		})
+	}
+
+	if len(shops) == 0 {
+		return c.Status(200).JSON(fiber.Map{
+			"status":  "success",
+			"message": "No accepted shops found",
+			"data":    []models.ShopResponse{},
+		})
+	}
+
+	var shopResponses []models.ShopResponse
+	for _, shop := range shops {
+		shopResponses = append(shopResponses, models.ShopResponse{
+			ID:            shop.ID,
+			UserID:        shop.UserID,
+			ShopName:      shop.ShopName,
+			ShopTelephone: shop.ShopTelephone,
+			ShopAddress:   shop.ShopAddress,
+			AccountNumber: shop.AccountNumber,
+			QrisPicture:   shop.QrisPicture,
+			StatusAdmin:   shop.StatusAdmin,
+			CreatedAt:     shop.CreatedAt,
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"status": "success",
+		"data":   shopResponses,
+	})
+}
+
+func GetAllShopPending(c *fiber.Ctx) error {
+	var shops []models.Shop
+
+	if err := database.DB.Where("status_admin = ?", "pending").Find(&shops).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"status":  "error",
+			"message": "Failed to fetch shops",
+			"error":   err.Error(),
+		})
+	}
+
+	if len(shops) == 0 {
+		return c.Status(200).JSON(fiber.Map{
+			"status":  "success",
+			"message": "No accepted shops found",
+			"data":    []models.ShopResponse{},
+		})
+	}
+
+	var shopResponses []models.ShopResponse
+	for _, shop := range shops {
+		shopResponses = append(shopResponses, models.ShopResponse{
+			ID:            shop.ID,
+			UserID:        shop.UserID,
+			ShopName:      shop.ShopName,
+			ShopTelephone: shop.ShopTelephone,
+			ShopAddress:   shop.ShopAddress,
+			AccountNumber: shop.AccountNumber,
+			QrisPicture:   shop.QrisPicture,
+			StatusAdmin:   shop.StatusAdmin,
+			CreatedAt:     shop.CreatedAt,
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"status": "success",
+		"data":   shopResponses,
+	})
+}
+
+func AcceptRequestShop(c *fiber.Ctx) error {
+	type Request struct {
+		ShopID uint `json:"shop_id"`
+		Status bool `json:"status"` 
+	}
+
+	var body Request
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
+	}
+
+	var shop models.Shop
+	if err := database.DB.First(&shop, body.ShopID).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Shop not found"})
+	}
+
+	var user models.User
+	if err := database.DB.First(&user, shop.UserID).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	if body.Status {
+		shop.StatusAdmin = "approve"
+		if err := database.DB.Save(&shop).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Failed to update shop status"})
+		}
+
+		user.Role = "seller"
+		if err := database.DB.Save(&user).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Failed to update user role"})
+		}
+
+		return c.Status(200).JSON(fiber.Map{
+			"status":  "success",
+			"message": "Shop has been accepted and user role updated to seller",
+			"data": fiber.Map{
+				"shop_id": shop.ID,
+				"user_id": user.ID,
+				"role":    user.Role,
+			},
+		})
+	}
+
+	if err := database.DB.Delete(&shop).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete rejected shop"})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"status":  "success",
+		"message": "Shop request has been rejected and deleted",
+		"data": fiber.Map{
+			"shop_id": shop.ID,
+			"user_id": user.ID,
+		},
+	})
+}
+
 func CreateShop(c *fiber.Ctx) error {
 	userToken := c.Locals("user").(*jwt.Token)
 	claims := userToken.Claims.(jwt.MapClaims)
@@ -73,11 +210,6 @@ func CreateShop(c *fiber.Ctx) error {
 	if err := database.DB.Create(&shop).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to create shop", "details": err.Error()})
 	}
-
-	// if err := database.DB.Model(&models.User{}).Where("id = ?", userID).Update("role", "seller").Error; err != nil {
-	// 	return c.Status(500).JSON(fiber.Map{"error": "Gagal memperbarui role user"})
-	// }
-
 	
 	shopResponse := models.ShopResponse{
 		ID:            shop.ID,
