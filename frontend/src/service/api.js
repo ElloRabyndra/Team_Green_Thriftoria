@@ -127,7 +127,15 @@ export const editShopApi = (shopId, data) => {
 
 // ==================== ADMIN ENDPOINTS ====================
 
-// Export axios instance untuk custom requests
-export { api };
+export const getAllShopApproveApi = () => api.get("/shop/approve");
+
+export const getAllShopPendingApi = () => api.get("/shop/pending");
+
+export const reviewShopRequestApi = (shopId, status) => {
+  return api.patch("/shop/accept", {
+    shop_id: shopId,
+    status: status,
+  });
+};
 
 export default api;

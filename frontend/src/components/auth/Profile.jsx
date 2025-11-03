@@ -161,7 +161,7 @@ export default function Profile() {
       </section>
     );
   }
-
+  console.log(user);
   return (
     <section className="space-y-4 md:ml-4">
       {/* My Profile */}

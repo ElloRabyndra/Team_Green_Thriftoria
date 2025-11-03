@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Eye, Upload, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import ErrorMessage from "../../ErrorMessage";
+import Pending from "@/components/ui/Pending";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
 import { useShop } from "@/hooks/useShop";
@@ -102,11 +103,18 @@ const RegisterShop = () => {
       setQrisFile(null);
     } catch (error) {
       console.error("Shop update error:", error);
-      toast.error("Shop update failed!");
     } finally {
       navigate("/dashboard");
     }
   };
+
+  if (user.Shop) {
+    return (
+      <SlideIn direction="down">
+        <Pending />
+      </SlideIn>
+    );
+  }
 
   return (
     <div className="px-4 sm:px-6 -mt-4">
@@ -247,8 +255,8 @@ const RegisterShop = () => {
 
                   {/* Preview Overlay/Popup */}
                   {showPreview && qrisPreview && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                      <Card className="relative rounded-lg p-4 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
+                    <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
+                      <Card className="relative rounded-lg p-4 bg-popover max-w-sm max-h-[90vh] overflow-auto">
                         {/* Close Button */}
                         <button
                           onClick={() => setShowPreview(false)}

@@ -9,10 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import { useAdmin } from "@/hooks/useAdmin";
 import Loading from "@/components/ui/loading";
 import { SlideIn } from "@/components/animations/SlideIn";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 // Badge component untuk status
 function StatusBadge({ status_admin }) {
@@ -32,6 +33,7 @@ function StatusBadge({ status_admin }) {
 
 // Buyer List Component
 const ShopsList = () => {
+  const Navigate = useNavigate();
   const { shopList, loading, fetchShopList } = useAdmin();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredShops, setFilteredShops] = useState([]);
@@ -75,7 +77,7 @@ const ShopsList = () => {
   };
 
   const handleView = (shop) => {
-    console.log("View shop:", shop);
+    Navigate(`/shop/${shop.id}`);
   };
 
   const handleDelete = (shop) => {};
@@ -224,13 +226,14 @@ const ShopsList = () => {
                             >
                               <Eye className="h-4 w-4" />
                             </button>
-                            <button
-                              onClick={() => handleDelete(shop)}
-                              className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
-                              title="Delete User"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
+                            <ConfirmDialog onConfirm={() => handleDelete(shop)}>
+                              <button
+                                className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+                                title="Delete User"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </ConfirmDialog>
                           </div>
                         </TableCell>
                       </TableRow>

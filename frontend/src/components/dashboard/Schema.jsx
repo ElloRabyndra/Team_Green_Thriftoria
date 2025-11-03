@@ -5,7 +5,7 @@ export const registerShopSchema = z.object({
     .string()
     .min(1, "Shop name is required")
     .min(4, "Shop name must be at least 4 characters"),
-  	shop_telephone: z
+  shop_telephone: z
     .string()
     .min(1, "Shop Phone number is required")
     .regex(/^[0-9]+$/, "Shop Phone number must contain only digits")
@@ -17,8 +17,7 @@ export const registerShopSchema = z.object({
   account_number: z
     .string()
     .min(1, "Account number is required")
-    .regex(/^[0-9]+$/, "Account number must contain only digits")
-    .min(10, "Account number must be at least 10 digits"),
+    .min(5, "Account number must be at least 5 characters"),
   qris_picture: z
     .custom((val) => val instanceof FileList, {
       message: "QRIS picture is required",
@@ -31,20 +30,22 @@ export const registerShopSchema = z.object({
       message: "File size must not exceed 5MB",
     })
     .refine(
-      (file) => ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(file.type),
+      (file) =>
+        ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(
+          file.type
+        ),
       {
         message: "Only JPG and PNG formats are allowed",
       }
     ),
 });
 
-
 export const editShopSchema = z.object({
   shop_name: z
     .string()
     .min(1, "Shop name is required")
     .min(4, "Shop name must be at least 4 characters"),
-  	shop_telephone: z
+  shop_telephone: z
     .string()
     .min(1, "Shop Phone number is required")
     .regex(/^[0-9]+$/, "Shop Phone number must contain only digits")
@@ -56,8 +57,7 @@ export const editShopSchema = z.object({
   account_number: z
     .string()
     .min(1, "Account number is required")
-    .regex(/^[0-9]+$/, "Account number must contain only digits")
-    .min(10, "Account number must be at least 10 digits"),
+    .min(5, "Account number must be at least 5 characters"),
   qris_picture: z
     .union([
       z
@@ -72,7 +72,9 @@ export const editShopSchema = z.object({
           (file) =>
             !file ||
             (file.size <= 5 * 1024 * 1024 &&
-              ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(file.type)),
+              ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(
+                file.type
+              )),
           {
             message:
               "QRIS picture must be JPG/PNG format and not exceed 5MB if uploaded",

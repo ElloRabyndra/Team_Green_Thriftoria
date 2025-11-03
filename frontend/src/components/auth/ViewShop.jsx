@@ -82,7 +82,9 @@ const ViewShop = () => {
               ))}
             </div>
           ) : (
-            <Empty>Product not found</Empty>
+            <div className="-mt-20">
+              <Empty>Product not found</Empty>
+            </div>
           )}
         </section>
       </SlideIn>
