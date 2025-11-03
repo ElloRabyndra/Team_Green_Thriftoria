@@ -38,7 +38,7 @@ func GetProfile(c *fiber.Ctx) error {
 	userID := c.Locals("id", claims["id"])
 
 	var user models.User
-	if err := database.DB.First(&user, userID).Error; err != nil {
+	if err := database.DB.Preload("Shop").First(&user, userID).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "User not found"})
 	}
 

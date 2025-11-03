@@ -18,7 +18,7 @@ func ShopRoutes(api fiber.Router) {
 
 	shop.Patch("/accept", middleware.Protected(), middleware.RequireRole("admin"), controllers.AcceptRequestShop)
 
-	shop.Get("/:id", middleware.Protected(), middleware.RequireRole("seller", "admin"), controllers.GetDetailShop)
+	shop.Get("/:id", middleware.Protected(), middleware.RequireRole("buyer", "seller", "admin"), controllers.GetDetailShop)
 
 	shop.Patch("/:id", middleware.Protected(), middleware.RequireRole("seller", "admin"), controllers.EditShop)
 }

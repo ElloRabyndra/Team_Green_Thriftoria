@@ -184,7 +184,7 @@ Response (200 OK):
 
 
 #### Get Detail SHOP
-Get http://localhost:3000/api/v1/shop/:id (seller, admin)
+Get http://localhost:3000/api/v1/shop/:id (buyer, seller, admin)
 
 Response (200 OK):
 {
