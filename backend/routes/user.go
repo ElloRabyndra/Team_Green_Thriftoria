@@ -9,6 +9,7 @@ import (
 
 func UserRoutes(api fiber.Router){
 	user := api.Group("/user")
+	user.Get("/",middleware.Protected(), middleware.RequireRole("admin"), controllers.GetAllUsers)
 	user.Get("/profile",middleware.Protected(), controllers.GetProfile)
 	user.Patch("/profile",middleware.Protected(), controllers.UpdateProfile)
 	user.Delete("/:id", controllers.DeleteUser)

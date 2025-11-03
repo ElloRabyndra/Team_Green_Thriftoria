@@ -75,6 +75,39 @@ Response:
 "message": "Logout success"
 }
 
+#### Get All User
+
+GET http://localhost:3000/api/v1/user
+Response (200 OK):
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "username": "steven",
+      "email": "steven@gmail.com",
+      "address": "",
+      "telephone": "",
+      "role": "seller",
+      "profile_picture": "https://i.pravatar.cc/150",
+      "Shop": null
+    },
+    {
+      "id": 3,
+      "username": "steven2",
+      "email": "steven2@gmail.com",
+      "address": "",
+      "telephone": "",
+      "role": "seller",
+      "profile_picture": "https://i.pravatar.cc/150",
+      "Shop": null
+    }
+  ],
+  "status": "success"
+}
+```
+
 #### Get Profile
 
 GET http://localhost:3000/api/v1/user/profile
@@ -263,22 +296,24 @@ Response (200 OK):
 
 GET http://localhost:3000/api/v1/shop/accept
 Request Body:
+
 ```json
-    {
-      "shop_id": 8,
-      "status": true
-    }
+{
+  "shop_id": 8,
+  "status": true
+}
 ```
 
 Response (200 Created):
+
 ```json
-    {
-      "data": {
-          "role": "seller",
-          "shop_id": 8,
-          "user_id": 3
-      },
-      "message": "Shop has been accepted and user role updated to seller",
-      "status": "success"
-    }
+{
+  "data": {
+    "role": "seller",
+    "shop_id": 8,
+    "user_id": 3
+  },
+  "message": "Shop has been accepted and user role updated to seller",
+  "status": "success"
+}
 ```
