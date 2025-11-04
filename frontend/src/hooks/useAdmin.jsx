@@ -6,6 +6,8 @@ import {
   getAllUser,
 } from "@/service/dummyApi";
 import {
+  getAllUserApi,
+  getUserByIdApi,
   getAllShopApproveApi,
   getAllShopPendingApi,
   reviewShopRequestApi,
@@ -14,6 +16,7 @@ import { toast } from "react-toastify";
 
 export const useAdmin = () => {
   const [userList, setUserList] = useState([]);
+  const [userDetail, setUserDetail] = useState(null);
   const [shopList, setShopList] = useState([]);
   const [requestShopList, setRequestShopList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -22,9 +25,9 @@ export const useAdmin = () => {
   const fetchUserList = async () => {
     setLoading(true);
     try {
-      const response = await getAllUser();
-      if (response.success) {
-        setUserList(response.data);
+      const response = await getAllUserApi();
+      if (response.status === 200) {
+        setUserList(response.data.data);
       } else {
         setUserList(null);
       }
@@ -35,25 +38,22 @@ export const useAdmin = () => {
       setLoading(false);
     }
   };
-  
-  // Delete User
-  const deleteUser = async (user_id) => {
-    try {
-      const response = await deleteUserApi(user_id);
 
+  // Fetch User Detail
+  const fetchUserDetail = async (user_id) => {
+    setLoading(true);
+    try {
+      const response = await getUserByIdApi(user_id);
       if (response.status === 200) {
-        return { success: true, message: response.data.message };
+        setUserDetail(response.data.data);
       } else {
-        return {
-          success: false,
-          message: "Failed to delete user. Please try again.",
-        };
+        setUserDetail(null);
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to delete user. Please try again.";
-      return { success: false, message: errorMessage };
+      console.error("Error fetching user detail:", error);
+      setUserDetail(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,12 +116,13 @@ export const useAdmin = () => {
 
   return {
     userList,
+    userDetail,
     shopList,
     requestShopList,
     fetchUserList,
+    fetchUserDetail,
     fetchShopList,
     fetchRequestShopList,
-    deleteUser,
     acceptRequest,
     loading,
   };

@@ -61,11 +61,6 @@ export const updateProfileApi = (data) => {
   });
 };
 
-// Fungsi API untuk menghapus User
-export const deleteUserApi = (id) => {
-  return api.delete(`/user/${id}`);
-};
-
 // ==================== SHOP ENDPOINTS ====================
 
 // Fungsi API untuk membuat Shop baru
@@ -127,10 +122,19 @@ export const editShopApi = (shopId, data) => {
 
 // ==================== ADMIN ENDPOINTS ====================
 
+// Fungsi API untuk mendapatkan semua user
+export const getAllUserApi = () => api.get("/user");
+
+// Fungsi API untuk mendapatkan user berdasarkan Id
+export const getUserByIdApi = (user_id) => api.get(`/user/${user_id}`);
+
+// Fungsi API untuk mendapatkan semua shop
 export const getAllShopApproveApi = () => api.get("/shop/approve");
 
+// Fungsi API untuk mendapatkan pending shop
 export const getAllShopPendingApi = () => api.get("/shop/pending");
 
+// Fungsi API untuk mengubah status shop
 export const reviewShopRequestApi = (shopId, status) => {
   return api.patch("/shop/accept", {
     shop_id: shopId,

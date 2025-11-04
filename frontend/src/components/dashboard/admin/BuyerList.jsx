@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { Eye, Trash2, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
@@ -9,18 +10,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import Loading from "@/components/ui/loading";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { toast } from "react-toastify";
 import { SlideIn } from "@/components/animations/SlideIn";
 
 // Buyer List Component
 const BuyerList = () => {
-  const { userList, loading, fetchUserList, deleteUser } = useAdmin();
+  const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
+  const { userList, loading, fetchUserList } = useAdmin();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Redirect jika bukan admin
+  useEffect(() => {
+    if (!isLoading && user && user.role !== "admin") {
+      navigate("/dashboard");
+    }
+  }, [isLoading, user, navigate]);
 
   // Fetch User List
   useEffect(() => {
@@ -62,24 +71,8 @@ const BuyerList = () => {
     }
   };
 
-  // Delete User
-  const handleDeleteUser = async (user_id) => {
-    try {
-      const response = await deleteUser(user_id);
-      if (response.success) {
-        toast.success(response.message);
-        fetchUserList();
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      toast.error(response.message);
-      console.error("Error deleting user:", error);
-    }
-  };
-
   // Loading state
-  if (loading) {
+  if (loading || isLoading) {
     return <Loading />;
   }
   return (
@@ -201,16 +194,15 @@ const BuyerList = () => {
                         {/* Action - Always visible */}
                         <TableCell>
                           <div className="flex items-center justify-center gap-2">
-                            <ConfirmDialog
-                              onConfirm={() => handleDeleteUser(user.id)}
+                            <button
+                              onClick={() =>
+                                navigate(`/dashboard/user/${user.id}`)
+                              }
+                              className="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors"
+                              title="View User"
                             >
-                              <button
-                                className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
-                                title="Delete User"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </ConfirmDialog>
+                              <Eye className="h-4 w-4" />
+                            </button>
                           </div>
                         </TableCell>
                       </TableRow>

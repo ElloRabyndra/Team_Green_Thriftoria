@@ -29,6 +29,7 @@ import BuyerList from "@/components/dashboard/admin/BuyerList";
 import ShopsList from "@/components/dashboard/admin/ShopsList";
 import PendingList from "@/components/dashboard/admin/PendingList";
 import LandingPage from "@/pages/LandingPage";
+import ViewProfile from "@/components/dashboard/admin/ViewProfile";
 
 const Routing = () => {
   const { theme } = useContext(ThemeContext);
@@ -167,6 +168,14 @@ const Routing = () => {
               element={
                 <ProtectedRoute>
                   <BuyerList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="user/:userId"
+              element={
+                <ProtectedRoute>
+                  <ViewProfile />
                 </ProtectedRoute>
               }
             />
