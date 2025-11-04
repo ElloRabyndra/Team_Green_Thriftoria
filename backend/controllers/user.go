@@ -14,6 +14,27 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func GetUserById(c *fiber.Ctx) error {
+	id := c.Params("id") 
+
+	var user models.User
+    
+	if err := database.DB.Preload("Shop").First(&user, id).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"status": "error",
+			"message": "User not found",
+			"error": err.Error(),
+		})
+	}
+
+	user.Password = ""
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status": "success",
+		"data": user,
+	})
+}
+
 func GetAllUsers(c *fiber.Ctx) error {
 	var users []models.User
 
@@ -150,32 +171,5 @@ func UpdateProfile(c *fiber.Ctx) error {
 		"status":  "success",
 		"message": "Profile updated successfully",
 		"data":    user,
-	})
-}
-
-
-func DeleteUser(c *fiber.Ctx) error {
-	id := c.Params("id")
-	var user models.User
-
-	if err := database.DB.First(&user, id).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"status": "error",
-			"message": "User not found",
-			"error": err.Error(),
-		})
-	}
-
-	if err := database.DB.Delete(&user).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status": "error",
-			"message": "Could not delete user",
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"status": "success",
-		"message": "User deleted successfully",
 	})
 }
