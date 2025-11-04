@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
 import {
-  getAllProduct,
-  getProductByCategory,
-  searchProduct,
   getAllCart,
   addToCart as addToCartApi,
   updateCartQuantity,
   deleteCartItem,
-  addProduct,
-  editProduct,
-  deleteProduct,
-  getDetailProduct,
 } from "@/service/dummyApi";
+
+import {
+  getAllProductsApi,
+  searchProductApi,
+  getProductByCategoryApi,
+  getDetailProductApi,
+  addProductApi,
+  editProductApi,
+  deleteProductApi,
+} from "@/service/api";
 
 // Daftar kategori yang tersedia
 export const allCategories = ["Fashion", "Others"];
@@ -44,17 +47,18 @@ export const useProducts = () => {
   // ==================== PRODUCT ====================
   const fetchProducts = async () => {
     setLoading(true);
+    setProducts([]);
     try {
       let response;
 
       if (selectedCategory === "all") {
-        response = await getAllProduct();
+        response = await getAllProductsApi();
       } else {
-        response = await getProductByCategory(selectedCategory);
+        response = await getProductByCategoryApi(selectedCategory);
       }
 
-      if (response.success) {
-        setProducts(response.data || []);
+      if (response.status === 200) {
+        setProducts(response.data.data || []);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -72,9 +76,9 @@ export const useProducts = () => {
 
     setLoading(true);
     try {
-      const response = await searchProduct(query);
-      if (response.success) {
-        setProducts(response.data || []);
+      const response = await searchProductApi(query);
+      if (response.status === 200) {
+        setProducts(response.data.data || []);
       }
     } catch (error) {
       console.error("Error searching products:", error);
@@ -87,9 +91,9 @@ export const useProducts = () => {
   const getProductDetail = async (id) => {
     setLoading(true);
     try {
-      const response = await getDetailProduct(Number(id));
-      if (response.success) {
-        setProductDetail(response.data || null);
+      const response = await getDetailProductApi(Number(id));
+      if (response.status === 200) {
+        setProductDetail(response.data.data || null);
       }
     } catch (error) {
       console.error("Error fetching product detail:", error);
@@ -99,29 +103,11 @@ export const useProducts = () => {
     }
   };
 
-  const addNewProduct = async ({
-    shop_id,
-    name,
-    category,
-    label,
-    description,
-    image,
-    price,
-    stock,
-  }) => {
+  const addNewProduct = async (productData) => {
     try {
-      const response = await addProduct(
-        shop_id,
-        name,
-        category,
-        label,
-        description,
-        "https://www.svgrepo.com/show/508699/landscape-placeholder.svg",
-        price,
-        stock
-      );
-
-      if (response.success) {
+      const response = await addProductApi(productData);
+      console.log(response);
+      if (response.status === 201) {
         await fetchProducts();
         return { success: true, message: response.message };
       }
@@ -133,14 +119,9 @@ export const useProducts = () => {
 
   const editExistingProduct = async (product_id, updatedData) => {
     try {
-      const productData = {
-        ...updatedData,
-        image: "https://www.svgrepo.com/show/508699/landscape-placeholder.svg", // abaikan file image asli
-      };
-
-      const response = await editProduct(product_id, productData);
-
-      if (response.success) {
+      const response = await editProductApi(product_id, updatedData);
+      console.log(response);
+      if (response.status === 200) {
         await fetchProducts();
         return { success: true, message: response.message };
       }
@@ -152,8 +133,9 @@ export const useProducts = () => {
 
   const removeProduct = async (product_id) => {
     try {
-      const response = await deleteProduct(product_id);
-      if (response.success) {
+      const response = await deleteProductApi(product_id);
+      console.log(response);
+      if (response.status === 200) {
         await fetchProducts();
         return { success: true, message: response.message };
       }

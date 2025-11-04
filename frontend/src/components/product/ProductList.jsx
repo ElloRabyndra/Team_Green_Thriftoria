@@ -1,24 +1,18 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router";
 import ProductCard from "./ProductCard";
-import RenderProduct from "./RenderProduct";
 import Empty from "../ui/Empty";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { SlideIn } from "../animations/SlideIn";
+import Loading from "../ui/loading";
 
 export default function ProductList() {
   const { category, query } = useParams();
   const location = useLocation();
   const { user } = useAuth();
-  const {
-    products,
-    loading,
-    changeCategory,
-    selectedCategory,
-    addToCart,
-    searchProducts,
-  } = useProducts();
+  const { products, loading, changeCategory, addToCart, searchProducts } =
+    useProducts();
   const [ProductList, setProductList] = useState([]);
 
   // Cek apakah ada kategori ada di URL dan apakah ada query di URL
@@ -26,22 +20,25 @@ export default function ProductList() {
     if (location.pathname === "/products") {
       changeCategory("all");
     } else if (category) {
-      changeCategory(category);
+      const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+      changeCategory(capitalize(category));
     } else if (query) {
       searchProducts(query);
       changeCategory("");
     }
-  }, [location, category, selectedCategory, query]);
+  }, [location, category, query]);
 
   // Filter produk yang bukan seller jual
   useEffect(() => {
-    if (products.length === 0) return;
+    if (products.length === 0) {
+      setProductList([]);
+      return;
+    }
+
     setProductList(
-      products.filter(
-        (product) => product.shop_id !== (user.Shop?.id || user.id)
-      ) // nanti ganti ke user.Shop.id
+      products.filter((product) => product.shop_id !== user.Shop?.id)
     );
-  }, [products]);
+  }, [products, user.Shop?.id]);
 
   // Wrapper function untuk addToCart dengan user_id
   const handleAddToCart = async (product) => {
@@ -49,9 +46,9 @@ export default function ProductList() {
   };
 
   if (loading) {
-    return <RenderProduct />;
+    return <Loading />;
   }
-
+  console.log(ProductList);
   return (
     <>
       {ProductList.length === 0 && <Empty>No products found</Empty>}

@@ -114,6 +114,79 @@ export const editShopApi = (shopId, data) => {
 
 // ==================== PRODUCT ENDPOINTS ====================
 
+// Fungsi API untuk mendapatkan semua produk
+export const getAllProductsApi = () => api.get("/products");
+
+// Fungsi API untuk mencari produk
+export const searchProductApi = (query) =>
+  api.get(`/products/search?q=${query}`);
+
+// Fungsi API untuk mendapatkan produk berdasarkan kategori
+export const getProductByCategoryApi = (category) =>
+  api.get(`/products/category/${category}`);
+
+// Fungsi API untuk mendapatkan detail produk
+export const getDetailProductApi = (productId) =>
+  api.get(`/products/${productId}`);
+
+// Fungsi API untuk menambah produk
+// file: api.js
+
+// Fungsi API untuk menambah produk
+export const addProductApi = (data) => {
+  const formData = new FormData();
+
+  formData.append("name", data.name || "");
+  formData.append("category", data.category || "");
+  formData.append("label", data.label || "");
+  formData.append("description", data.description || "");
+  formData.append("price", data.price?.toString() || "0");
+  formData.append("stock", data.stock?.toString() || "0");
+
+  const fileList = data.image;
+  const imageFile = fileList?.[0];
+
+  if (imageFile && imageFile instanceof File) {
+    formData.append("image", imageFile, imageFile.name);
+  }
+
+  return api.post("/products", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+// Fungsi API untuk mengedit produk
+export const editProductApi = (productId, data) => {
+  const formData = new FormData();
+
+  // Append text fields
+  formData.append("name", data.name || "");
+  formData.append("category", data.category || "");
+  formData.append("label", data.label || "");
+  formData.append("description", data.description || "");
+  formData.append("price", data.price?.toString() || "0");
+  formData.append("stock", data.stock?.toString() || "0");
+
+  const fileList = data.image;
+  const imageFile = fileList?.[0];
+
+  if (imageFile && imageFile instanceof File) {
+    formData.append("image", imageFile, imageFile.name);
+  }
+
+  return api.patch(`/products/${productId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+// Fungsi API untuk menghapus produk - HANYA SELLER (DELETE /products/:id)
+export const deleteProductApi = (productId) =>
+  api.delete(`/products/${productId}`);
+
 // ==================== CART ENDPOINTS ====================
 
 // ==================== ORDER ENDPOINTS ====================
