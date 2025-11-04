@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { editProductSchema } from "./Schema";
+import { addProductSchema } from "./Schema";
 import { ArrowLeft, Edit3, Save, Upload } from "lucide-react";
 import { Button } from "../ui/button";
 import Loading from "../ui/loading";
@@ -29,7 +29,7 @@ export default function AddProduct() {
     setError,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(editProductSchema),
+    resolver: zodResolver(addProductSchema),
     defaultValues: {
       label: "",
       name: "",
@@ -77,39 +77,34 @@ export default function AddProduct() {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    const fileList = e.target.files;
 
-    if (file) {
-      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
-      if (!validTypes.includes(file.type)) {
-        toast.error("Please select a valid image file (JPEG, JPG, PNG)");
-        e.target.value = "";
-        return;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size must be less than 5MB");
-        e.target.value = "";
-        return;
-      }
-
-      setPreviewImage(URL.createObjectURL(file));
+    if (!file) {
+      setPreviewImage(null);
+      setValue("image", fileList);
+      return;
     }
+
+    // Validasi Client-Side
+    const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Please select a valid image file (JPEG, JPG, PNG, WEBP)");
+      e.target.value = "";
+      setPreviewImage(null);
+      return;
+    }
+
+    setPreviewImage(URL.createObjectURL(file));
+
+    setValue("image", fileList, { shouldValidate: true });
   };
 
   const onSubmit = async (data) => {
     console.log("Submitted data:", data);
 
-    const { name, category, label, description, image, price, stock } = data;
-
     const result = await addNewProduct({
-      shop_id: (user.Shop?.id || user.id), // nanti ganti ke user.Shop.id
-      name,
-      category,
-      label,
-      description,
-      image: image?.[0],
-      price,
-      stock,
+      shop_id: user.Shop?.id || user.id, // nanti ganti ke user.Shop.id
+      ...data,
     });
 
     if (result.success) {
@@ -196,7 +191,6 @@ export default function AddProduct() {
           )}
 
           <input
-            {...register("image")}
             id="image"
             type="file"
             accept="image/*"
@@ -265,7 +259,7 @@ export default function AddProduct() {
                 <input
                   {...register("category")}
                   type="radio"
-                  value="fashion"
+                  value="Fashion"
                   defaultChecked
                   className="accent-primary text-primary"
                 />
@@ -275,7 +269,7 @@ export default function AddProduct() {
                 <input
                   {...register("category")}
                   type="radio"
-                  value="others"
+                  value="Others"
                   className="accent-primary text-primary"
                 />
                 <span className="text-gray-700">Others</span>

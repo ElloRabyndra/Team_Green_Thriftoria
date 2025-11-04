@@ -9,11 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link, Navigate, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import Loading from "@/components/ui/loading";
 import { SlideIn } from "@/components/animations/SlideIn";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 // Badge component untuk status
 function StatusBadge({ status_admin }) {
@@ -33,11 +33,19 @@ function StatusBadge({ status_admin }) {
 
 // Buyer List Component
 const ShopsList = () => {
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
   const { shopList, loading, fetchShopList } = useAdmin();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredShops, setFilteredShops] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Redirect jika bukan admin
+  useEffect(() => {
+    if (!isLoading && user && user.role !== "admin") {
+      navigate("/dashboard");
+    }
+  }, [isLoading, user, navigate]);
 
   // Fetch Shop List
   useEffect(() => {
@@ -77,13 +85,11 @@ const ShopsList = () => {
   };
 
   const handleView = (shop) => {
-    Navigate(`/shop/${shop.id}`);
+    navigate(`/shop/${shop.id}`);
   };
 
-  const handleDelete = (shop) => {};
-
   // Loading state
-  if (loading) {
+  if (loading || isLoading) {
     return <Loading />;
   }
 
@@ -226,14 +232,6 @@ const ShopsList = () => {
                             >
                               <Eye className="h-4 w-4" />
                             </button>
-                            <ConfirmDialog onConfirm={() => handleDelete(shop)}>
-                              <button
-                                className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
-                                title="Delete User"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </ConfirmDialog>
                           </div>
                         </TableCell>
                       </TableRow>

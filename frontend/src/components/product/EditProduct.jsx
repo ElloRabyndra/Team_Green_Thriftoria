@@ -66,7 +66,7 @@ export default function ProductDetail() {
       setValue("stock", originalStock);
       setValue(
         "category",
-        productDetail.category ? productDetail.category.toLowerCase() : "others"
+        productDetail.category ? productDetail.category : "Others"
       );
       setValue("description", productDetail.description);
 
@@ -110,39 +110,39 @@ export default function ProductDetail() {
     const numericValue = removeFormat(inputValue);
     const formattedValue = formatPrice(numericValue);
 
-    // Update tampilan
     setFormattedStock(formattedValue);
-    // Update nilai form dengan nilai asli (tanpa format)
     setValue("stock", numericValue);
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const fileList = e.target.files;
+    const file = fileList[0];
 
-    if (file) {
-      // Validasi file type
-      const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
-      if (!validTypes.includes(file.type)) {
-        toast.error("Please select a valid image file (JPEG, JPG, PNG, WEBP)");
-        // Reset input file
-        e.target.value = "";
-        return;
-      }
-
-      // Validasi file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size must be less than 5MB");
-        // Reset input file
-        e.target.value = "";
-        return;
-      }
-
-      // Jika validasi berhasil, update preview
-      setProduct((prev) => ({
-        ...prev,
-        previewImage: URL.createObjectURL(file), // preview sementara
-      }));
+    if (!file) {
+      setProduct((prev) => ({ ...prev, previewImage: undefined }));
+      setValue("image", fileList, { shouldValidate: true });
+      return;
     }
+
+    const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Please select a valid image file (JPEG, JPG, PNG, WEBP)");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 1 * 1024 * 1024) {
+      toast.error("File size must be less than 1MB");
+      e.target.value = "";
+      return;
+    }
+
+    setProduct((prev) => ({
+      ...prev,
+      previewImage: URL.createObjectURL(file),
+    }));
+
+    setValue("image", fileList, { shouldValidate: true });
   };
 
   const onSubmit = async (data) => {
@@ -231,7 +231,6 @@ export default function ProductDetail() {
               <Edit3 className="h-5 w-5" />
             </label>
             <input
-              {...register("image")}
               id="image"
               type="file"
               accept="image/*"
@@ -301,7 +300,7 @@ export default function ProductDetail() {
                 <input
                   {...register("category")}
                   type="radio"
-                  value="fashion"
+                  value="Fashion"
                   className="accent-primary text-primary"
                 />
                 <span className="text-gray-700">Fashion</span>
@@ -310,7 +309,7 @@ export default function ProductDetail() {
                 <input
                   {...register("category")}
                   type="radio"
-                  value="others"
+                  value="Others"
                   className="accent-primary text-primary"
                 />
                 <span className="text-gray-700">Others</span>

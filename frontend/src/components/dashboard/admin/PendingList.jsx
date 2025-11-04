@@ -9,7 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "@/hooks/useAuth";
 import { useAdmin } from "@/hooks/useAdmin";
 import Loading from "@/components/ui/loading";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -33,11 +34,20 @@ function StatusBadge({ status_admin }) {
 
 // Buyer List Component
 const PendingList = () => {
+  const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
   const { requestShopList, loading, fetchRequestShopList, acceptRequest } =
     useAdmin();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredShops, setFilteredShops] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Redirect jika bukan admin
+  useEffect(() => {
+    if (!isLoading && user && user.role !== "admin") {
+      navigate("/dashboard");
+    }
+  }, [isLoading, user, navigate]);
 
   // Fetch Shop List
   useEffect(() => {
@@ -87,7 +97,7 @@ const PendingList = () => {
   };
 
   // Loading state
-  if (loading) {
+  if (loading || isLoading) {
     return <Loading />;
   }
 

@@ -5,6 +5,7 @@ import "time"
 type Product struct {
 	ID        	uint       `json:"id"    gorm:"primaryKey"`
 	ShopID    	uint       `json:"shop_id"`
+	Shop 				Shop 			 `json:"-" gorm:"foreignKey:ShopID"` 
 	Name      	string    `json:"name" gorm:"type:varchar(100)"`
 	Category  	string    `json:"category" gorm:"type:varchar(100)"`
 	Label		string    `json:"label" gorm:"type:varchar(100)"`
