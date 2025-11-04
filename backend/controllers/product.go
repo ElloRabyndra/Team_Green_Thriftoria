@@ -192,11 +192,27 @@ func GetDetailProduct(c *fiber.Ctx) error {
 	}
 
 	var product models.Product
-	if err := database.DB.First(&product, id).Error; err != nil {
+	if err := database.DB.Preload("Shop").First(&product, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Product not found"})
 	}
 
-	return c.JSON(fiber.Map{"status": "success", "data": product})
+	responseMap := fiber.Map{
+		"id": product.ID,
+		"shop_id": product.ShopID,
+		"shop_name": product.Shop.ShopName, 
+		"name": product.Name,
+		"category": product.Category,
+		"label": product.Label,
+		"description": product.Description,
+		"image": product.Image,
+		"price": product.Price,
+		"stock": product.Stock,
+		"created_at": product.CreatedAt,
+		"updated_at": product.UpdatedAt,
+	}
+
+
+	return c.JSON(fiber.Map{"status": "success", "data": responseMap})
 }
 
 func EditProduct(c *fiber.Ctx) error {
