@@ -173,7 +173,7 @@ export default function Checkout() {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col xl:flex-row gap-6"
       >
-        <main className="w-full xl:w-1/2">
+        <main className="w-full 2xl:w-1/2">
           <Card className="w-full min-w-80 md:min-w-lg">
             <CardHeader className="flex items-center justify-between gap-2">
               <CardTitle>Checkout Form</CardTitle>
@@ -266,8 +266,8 @@ export default function Checkout() {
                     </button>
                     {/* Preview Overlay/Popup */}
                     {showQrisPreview && qrisPreview && (
-                      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                        <Card className="relative rounded-lg p-6 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
+                      <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
+                        <Card className="relative rounded-lg p-6 bg-popover max-w-sm max-h-[90vh] overflow-auto">
                           {/* Close Button */}
                           <button
                             onClick={() => setShowQrisPreview(false)}
@@ -347,8 +347,8 @@ export default function Checkout() {
 
                   {/* Preview Overlay/Popup */}
                   {showProofPaymentPreview && qrisPreview && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-                      <Card className="relative rounded-lg p-6 bg-popover max-w-2xl max-h-[90vh] overflow-auto">
+                    <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
+                      <Card className="relative rounded-lg p-6 bg-popover max-w-sm max-h-[90vh] overflow-auto">
                         {/* Close Button */}
                         <button
                           onClick={() => setShowProofPaymentPreview(false)}
@@ -376,7 +376,7 @@ export default function Checkout() {
             </CardContent>
           </Card>
         </main>
-        <aside className="w-full xl:w-1/2">
+        <aside className="w-full 2xl:w-1/2">
           <CheckoutDetail
             selectedItems={selectedItems}
             subtotal={subtotal}
