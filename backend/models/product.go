@@ -3,8 +3,8 @@ package models
 import "time"
 
 type Product struct {
-	ID        	int       `json:"id"    gorm:"primaryKey"`
-	ShopID    	int       `json:"shop_id"`
+	ID        	uint       `json:"id"    gorm:"primaryKey"`
+	ShopID    	uint       `json:"shop_id"`
 	Name      	string    `json:"name" gorm:"type:varchar(100)"`
 	Category  	string    `json:"category" gorm:"type:varchar(100)"`
 	Label		string    `json:"label" gorm:"type:varchar(100)"`

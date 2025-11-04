@@ -317,3 +317,209 @@ Response (200 Created):
   "status": "success"
 }
 ```
+
+#### Get All Products (Public)
+
+GET http://localhost:3000/api/v1/products
+
+Response (200 OK):
+
+```JSON
+{
+"status": "success",
+"data": [
+    {
+    "id": 1,
+    "shop_id": 5,
+    "name": "Baju Kemeja Pria",
+    "category": "Fashion",
+    "label": "Best Seller",
+    "description": "Baju kemeja lengan panjang bahan katun.",
+    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg",
+    "price": 150000,
+    "stock": 50,
+    "created_at": "2025-11-04T15:00:00+07:00",
+    "updated_at": "2025-11-04T15:00:00+07:00"
+    },
+    {
+    "id": 2,
+    "shop_id": 5,
+    "name": "Celana Jeans",
+    "category": "Fashion",
+    "label": "",
+    "description": "Celana jeans pria.",
+    "image": "http://127.0.0.1:3000/assets/products/123456790.jpg",
+    "price": 250000,
+    "stock": 30,
+    "created_at": "2025-11-04T15:01:00+07:00",
+    "updated_at": "2025-11-04T15:01:00+07:00"
+    }
+  ]
+}
+```
+
+#### Get Product By Category (Public)
+
+GET http://localhost:3000/api/v1/products/category/:category
+Keterangan: Ganti :category dengan Fashion atau Others.
+
+Response (200 OK):
+
+```JSON
+{
+"status": "success",
+"data": [
+    {
+    "id": 1,
+    "shop_id": 5,
+    "name": "Baju Kemeja Pria",
+    "category": "Fashion",
+    "label": "Best Seller",
+    "description": "Baju kemeja lengan panjang bahan katun.",
+    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg",
+    "price": 150000,
+    "stock": 50,
+    "created_at": "2025-11-04T15:00:00+07:00",
+    "updated_at": "2025-11-04T15:00:00+07:00"
+    }
+  ]
+}
+```
+
+##### Search Product (Public)
+
+GET http://localhost:3000/api/v1/products/search?q=kemeja
+Keterangan: Menggunakan query param q untuk mencari berdasarkan nama produk.
+
+Response (200 OK):
+
+```JSON
+{
+"status": "success",
+"data": [
+    {
+    "id": 1,
+    "shop_id": 5,
+    "name": "Baju Kemeja Pria",
+    "category": "Fashion",
+    "label": "Best Seller",
+    "description": "Baju kemeja lengan panjang bahan katun.",
+    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg",
+    "price": 150000,
+    "stock": 50,
+    "created_at": "2025-11-04T15:00:00+07:00",
+    "updated_at": "2025-11-04T15:00:00+07:00"
+    }
+  ]
+}
+```
+
+#### Get Detail Product (Public)
+
+GET http://localhost:3000/api/v1/products/1
+
+Response (200 OK):
+
+```JSON
+{
+  "status": "success",
+  "data": {
+    "id": 1,
+    "shop_id": 5,
+    "name": "Baju Kemeja Pria",
+    "category": "Fashion",
+    "label": "Best Seller",
+    "description": "Baju kemeja lengan panjang bahan katun.",
+    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg",
+    "price": 150000,
+    "stock": 50,
+    "created_at": "2025-11-04T15:00:00+07:00",
+    "updated_at": "2025-11-04T15:00:00+07:00"
+  }
+}
+```
+
+#### Add Product (Seller)
+
+POST http://localhost:3000/api/v1/products
+
+Request Body (multipart/form-data):
+name (string, required)
+category (string, required - "Fashion" atau "Others")
+price (number, required)
+stock (number, required)
+label (string, opsional)
+description (string, opsional)
+image (file, required - Maks 1MB, format: .png, .jpg, .jpeg, .webp)
+
+Response (201 Created):
+
+```JSON
+
+{
+  "status": "success",
+  "message": "Product added successfully",
+  "data": {
+    "id": 1,
+    "shop_id": 5,
+    "name": "Baju Kemeja Pria",
+    "category": "Fashion",
+    "label": "Best Seller",
+    "description": "Baju kemeja lengan panjang bahan katun.",
+    "image": "http://127.0.0.1:3000/assets/products/1762234033104689200.jpg",
+    "price": 150000,
+    "stock": 50,
+    "created_at": "2025-11-04T15:07:13.104+07:00",
+    "updated_at": "2025-11-04T15:07:13.104+07:00"
+  }
+}
+```
+
+#### Edit Product (Seller)
+
+PATCH http://localhost:3000/api/v1/products/:id
+
+Request Body (multipart/form-data):
+name (string, opsional)
+category (string, opsional - "Fashion" atau "Others")
+price (number, opsional)
+stock (number, opsional)
+label (string, opsional)
+description (string, opsional)
+image (file, opsional - Maks 1MB, format: .png, .jpg, .jpeg, .webp)
+
+Response (200 OK):
+
+```JSON
+{
+  "status": "success",
+  "message": "Product updated successfully",
+  "data": {
+    "id": 1,
+    "shop_id": 5,
+    "name": "Baju Kemeja Pria (Edited)",
+    "category": "Fashion",
+    "label": "New",
+    "description": "Baju kemeja lengan panjang bahan katun premium.",
+    "image": "http://127.0.0.1:3000/assets/products/1_1762234200123456700.jpg",
+    "price": 155000,
+    "stock": 45,
+    "created_at": "2025-11-04T15:07:13.104+07:00",
+    "updated_at": "2025-11-04T15:10:00.123+07:00"
+  }
+}
+```
+
+#### Delete Product (Seller)
+
+DELETE http://localhost:3000/api/v1/products/1
+
+Response (200 OK):
+
+```JSON
+
+{
+  "status": "success",
+  "message": "Product deleted successfully"
+}
+```
