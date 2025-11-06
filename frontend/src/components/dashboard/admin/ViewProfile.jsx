@@ -60,7 +60,7 @@ export default function ViewProfile() {
 
       {/* View Profile */}
       <SlideIn direction="left">
-        <Card className="w-full min-w-80 md:min-w-md">
+        <Card className="w-full pt-0 min-w-80 md:min-w-md">
           <CardContent className="pt-6">
             <div className="flex flex-col gap-6">
               {/* Profile Picture & Basic Info */}
