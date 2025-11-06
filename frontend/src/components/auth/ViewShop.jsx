@@ -44,13 +44,13 @@ const ViewShop = () => {
         <Card className="mb-6 border border-border/40 shadow-md hover:shadow-lg transition-all p-0">
           <CardContent className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6">
             <div>
-              <h1 className="text-sm md:text-lg font-semibold text-foreground flex items-center gap-2">
-                <Store className="w-6 h-6 text-primary" />
+              <h1 className="md:text-lg font-semibold text-foreground flex items-center gap-2">
+                <Store className="w-5 h-5 text-primary" />
                 {shop.shop_name}
               </h1>
               <div className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-primary" />
+                  <MapPin className="w-5 h-5 text-primary" />
                   <span>{shop.shop_address}</span>
                 </div>
                 <div className="flex items-center gap-2">

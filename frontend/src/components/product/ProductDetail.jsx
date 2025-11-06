@@ -88,7 +88,7 @@ export default function ProductDetail() {
         {/* Product Images */}
         <div>
           {/* Main Image */}
-          <div className="overflow-hidden w-60 sm:w-80 lg:w-96 p-0">
+          <div className="overflow-hidden w-58 sm:w-80 lg:w-96 p-0">
             <img
               src={productDetail.image}
               alt={productDetail.name}
