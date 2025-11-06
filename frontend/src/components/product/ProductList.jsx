@@ -48,11 +48,10 @@ export default function ProductList() {
   if (loading) {
     return <Loading />;
   }
-  console.log(ProductList);
   return (
     <>
       {ProductList.length === 0 && <Empty>No products found</Empty>}
-      <div className="px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="-mt-1 sm:px-6 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center">
         {ProductList.map((product, index) => (
           <SlideIn key={product.id} direction="up" delay={index * 0.09}>
             <ProductCard

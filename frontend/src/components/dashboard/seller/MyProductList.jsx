@@ -72,7 +72,7 @@ const MyProductList = () => {
               My Product
             </h1>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="sm:px-6 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {myProducts.map((product, index) => (
               <SlideIn key={product.id} direction="up">
                 <ProductCard

@@ -24,7 +24,7 @@ export default function MainPage() {
 
         {/* Main Content */}
         <main className="flex-1 py-6 px-5 lg:py-8 lg:px-24">
-          <div className="relative mx-auto md:ml-56">
+          <div className="relative mx-auto md:ml-58">
             <Outlet />
           </div>
         </main>

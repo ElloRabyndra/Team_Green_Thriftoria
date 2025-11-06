@@ -38,7 +38,7 @@ const ViewShop = () => {
   if (!shop) return <Empty>Shop not found</Empty>;
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="container mx-auto">
       {/* Header toko */}
       <SlideIn direction="up">
         <Card className="mb-6 border border-border/40 shadow-md hover:shadow-lg transition-all p-0">
@@ -63,15 +63,15 @@ const ViewShop = () => {
         </Card>
       </SlideIn>
       <SlideIn direction="up">
-        <section className="p-4 py-0 ">
+        <section className="py-0 ">
           <div className="mb-6">
-            <h1 className="text-lg md:text-2xl font-semibold mb-2">
+            <h1 className="text-xl md:text-2xl font-semibold mb-2">
               Product List
             </h1>
           </div>
           {/* Menampilkan produk penjual */}
           {shopProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="-mt-1 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center">
               {shopProducts.map((product) => (
                 <ProductCard
                   key={product.id}

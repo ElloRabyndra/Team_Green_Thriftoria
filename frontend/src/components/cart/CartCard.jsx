@@ -22,9 +22,9 @@ export default function CartCard({
 
   return (
     <Card
-      className={`flex gap-2 flex-row p-2 transition-all duration-200 ${
+      className={`bg-card flex gap-2 flex-row p-2 transition-all duration-200 ${
         isSelected
-          ? "ring-2 ring-primary bg-primary/5"
+          ? "ring-2 ring-primary bg-primary/10"
           : "hover:shadow-md opacity-100"
       }`}
     >

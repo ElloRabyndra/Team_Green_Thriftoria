@@ -57,7 +57,7 @@ export default function ProductCard({
           </button>
         </ConfirmDialog>
       )}
-      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
+      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 max-w-64 sm:max-w-full sm:w-full gap-0 sm:gap-4 pb-0 sm:pb-4">
         {role === "seller" && product.shop_id === shop_id ? (
           <Link
             to={`/dashboard/edit-product/${product.id}`}
@@ -66,7 +66,7 @@ export default function ProductCard({
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-48 object-cover transition-transform duration-300"
+              className="w-full h-20 sm:h-48 object-cover transition-transform duration-300"
               onError={(e) => {
                 e.target.src =
                   "https://www.svgrepo.com/show/508699/landscape-placeholder.svg";
@@ -91,7 +91,7 @@ export default function ProductCard({
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-48 object-cover transition-transform duration-300"
+              className="w-full h-20 sm:h-48 object-cover transition-transform duration-300"
               onError={(e) => {
                 e.target.src =
                   "https://www.svgrepo.com/show/508699/landscape-placeholder.svg";
@@ -102,23 +102,23 @@ export default function ProductCard({
 
         <div className="p-4">
           <div className="mb-2">
-            <span className="text-xs text-gray-500 uppercase font-medium">
+            <span className="hidden sm:block text-xs text-gray-500 uppercase font-medium">
               {product.label}
             </span>
-            <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
+            <h3 className="font-semibold text-sm line-clamp-1 group-hover:text-primary transition-colors">
               {product.name}
             </h3>
           </div>
 
           <div className="mb-2">
-            <p className="text-xs text-gray-600 line-clamp-2">
+            <p className="text-xs text-gray-600 line-clamp-1 sm:line-clamp-2">
               {product.description}
             </p>
           </div>
 
           <div className="flex items-center justify-between mb-3">
             <div className="flex flex-col">
-              <span className="text-lg font-bold text-primary">
+              <span className="text-sm sm:text-lg font-bold text-primary">
                 {formatPrice(product.price)}
               </span>
             </div>
@@ -128,20 +128,22 @@ export default function ProductCard({
           {(role === "seller" && product.shop_id !== shop_id) ||
           role === "buyer" ? (
             <button
-              className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 px-4 rounded-lg transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 px-1 sm:px-4 rounded-lg transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               onClick={() => handleAddToCart()}
             >
               <ShoppingCart className="h-4 w-4" />
-              <span className="text-sm font-medium">Add to Cart</span>
+              <span className="text-xs sm:text-sm font-medium">
+                Add to Cart
+              </span>
             </button>
           ) : (
             <div className="flex gap-2">
               <Link
                 to={`/product/${product.id}`}
-                className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 px-4 rounded-lg transition-all duration-200"
+                className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 pxpx-4 rounded-lg transition-all duration-200"
               >
                 <Eye className="h-4 w-4" />
-                <span className="text-sm font-medium">View Details</span>
+                <span className="text-xs sm:text-sm font-medium">View Details</span>
               </Link>
             </div>
           )}
