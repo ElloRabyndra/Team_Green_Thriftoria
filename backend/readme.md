@@ -553,7 +553,7 @@ Response (200 OK):
 }
 ```
 
-#### Add Product (Seller)
+#### Add Cart (Seller)
 
 POST http://localhost:3000/api/v1/cart
 
@@ -573,7 +573,7 @@ Response (201 Created):
 }
 ```
 
-#### Edit Product (Seller)
+#### Edit Cart (Seller)
 
 PATCH http://localhost:3000/api/v1/cart/:cart_id
 
@@ -594,7 +594,7 @@ Response (200 OK):
 }
 ```
 
-#### Delete Product
+#### Delete Cart
 
 DELETE http://localhost:3000/api/v1/cart/:cart_id
 
