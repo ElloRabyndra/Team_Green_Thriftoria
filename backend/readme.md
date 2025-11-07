@@ -523,3 +523,83 @@ Response (200 OK):
   "message": "Product deleted successfully"
 }
 ```
+
+#### Get ALL CART
+
+GET http://localhost:3000/api/v1/cart
+
+Response (200 OK):
+
+```JSON
+{
+    "data": [
+        {
+            "cart_items": [
+                {
+                    "id": 2,
+                    "image": "http://127.0.0.1:3000/assets/products/1_1762244289995726800.webp",
+                    "label": "mens-shirts",
+                    "name": "Blue & Black Check Shirt",
+                    "price": 450000,
+                    "product_id": 3,
+                    "quantity": 1
+                }
+            ],
+            "shop_id": 5,
+            "shop_name": "HalalMart"
+        }
+    ],
+    "status": "success"
+}
+```
+
+#### Add Product (Seller)
+
+POST http://localhost:3000/api/v1/cart
+
+Request Body:
+````json
+{
+    "product_id": 3
+}
+````
+
+Response (201 Created):
+
+```JSON
+{
+    "message": "Product added to cart"
+}
+```
+
+#### Edit Product (Seller)
+
+PATCH http://localhost:3000/api/v1/cart/:cart_id
+
+Request Body:
+````json
+{
+  "product_id": 3,
+  "quantity": 1
+}
+````
+
+Response (200 OK):
+
+```JSON
+{
+    "message": "Cart updated successfully"
+}
+```
+
+#### Delete Product
+
+DELETE http://localhost:3000/api/v1/cart/:cart_id
+
+Response (200 OK):
+
+```JSON
+{
+    "message": "Cart item deleted successfully"
+}
+```

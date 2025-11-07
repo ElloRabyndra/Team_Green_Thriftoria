@@ -15,6 +15,7 @@ type Product struct {
 	Stock     	int       `json:"stock" gorm:"type:int"`
 	CreatedAt 	time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt 	time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	Shop Shop `gorm:"foreignKey:ShopID" json:"shop"`
 }
 
 func (*Product) TableName() string {
