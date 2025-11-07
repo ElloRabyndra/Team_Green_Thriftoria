@@ -7,7 +7,9 @@ export default function CheckoutDetail({
   subtotal,
   deliveryFee,
   total,
+  shop_id,
   shop_name,
+  isSubmitting,
 }) {
   const navigate = useNavigate();
   // Fungsi untuk format harga
@@ -40,7 +42,7 @@ export default function CheckoutDetail({
 
           {/* Shop Name */}
           <Link
-            to={`/shop/${1}`}
+            to={`/shop/${shop_id}`}
             className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"
           >
             <Store className="h-4 w-4" />
@@ -99,6 +101,7 @@ export default function CheckoutDetail({
         {/* Place Order Button */}
         <button
           type="submit"
+          disabled={isSubmitting}
           className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg font-medium transition-all duration-200 hover:bg-primary/90 hover:shadow-md flex items-center justify-center gap-2 cursor-pointer"
         >
           <ShoppingBag className="h-5 w-5" />

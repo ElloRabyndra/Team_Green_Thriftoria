@@ -1,32 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  ArrowLeft,
-  Phone,
-  ShoppingBag,
-  Store,
-  Check,
-  X,
-  ChevronDown,
-} from "lucide-react";
+import { ArrowLeft, Phone, Store, Check, X, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { sampleOrders, orderItems } from "@/database/dummy";
 import Empty from "@/components/ui/Empty";
 import Loading from "@/components/ui/loading";
-import { useSales } from "@/hooks/useSales";
 import { useOrders } from "@/hooks/useOrders";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { toast } from "react-toastify";
 import { SlideIn } from "@/components/animations/SlideIn";
 
 const SaleDetail = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
   const { saleId } = useParams();
-  const [sale, setSale] = useState(null);
-  const [currentSaleItem, setCurrentSaleItem] = useState([]);
   const [curentStatusShipped, setCurrentStatusShipped] = useState("");
   const [proofPaymentPreview, setProofPaymentPreview] = useState(
     "https://public.bnbstatic.com/image/cms/article/body/202302/d9f75be540977a5782c30a277ff180b1.jpeg"
@@ -39,11 +26,11 @@ const SaleDetail = () => {
     requestCancel,
     approveCancel,
     denyCancel,
+    updatePaymentStatus,
+    updateShippingStatus,
     fetchOrderDetail,
     loading: orderLoading,
   } = useOrders();
-
-  const { handlePayment, updateShippingStatus } = useSales();
 
   // Ambil detail order saat saleId berubah
   useEffect(() => {
@@ -53,7 +40,8 @@ const SaleDetail = () => {
   // set currenStatusShipped
   useEffect(() => {
     if (orderDetail) {
-      setCurrentStatusShipped(orderDetail.status_shipping);
+      setCurrentStatusShipped(orderDetail.order.status_shipping);
+      setProofPaymentPreview(orderDetail.order.proof_payment);
     }
   }, [orderDetail]);
 
@@ -111,41 +99,32 @@ const SaleDetail = () => {
     }
   };
 
-  const handleRequestCancel = async (order_id, role, user_id) => {
-    await requestCancel(order_id, role, user_id);
+  const handleRequestCancel = async (order_id, cancelRole) => {
+    await requestCancel(order_id, cancelRole);
     await fetchOrderDetail(order_id);
   };
 
-  const handleApprove = async (order_id, user_id, status_shipping) => {
+  const handleApprove = async (order_id, status_shipping) => {
     if (status_shipping === "cancelPending") {
-      await approveCancel(order_id, user_id);
-      toast.success("Cancel request approved!");
+      await approveCancel(order_id);
     } else if (status_shipping === "awaitingPayment") {
-      await handlePayment(order_id, true, user_id);
-      toast.success("Payment accepted!");
+      await updatePaymentStatus(order_id, true);
     }
     await fetchOrderDetail(order_id);
   };
 
-  const handleDeny = async (order_id, user_id, status_shipping) => {
+  const handleDeny = async (order_id, status_shipping) => {
     if (status_shipping === "cancelPending") {
-      await denyCancel(order_id, user_id);
-      toast.success("Cancel request denied!");
+      await denyCancel(order_id);
     } else if (status_shipping === "awaitingPayment") {
-      await handlePayment(order_id, false, user_id);
-      toast.success("Payment rejected!");
+      await updatePaymentStatus(order_id, false);
     }
     await fetchOrderDetail(order_id);
   };
 
-  const handleUpdateShippingStatus = async (
-    order_id,
-    status_shipping,
-    user_id
-  ) => {
-    await updateShippingStatus(order_id, status_shipping, user_id);
+  const handleUpdateShippingStatus = async (order_id, status_shipping) => {
+    await updateShippingStatus(order_id, status_shipping);
     await fetchOrderDetail(order_id);
-    toast.success("Status updated!");
   };
 
   // Konfigurasi status
@@ -201,13 +180,16 @@ const SaleDetail = () => {
               <CardHeader className="flex items-center justify-between gap-2">
                 <CardTitle>Order Information</CardTitle>
                 {/* Tombol Cancel hanya muncul jika status_shipping bukan cancelled atau cancelPending */}
-                {orderDetail.status_shipping !== "cancelled" &&
-                  orderDetail.status_shipping !== "cancelPending" &&
-                  orderDetail.status_shipping !== "delivered" &&
-                  orderDetail.status_shipping !== "awaitingPayment" && (
+                {orderDetail.order.status_shipping !== "cancelled" &&
+                  orderDetail.order.status_shipping !== "cancelPending" &&
+                  orderDetail.order.status_shipping !== "delivered" &&
+                  orderDetail.order.status_shipping !== "awaitingPayment" && (
                     <ConfirmDialog
                       onConfirm={() =>
-                        handleRequestCancel(orderDetail.id, user.role, user.id)
+                        handleRequestCancel(
+                          orderDetail.order.order_id,
+                          "seller"
+                        )
                       }
                     >
                       <button className="text-sm hover:text-red-400 hover:underline cursor-pointer">
@@ -221,31 +203,33 @@ const SaleDetail = () => {
                   {/* Recipient */}
                   <div>
                     <p className="text-sm text-muted-foreground">Recipient:</p>
-                    <p className="font-medium">{orderDetail.recipient}</p>
+                    <p className="font-medium">{orderDetail.order.recipient}</p>
                   </div>
                   {/* Telephone */}
                   <div>
                     <p className="text-sm text-muted-foreground">Telephone:</p>
-                    <p className="font-medium">{orderDetail.telephone}</p>
+                    <p className="font-medium">{orderDetail.order.telephone}</p>
                   </div>
                   {/* Shipping Address */}
                   <div>
                     <p className="text-sm text-muted-foreground">
                       Shipping Address:
                     </p>
-                    <p className="font-medium">{orderDetail.address}</p>
+                    <p className="font-medium">{orderDetail.order.address}</p>
                   </div>
                   {/* Note */}
                   <div>
                     <p className="text-sm text-muted-foreground">Note:</p>
-                    <p className="font-medium max-w-sm">{orderDetail.note}</p>
+                    <p className="font-medium max-w-sm">
+                      {orderDetail.order.note}
+                    </p>
                   </div>
 
                   {/* Order Date */}
                   <div>
                     <p className="text-sm text-muted-foreground">Order Date:</p>
                     <p className="font-medium">
-                      {formatDate(orderDetail.created_at)}
+                      {formatDate(orderDetail.order.created_at)}
                     </p>
                   </div>
 
@@ -267,62 +251,40 @@ const SaleDetail = () => {
                     >
                       Proof Payment Preview
                     </button>
-                    {/* Preview Overlay/Popup */}
-                    {showProofPaymentPreview && proofPaymentPreview && (
-                      <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
-                        <Card className="relative rounded-lg p-6 bg-popover max-w-sm max-h-[90vh] overflow-auto">
-                          {/* Close Button */}
-                          <button
-                            onClick={() => setShowProofPaymentPreview(false)}
-                            className="absolute top-5 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-
-                          {/* Image */}
-                          <div className="text-center">
-                            <h3 className="text-lg font-semibold mb-4 text-card-foreground">
-                              Proof Payment Preview
-                            </h3>
-                            <img
-                              src={proofPaymentPreview}
-                              alt="QRIS Preview"
-                              className="max-w-full max-h-[70vh] object-contain rounded-lg border"
-                            />
-                          </div>
-                        </Card>
-                      </div>
-                    )}
                   </div>
 
                   {/* Status Badge */}
                   <div className="flex items-center gap-2">
                     <p className="text-sm text-muted-foreground">Status:</p>
-                    {orderDetail.status_shipping === "cancelPending" ||
-                    orderDetail.status_shipping === "cancelled" ||
-                    orderDetail.status_shipping === "awaitingPayment" ? (
+                    {orderDetail.order.status_shipping === "cancelPending" ||
+                    orderDetail.order.status_shipping === "cancelled" ||
+                    orderDetail.order.status_shipping === "awaitingPayment" ? (
                       <div className="flex items-center gap-1">
                         <span
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${
-                            statusConfig[orderDetail.status_shipping].color
+                            statusConfig[orderDetail.order.status_shipping]
+                              .color
                           }`}
                         >
                           <span>
-                            {statusConfig[orderDetail.status_shipping].label}
+                            {
+                              statusConfig[orderDetail.order.status_shipping]
+                                .label
+                            }
                           </span>
                         </span>
-                        {((orderDetail.status_shipping === "cancelPending" &&
-                          orderDetail.cancelBy === "buyer") ||
-                          orderDetail.status_shipping ===
+                        {((orderDetail.order.status_shipping ===
+                          "cancelPending" &&
+                          orderDetail.order.cancel_by === "buyer") ||
+                          orderDetail.order.status_shipping ===
                             "awaitingPayment") && (
                           <div className="flex items-center gap-1 ml-2">
                             {/* Tombol Setuju */}
                             <ConfirmDialog
                               onConfirm={() =>
                                 handleApprove(
-                                  orderDetail.id,
-                                  user.id,
-                                  orderDetail.status_shipping
+                                  orderDetail.order.order_id,
+                                  orderDetail.order.status_shipping
                                 )
                               }
                             >
@@ -335,9 +297,8 @@ const SaleDetail = () => {
                             <ConfirmDialog
                               onConfirm={() =>
                                 handleDeny(
-                                  orderDetail.id,
-                                  user.id,
-                                  orderDetail.status_shipping
+                                  orderDetail.order.order_id,
+                                  orderDetail.order.status_shipping
                                 )
                               }
                             >
@@ -387,9 +348,8 @@ const SaleDetail = () => {
                         <button
                           onClick={() =>
                             handleUpdateShippingStatus(
-                              orderDetail.id,
-                              curentStatusShipped,
-                              user.id
+                              orderDetail.order.order_id,
+                              curentStatusShipped
                             )
                           }
                           className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors cursor-pointer"
@@ -422,21 +382,21 @@ const SaleDetail = () => {
                   >
                     <Store className="h-4 w-4" />
                     <span className="font-medium capitalize">
-                      {orderDetail.shop_name}
+                      {orderDetail.order.shop_name}
                     </span>
                   </Link>
                   {/* Telephone */}
                   <div className="flex items-center gap-2 ml-1 mt-1 text-muted-foreground">
                     <Phone className="h-3 w-3" />
                     <span className="text-xs text-muted-foreground">
-                      {orderDetail.shop_telephone}
+                      {orderDetail.order.shop_phone}
                     </span>
                   </div>
 
                   {/* Selected Items */}
                   <div className="mt-4 space-y-3 max-h-48 overflow-y-auto pr-2">
-                    {orderDetail.orderItems.map((item) => (
-                      <div key={item.id} className="flex items-center gap-3">
+                    {orderDetail.order_items.map((item, index) => (
+                      <div key={index} className="flex items-center gap-3">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -468,7 +428,7 @@ const SaleDetail = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Subtotal</span>
                     <span className="font-medium">
-                      {formatPrice(orderDetail.total_price - 30000)}
+                      {formatPrice(orderDetail.order.total_price - 30000)}
                     </span>
                   </div>
 
@@ -481,7 +441,7 @@ const SaleDetail = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold">Total</span>
                       <span className="text-lg font-bold text-primary">
-                        {formatPrice(orderDetail.total_price)}
+                        {formatPrice(orderDetail.order.total_price)}
                       </span>
                     </div>
                   </div>
@@ -490,6 +450,32 @@ const SaleDetail = () => {
             </Card>
           </SlideIn>
         </aside>
+        {/* Preview Overlay/Popup */}
+        {showProofPaymentPreview && proofPaymentPreview && (
+          <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
+            <Card className="relative rounded-lg p-6 bg-popover max-w-sm max-h-[90vh] overflow-auto">
+              {/* Close Button */}
+              <button
+                onClick={() => setShowProofPaymentPreview(false)}
+                className="absolute top-5 right-2 p-2 rounded-full bg-background/80 hover:bg-background transition-colors z-10"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              {/* Image */}
+              <div className="text-center">
+                <h3 className="text-lg font-semibold mb-4 text-card-foreground">
+                  Proof Payment
+                </h3>
+                <img
+                  src={proofPaymentPreview}
+                  alt="QRIS Preview"
+                  className="max-w-full max-h-[60vh] object-contain rounded-lg border"
+                />
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </section>
   );
