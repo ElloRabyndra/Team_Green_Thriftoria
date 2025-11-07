@@ -1,9 +1,13 @@
 import { z } from "zod";
+
+// Ukuran maksimum file: 1MB 
+export const MAX_FILE_SIZE = 1 * 1024 * 1024;
+
 export const checkoutSchema = z.object({
   recipient: z
     .string()
     .min(1, "Recipient is required")
-    .min(4, "Recipient must be at least 3 characters"),
+    .min(3, "Recipient must be at least 3 characters"), // Diperbaiki dari 4 ke 3 agar konsisten dengan pesan error
   telephone: z
     .string()
     .min(1, "Phone number is required")
@@ -19,14 +23,18 @@ export const checkoutSchema = z.object({
     .refine((files) => files?.length === 1, {
       message: "Proof payment is required",
     })
-    .transform((files) => files[0])
-    .refine((file) => file?.size <= 5 * 1024 * 1024, {
-      message: "File size must not exceed 5MB",
+    .transform((files) => files[0]) // PERBAIKAN: Sinkronisasi ukuran file ke 1MB
+    .refine((file) => file?.size <= MAX_FILE_SIZE, {
+      message: "File size must not exceed 1MB",
     })
     .refine(
-      (file) => ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(file?.type),
+      // PERBAIKAN: Tambahkan JPG, karena file type seringkali image/jpeg meskipun ekstensi jpg
+      (file) =>
+        ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(
+          file?.type
+        ),
       {
-        message: "Only JPG and PNG formats are allowed",
+        message: "Only JPEG, PNG, JPG, or WEBP formats are allowed",
       }
     ),
 });

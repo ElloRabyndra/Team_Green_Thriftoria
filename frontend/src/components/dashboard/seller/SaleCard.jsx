@@ -58,7 +58,7 @@ const SaleCard = ({ sale }) => {
   const currentStatus =
     statusConfig[sale.status_shipping] || statusConfig.awaitingPayment;
   return (
-    <Link to={`/dashboard/sale/${sale.id}`}>
+    <Link to={`/dashboard/sale/${sale.order_id}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
         <div className="px-4 py-0 sm:py-1">
           {/* Header Section */}
@@ -83,7 +83,7 @@ const SaleCard = ({ sale }) => {
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Package className="h-4 w-4" />
                 <span>
-                  {sale.productCount} Item{sale.productCount > 1 ? "s" : ""}
+                  {sale.product_count} Item{sale.product_count > 1 ? "s" : ""}
                 </span>
               </div>
               <span className="font-semibold text-base sm:text-lg text-primary">

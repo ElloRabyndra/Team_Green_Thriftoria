@@ -39,7 +39,7 @@ export default function OrderCard({ order }) {
   const handleShopClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    navigate(`/shop/${1}`);
+    navigate(`/shop/${order.shop_id}`);
   };
 
   // Konfigurasi status
@@ -77,7 +77,7 @@ export default function OrderCard({ order }) {
     statusConfig[order.status_shipping] || statusConfig.awaitingPayment;
 
   return (
-    <Link to={`/dashboard/order/${order.id}`}>
+    <Link to={`/dashboard/order/${order.order_id}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer">
         <div className="px-4 py-0 sm:py-1">
           {/* Header Section */}
@@ -96,7 +96,7 @@ export default function OrderCard({ order }) {
             <div className="flex items-center gap-2 ml-1 text-muted-foreground">
               <Phone className="h-3 w-3" />
               <span className="text-xs text-muted-foreground">
-                {order.shop_telephone}
+                {order.shop_phone}
               </span>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function OrderCard({ order }) {
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Package className="h-4 w-4" />
                 <span>
-                  {order.productCount} Item{order.productCount > 1 ? "s" : ""}
+                  {order.product_count} Item{order.product_count > 1 ? "s" : ""}
                 </span>
               </div>
               <span className="font-semibold text-base sm:text-lg text-primary">

@@ -1,12 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
-  getAllCart,
-  addToCart as addToCartApi,
-  updateCartQuantity,
-  deleteCartItem,
-} from "@/service/dummyApi";
-
-import {
+  getAllCartApi,
+  addToCartApi,
+  updateCartQuantityApi,
+  deleteCartItemApi,
   getAllProductsApi,
   searchProductApi,
   getProductByCategoryApi,
@@ -26,26 +23,24 @@ export const useProducts = () => {
   const [productDetail, setProductDetail] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [cartLoading, setCartLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [cart, setCart] = useState([]);
   const [total_price, setTotalPrice] = useState(0);
 
-  // Fetch products saat component mount atau kategori berubah
-  useEffect(() => {
-    fetchProducts();
-  }, [selectedCategory]);
-
   // Hitung total price saat cart berubah
   useEffect(() => {
-    const total = cart.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+    let total = 0;
+    cart.forEach((shopCart) => {
+      shopCart.cart_items.forEach((item) => {
+        total += item.price * item.quantity;
+      });
+    });
     setTotalPrice(total);
   }, [cart]);
 
   // ==================== PRODUCT ====================
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     setProducts([]);
     try {
@@ -66,7 +61,7 @@ export const useProducts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory]);
 
   const searchProducts = async (query) => {
     if (!query.trim()) {
@@ -146,70 +141,100 @@ export const useProducts = () => {
   };
 
   // ==================== CART ====================
-  const loadCart = async (user_id) => {
+  const loadCart = useCallback(async () => {
     try {
-      const response = await getAllCart(user_id);
-      if (response.success) {
-        setCart(response.data || []);
+      setCartLoading(true);
+      const response = await getAllCartApi();
+
+      if (response.status === 200 && response.data.status === "success") {
+        setCart(response.data.data || []);
+      } else {
+        console.error(
+          "Failed to load cart with message:",
+          response.data.message
+        );
+        setCart([]);
       }
     } catch (error) {
       console.error("Error loading cart:", error);
       setCart([]);
+    } finally {
+      setCartLoading(false);
     }
-  };
+  }, []);
 
-  const addToCart = async (user_id, product) => {
-    try {
-      const response = await addToCartApi(user_id, product.id);
-      if (response.success) {
-        await loadCart(user_id);
-        return true;
+  const addToCart = useCallback(
+    async (productId) => {
+      try {
+        const response = await addToCartApi(productId);
+
+        if (response.status === 200 || response.status === 201) {
+          await loadCart();
+          return { success: true, message: response.data.message };
+        }
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        const errorMessage =
+          error.response?.data?.error || "Failed to add product to cart";
+        return { success: false, message: errorMessage };
       }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      return false;
-    }
-  };
+    },
+    [loadCart]
+  );
 
-  const updateQuantity = async (user_id, cartId, quantity) => {
-    try {
-      if (quantity < 1) {
-        await removeFromCart(user_id, cartId);
-        return;
+  const removeFromCart = useCallback(
+    async (cartId) => {
+      try {
+        const response = await deleteCartItemApi(cartId);
+
+        if (response.status === 200) {
+          await loadCart();
+        }
+      } catch (error) {
+        console.error("Error removing from cart:", error);
       }
+    },
+    [loadCart]
+  );
 
-      const response = await updateCartQuantity(cartId, quantity);
-      if (response.success) {
-        await loadCart(user_id);
+  const updateQuantity = useCallback(
+    async (cartId, quantity) => {
+      try {
+        if (quantity < 1) {
+          await removeFromCart(cartId);
+          return;
+        }
+
+        const response = await updateCartQuantityApi(cartId, quantity);
+
+        if (response.status === 200) {
+          await loadCart();
+        }
+      } catch (error) {
+        console.error("Error updating quantity:", error);
       }
-    } catch (error) {
-      console.error("Error updating quantity:", error);
-    }
+    },
+    [loadCart, removeFromCart]
+  );
+
+  const increaseQuantity = async (cartItem) => {
+    await updateQuantity(cartItem.id, cartItem.quantity + 1);
   };
 
-  const increaseQuantity = async (user_id, cartItem) => {
-    await updateQuantity(user_id, cartItem.id, cartItem.quantity + 1);
-  };
-
-  const decreaseQuantity = async (user_id, cartItem) => {
-    await updateQuantity(user_id, cartItem.id, cartItem.quantity - 1);
-  };
-
-  const removeFromCart = async (user_id, cartId) => {
-    try {
-      const response = await deleteCartItem(cartId);
-      if (response.success) {
-        await loadCart(user_id);
-      }
-    } catch (error) {
-      console.error("Error removing from cart:", error);
-    }
+  const decreaseQuantity = async (cartItem) => {
+    await updateQuantity(cartItem.id, cartItem.quantity - 1);
   };
 
   const changeCategory = (category) => {
     setSelectedCategory(category);
     setSearchQuery("");
   };
+
+  // Fetch products saat component mount atau kategori berubah
+  useEffect(() => {
+    fetchProducts();
+    loadCart();
+  }, [selectedCategory, fetchProducts, loadCart]);
 
   return {
     products,
@@ -218,6 +243,7 @@ export const useProducts = () => {
     cart,
     total_price,
     loading,
+    cartLoading,
     selectedCategory,
     searchQuery,
     setSearchQuery,

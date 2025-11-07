@@ -5,14 +5,14 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import SaleCard from "./SaleCard";
-import { useSales } from "@/hooks/useSales";
+import { useOrders } from "@/hooks/useOrders";
 import Loading from "@/components/ui/loading";
 import { SlideIn } from "@/components/animations/SlideIn";
 
 const MySales = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
-  const { sales, loading, fetchSales } = useSales();
+  const { sales, loading, fetchAllSales } = useOrders();
 
   // Panggil fetchOrders setelah user terautentikasi
   useEffect(() => {
@@ -21,7 +21,7 @@ const MySales = () => {
         navigate(-1);
         return;
       }
-      fetchSales(user.Shop?.id || user.id); // nanti ganti ke user.Shop.id
+      fetchAllSales(user.Shop?.id);
     }
   }, [isLoading, user, navigate]);
 
@@ -41,7 +41,7 @@ const MySales = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
           {sales.map((sale) => (
-            <SlideIn key={sale.id} direction="down">
+            <SlideIn key={sale.order_id} direction="down">
               <SaleCard sale={sale} />
             </SlideIn>
           ))}

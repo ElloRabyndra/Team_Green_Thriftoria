@@ -24,6 +24,7 @@ const OrderDetail = () => {
     denyCancel,
     requestCancel,
     loading: orderLoading,
+    orderActionLoading,
     resetOrderDetail,
   } = useOrders();
 
@@ -116,22 +117,21 @@ const OrderDetail = () => {
     },
   };
 
-  const handleRequestCancel = async (order_id, role, user_id) => {
-    await requestCancel(order_id, role, user_id);
+  const handleRequestCancel = async (order_id, cancelRole) => {
+    await requestCancel(order_id, cancelRole);
     await fetchOrderDetail(order_id);
   };
 
-  const handleApproveCancel = async (order_id, user_id) => {
-    await approveCancel(order_id, user_id);
+  const handleApproveCancel = async (order_id) => {
+    await approveCancel(order_id);
     await fetchOrderDetail(order_id);
-    toast.success("Order cancelled successfully!");
   };
 
-  const handleDenyCancel = async (order_id, user_id) => {
-    await denyCancel(order_id, user_id);
+  const handleDenyCancel = async (order_id) => {
+    await denyCancel(order_id);
     await fetchOrderDetail(order_id);
-    toast.success("Cancel request denied!");
   };
+
   return (
     <section className="space-y-4 md:ml-4">
       {/* Back Button */}
@@ -154,19 +154,18 @@ const OrderDetail = () => {
               <CardHeader className="flex items-center justify-between gap-2">
                 <CardTitle>Order Information</CardTitle>
                 {/* Tombol Cancel hanya muncul jika status_shipping bukan cancelled atau cancelPending */}
-                {orderDetail.status_shipping !== "cancelled" &&
-                  orderDetail.status_shipping !== "cancelPending" &&
-                  orderDetail.status_shipping !== "delivered" && (
+                {orderDetail.order.status_shipping !== "cancelled" &&
+                  orderDetail.order.status_shipping !== "cancelPending" &&
+                  orderDetail.order.status_shipping !== "delivered" && (
                     <ConfirmDialog
                       onConfirm={() =>
-                        handleRequestCancel(
-                          orderDetail.id,
-                          cancelRole(orderDetail, user),
-                          user.id
-                        )
+                        handleRequestCancel(orderDetail.order.order_id, "buyer")
                       }
                     >
-                      <button className="text-sm hover:text-red-400 hover:underline cursor-pointer">
+                      <button
+                        disabled={orderActionLoading}
+                        className="text-sm hover:text-red-400 hover:underline cursor-pointer"
+                      >
                         Cancel Order
                       </button>
                     </ConfirmDialog>
@@ -177,30 +176,32 @@ const OrderDetail = () => {
                   {/* Recipient */}
                   <div>
                     <p className="text-sm text-muted-foreground">Recipient:</p>
-                    <p className="font-medium">{orderDetail.recipient}</p>
+                    <p className="font-medium">{orderDetail.order.recipient}</p>
                   </div>
                   {/* Telephone */}
                   <div>
                     <p className="text-sm text-muted-foreground">Telephone:</p>
-                    <p className="font-medium">{orderDetail.telephone}</p>
+                    <p className="font-medium">{orderDetail.order.telephone}</p>
                   </div>
                   {/* Shipping Address */}
                   <div>
                     <p className="text-sm text-muted-foreground">
                       Shipping Address:
                     </p>
-                    <p className="font-medium">{orderDetail.address}</p>
+                    <p className="font-medium">{orderDetail.order.address}</p>
                   </div>
                   {/* Note */}
                   <div>
                     <p className="text-sm text-muted-foreground">Note:</p>
-                    <p className="font-medium max-w-sm">{orderDetail.note}</p>
+                    <p className="font-medium max-w-sm">
+                      {orderDetail.order.note}
+                    </p>
                   </div>
                   {/* Order Date */}
                   <div>
                     <p className="text-sm text-muted-foreground">Order Date:</p>
                     <p className="font-medium">
-                      {formatDate(orderDetail.created_at)}
+                      {formatDate(orderDetail.order.created_at)}
                     </p>
                   </div>
 
@@ -209,28 +210,31 @@ const OrderDetail = () => {
                     <p className="text-sm text-muted-foreground">Status:</p>
                     <span
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${
-                        statusConfig[orderDetail.status_shipping].color
+                        statusConfig[orderDetail.order.status_shipping].color
                       }`}
                     >
                       <span>
-                        {statusConfig[orderDetail.status_shipping].label}
+                        {statusConfig[orderDetail.order.status_shipping].label}
                       </span>
                     </span>
 
                     {/* Jika status cancelPending dan dibatalkan oleh seller */}
-                    {orderDetail.status_shipping === "cancelPending" &&
-                      ((orderDetail.cancelBy === "seller" &&
-                        orderDetail.shop_id !== (user.Shop?.id || user.id)) || //  nanti ganti ke user.Shop.id
-                        (orderDetail.cancelBy === "seller" &&
+                    {orderDetail.order.status_shipping === "cancelPending" &&
+                      ((orderDetail.order.cancel_by === "seller" &&
+                        orderDetail.order.shop_id !== user.Shop?.id) ||
+                        (orderDetail.order.cancel_by === "seller" &&
                           user.role === "buyer")) && (
                         <div className="flex items-center gap-1 ml-2">
                           {/* Tombol Setuju */}
                           <ConfirmDialog
                             onConfirm={() =>
-                              handleApproveCancel(orderDetail.id, user.id)
+                              handleApproveCancel(orderDetail.order.order_id)
                             }
                           >
-                            <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
+                            <button
+                              disabled={orderActionLoading}
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                            >
                               <Check size={16} />
                             </button>
                           </ConfirmDialog>
@@ -238,10 +242,13 @@ const OrderDetail = () => {
                           {/* Tombol Tolak */}
                           <ConfirmDialog
                             onConfirm={() =>
-                              handleDenyCancel(orderDetail.id, user.id)
+                              handleDenyCancel(orderDetail.order.order_id)
                             }
                           >
-                            <button className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+                            <button
+                              disabled={orderActionLoading}
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                            >
                               <X size={16} />
                             </button>
                           </ConfirmDialog>
@@ -265,26 +272,26 @@ const OrderDetail = () => {
 
                   {/* Shop Name */}
                   <Link
-                    to={`/shop/${1}`}
+                    to={`/shop/${orderDetail.order.shop_id}`}
                     className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"
                   >
                     <Store className="h-4 w-4" />
                     <span className="font-medium capitalize">
-                      {orderDetail.shop_name}
+                      {orderDetail.order.shop_name}
                     </span>
                   </Link>
                   {/* Telephone */}
                   <div className="flex items-center gap-2 ml-1 mt-1 text-muted-foreground">
                     <Phone className="h-3 w-3" />
                     <span className="text-xs text-muted-foreground">
-                      {orderDetail?.shop_telephone}
+                      {orderDetail.order?.shop_phone}
                     </span>
                   </div>
 
                   {/* Selected Items */}
                   <div className="mt-4 space-y-3 max-h-48 overflow-y-auto pr-2">
-                    {orderDetail?.orderItems.map((item) => (
-                      <div key={item.id} className="flex items-center gap-3">
+                    {orderDetail?.order_items.map((item, index) => (
+                      <div key={index} className="flex items-center gap-3">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -315,7 +322,7 @@ const OrderDetail = () => {
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Subtotal</span>
                     <span className="font-medium">
-                      {formatPrice(orderDetail?.total_price - 30000)}
+                      {formatPrice(orderDetail.order?.total_price - 30000)}
                     </span>
                   </div>
 
@@ -328,7 +335,7 @@ const OrderDetail = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-semibold">Total</span>
                       <span className="text-lg font-bold text-primary">
-                        {formatPrice(orderDetail?.total_price)}
+                        {formatPrice(orderDetail.order?.total_price)}
                       </span>
                     </div>
                   </div>

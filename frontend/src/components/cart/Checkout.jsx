@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { checkoutSchema } from "./Schema";
+import { checkoutSchema, MAX_FILE_SIZE } from "./Schema";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { ArrowLeft, X, Upload } from "lucide-react";
 import { Button } from "../ui/button";
@@ -14,48 +14,17 @@ import CheckoutDetail from "./CheckoutDetail";
 import { Textarea } from "../ui/textarea";
 import { toast } from "react-toastify";
 import { useOrders } from "@/hooks/useOrders";
-import { useProducts } from "@/hooks/useProducts";
+import { useShop } from "@/hooks/useShop";
+import Loading from "../ui/loading";
+import Empty from "../ui/Empty";
 
 export default function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
   const checkoutData = location.state;
-  const { removeFromCart } = useProducts();
-  const [qrisPreview, setQrisPreview] = useState(
-    "https://img.freepik.com/free-vector/scan-me-qr-code_78370-2915.jpg?semt=ais_hybrid&w=740&q=80"
-  );
-  const [showQrisPreview, setShowQrisPreview] = useState(false);
-  const [proofPaymentFile, setProofPaymentFile] = useState(null);
-  const [proofPaymentPreview, setProofPaymentPreview] = useState(null);
-  const [showProofPaymentPreview, setShowProofPaymentPreview] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef(null);
-  const { makeOrder } = useOrders();
 
-  // Redirect jika tidak ada data
-  useEffect(() => {
-    if (
-      !checkoutData ||
-      !checkoutData.selectedItems ||
-      checkoutData.selectedItems.length === 0
-    ) {
-      navigate("/cart");
-    }
-  }, [checkoutData, navigate]);
-
-  if (!checkoutData) {
-    return null;
-  }
-
-  const {
-    user_id,
-    shop_id,
-    selectedItems,
-    subtotal,
-    deliveryFee,
-    total,
-    shop_name,
-  } = checkoutData;
+  const { shop, fetchDetailShop, loading } = useShop();
+  const { makeOrder, loading: orderLoading } = useOrders();
 
   const {
     register,
@@ -68,10 +37,60 @@ export default function Checkout() {
     resolver: zodResolver(checkoutSchema),
   });
 
+  const [qrisPreview, setQrisPreview] = useState(
+    "https://img.freepik.com/free-vector/scan-me-qr-code_78370-2915.jpg?semt=ais_hybrid&w=740&q=80"
+  );
+  const [showQrisPreview, setShowQrisPreview] = useState(false);
+  const [proofPaymentFile, setProofPaymentFile] = useState(null);
+  const [proofPaymentPreview, setProofPaymentPreview] = useState(null);
+  const [showProofPaymentPreview, setShowProofPaymentPreview] = useState(false);
+
+  const isSubmitting = orderLoading;
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (checkoutData) {
+      console.log(checkoutData);
+      fetchDetailShop(checkoutData.shop_id);
+
+      if (
+        !checkoutData.selectedItems ||
+        checkoutData.selectedItems.length === 0
+      ) {
+        navigate("/cart");
+      }
+    }
+  }, [checkoutData, navigate]);
+
+  useEffect(() => {
+    if (shop?.qris_picture) {
+      setQrisPreview(shop.qris_picture);
+    }
+  }, [shop]);
+
+  if (!checkoutData) {
+    return <Empty>Please go back to cart to proceed checkout.</Empty>;
+  }
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  // Destructure data
+  const {
+    shop_id,
+    selectedItems = [],
+    subtotal,
+    deliveryFee,
+    total,
+    shop_name,
+  } = checkoutData;
+
+  const cartIds = selectedItems.map((item) => item.cart_id || item.id);
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Validasi file type
       const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
       if (!validTypes.includes(file.type)) {
         setError("proof_payment", {
@@ -81,8 +100,7 @@ export default function Checkout() {
         return;
       }
 
-      // Validasi file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > MAX_FILE_SIZE) {
         setError("proof_payment", {
           type: "manual",
           message: "File size must be less than 5MB",
@@ -90,6 +108,7 @@ export default function Checkout() {
         return;
       }
 
+      setError("proof_payment", { type: "manual", message: undefined });
       setProofPaymentFile(file);
 
       const dataTransfer = new DataTransfer();
@@ -98,7 +117,6 @@ export default function Checkout() {
         shouldValidate: true,
       });
 
-      // Create preview URL
       const reader = new FileReader();
       reader.onload = (e) => {
         setProofPaymentPreview(e.target.result);
@@ -110,6 +128,7 @@ export default function Checkout() {
   const handleProofPaymentPreviewClick = () => {
     setShowProofPaymentPreview(true);
   };
+
   const handleQrisPreviewClick = () => {
     if (qrisPreview) {
       setShowQrisPreview(true);
@@ -117,42 +136,29 @@ export default function Checkout() {
   };
 
   const onSubmit = async (data) => {
-    setIsSubmitting(true);
+    if (isSubmitting) return;
     try {
       const orderData = {
-        user_id: user_id,
         shop_id: shop_id,
         recipient: data.recipient,
         telephone: data.telephone,
         address: data.address,
         note: data.note,
-        total_price: total,
         proof_payment: proofPaymentFile,
-        orderItems: selectedItems.map((item) => ({
-          id: item.id,
-          product_id: item.id,
-          quantity: item.quantity,
-          price: item.price,
-        })),
+        cart_ids: cartIds,
       };
 
       const result = await makeOrder(orderData);
 
       if (result.success) {
-        // Hapus items dari cart
-        for (const item of selectedItems) {
-          await removeFromCart(user_id, item.id);
-        }
         toast.success("Created Order successfully!");
-        navigate("/dashboard/orders");
+        navigate(`/dashboard/orders`);
       } else {
-        toast.error(result.message || "Failed to create order");
+        toast.error("Failed to create order");
       }
     } catch (error) {
       console.error("Checkout error:", error);
       toast.error("An error occurred while creating order");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -346,7 +352,7 @@ export default function Checkout() {
                   </div>
 
                   {/* Preview Overlay/Popup */}
-                  {showProofPaymentPreview && qrisPreview && (
+                  {showProofPaymentPreview && proofPaymentPreview && (
                     <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
                       <Card className="relative rounded-lg p-6 bg-popover max-w-sm max-h-[90vh] overflow-auto">
                         {/* Close Button */}
@@ -382,7 +388,9 @@ export default function Checkout() {
             subtotal={subtotal}
             deliveryFee={deliveryFee}
             total={total}
+            shop_id={shop_id}
             shop_name={shop_name}
+            isSubmitting={isSubmitting}
           />
         </aside>
       </form>

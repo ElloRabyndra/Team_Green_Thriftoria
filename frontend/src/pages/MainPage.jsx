@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import SideBar from "@/components/SideBar";
 import NavBar from "@/components/Navbar";
 import { Outlet } from "react-router";

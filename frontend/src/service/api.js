@@ -130,9 +130,6 @@ export const getDetailProductApi = (productId) =>
   api.get(`/products/${productId}`);
 
 // Fungsi API untuk menambah produk
-// file: api.js
-
-// Fungsi API untuk menambah produk
 export const addProductApi = (data) => {
   const formData = new FormData();
 
@@ -189,9 +186,77 @@ export const deleteProductApi = (productId) =>
 
 // ==================== CART ENDPOINTS ====================
 
+// Fungsi API untuk mendapatkan semua item keranjang (GET /cart)
+export const getAllCartApi = () => api.get("/cart");
+
+// Fungsi API untuk menambah produk ke keranjang
+export const addToCartApi = (productId) =>
+  api.post("/cart", { product_id: productId });
+
+// Fungsi API untuk mengedit kuantitas item keranjang
+export const updateCartQuantityApi = (cartId, quantity) =>
+  api.patch(`/cart/${cartId}`, { quantity });
+
+// Fungsi API untuk menghapus item keranjang
+export const deleteCartItemApi = (cartId) => api.delete(`/cart/${cartId}`);
+
 // ==================== ORDER ENDPOINTS ====================
 
+export const createOrderApi = (data) => {
+  const formData = new FormData();
+
+  // Append data teks dan angka
+  formData.append("shop_id", data.shop_id.toString());
+  formData.append("recipient", data.recipient || "");
+  formData.append("telephone", data.telephone || "");
+  formData.append("address", data.address || "");
+  formData.append("note", data.note || "");
+
+  const imageFile = data.proof_payment;
+
+  if (imageFile instanceof File) {
+    formData.append("proof_payment", imageFile, imageFile.name);
+  } else {
+    console.error("proof_payment is not a File object", imageFile);
+  }
+
+  if (data.cart_ids && Array.isArray(data.cart_ids)) {
+    data.cart_ids.forEach((id) => {
+      formData.append("cart_ids[]", id.toString());
+    });
+  }
+
+  return api.post("/orders", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+export const getAllActiveOrdersApi = () => api.get("/orders");
+
+export const getOrderHistoryApi = () => api.get("/orders/history");
+
+export const getOrderDetailApi = (orderId) => api.get(`/orders/${orderId}`);
+
+export const requestOrderCancellationApi = (orderId, cancelRole) =>
+  api.patch(`/orders/${orderId}/cancel`, { cancel_role: cancelRole });
+
+export const rejectOrderCancellationApi = (orderId) =>
+  api.patch(`/orders/${orderId}/reject-cancel`);
+
+export const acceptOrderCancellationApi = (orderId) =>
+  api.patch(`/orders/${orderId}/accept-cancel`);
+
 // ==================== SALES ENDPOINTS (SELLER) ====================
+
+export const getAllSalesApi = (shopId) => api.get(`/orders/sales/${shopId}`);
+
+export const acceptRejectPaymentApi = (orderId, status) =>
+  api.patch(`/orders/${orderId}/accept-payment`, { status });
+
+export const updateShippingStatusApi = (orderId, status_shipping) =>
+  api.patch(`/orders/${orderId}/status`, { status_shipping });
 
 // ==================== ADMIN ENDPOINTS ====================
 

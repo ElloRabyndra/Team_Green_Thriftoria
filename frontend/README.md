@@ -14,7 +14,7 @@ The frontend application is built using modern JavaScript technologies and utili
 | **Shadcn UI**             | Reusable UI components built on Radix UI and Tailwind CSS.                                                                                          |
 | **React Router**          | Declarative routing for navigation between pages.                                                                                                   |
 | **React Hook Form / Zod** | Robust state management and schema validation for forms.                                                                                            |
-| **Custom Hooks/Contexts** | Centralized state management for app logic (`useAuth`, `useShop`, `useProducts`, `useOrders`, `useSales`, `useAdmin`) and Theming (`ThemeContext`). |
+| **Custom Hooks/Contexts** | Centralized state management for app logic (`useAuth`, `useShop`, `useProducts`, `useOrders`, `useAdmin`) and Theming (`ThemeContext`). |
 
 ## ✨ Core Features & User Roles
 

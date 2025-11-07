@@ -11,8 +11,14 @@ export default function ProductList() {
   const { category, query } = useParams();
   const location = useLocation();
   const { user } = useAuth();
-  const { products, loading, changeCategory, addToCart, searchProducts } =
-    useProducts();
+  const {
+    products,
+    loading,
+    cartLoading,
+    changeCategory,
+    addToCart,
+    searchProducts,
+  } = useProducts();
   const [ProductList, setProductList] = useState([]);
 
   // Cek apakah ada kategori ada di URL dan apakah ada query di URL
@@ -42,27 +48,31 @@ export default function ProductList() {
 
   // Wrapper function untuk addToCart dengan user_id
   const handleAddToCart = async (product) => {
-    return await addToCart(user.id, product);
+    return await addToCart(product.id);
   };
 
-  if (loading) {
-    return <Loading />;
+  if (loading && !ProductList) {
+    return null;
   }
   return (
     <>
-      {ProductList.length === 0 && <Empty>No products found</Empty>}
-      <div className="-mt-1 sm:px-6 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center">
-        {ProductList.map((product, index) => (
-          <SlideIn key={product.id} direction="up" delay={index * 0.09}>
-            <ProductCard
-              product={product}
-              onAddToCart={handleAddToCart}
-              role={user.role}
-              shop_id={user.Shop?.id || user.id} // nanti ganti ke user.Shop.id
-            />
-          </SlideIn>
-        ))}
-      </div>
+      {ProductList.length === 0 && !loading ? (
+        <Empty>No products found</Empty>
+      ) : (
+        <div className="-mt-1 sm:px-6 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center">
+          {ProductList.map((product, index) => (
+            <SlideIn key={product.id} direction="up" delay={index * 0.09}>
+              <ProductCard
+                product={product}
+                onAddToCart={handleAddToCart}
+                cartLoading={cartLoading}
+                role={user.role}
+                shop_id={user.Shop?.id || user.id} // nanti ganti ke user.Shop.id
+              />
+            </SlideIn>
+          ))}
+        </div>
+      )}
     </>
   );
 }

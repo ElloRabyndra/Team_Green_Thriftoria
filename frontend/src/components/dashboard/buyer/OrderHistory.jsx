@@ -45,7 +45,7 @@ const OrderHistory = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
           {orderHistory.map((order) => (
-            <SlideIn key={order.id} direction="down">
+            <SlideIn key={order.order_id} direction="down">
               <OrderCard order={order} />
             </SlideIn>
           ))}
