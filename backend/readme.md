@@ -558,11 +558,12 @@ Response (200 OK):
 POST http://localhost:3000/api/v1/cart
 
 Request Body:
-````json
+
+```json
 {
-    "product_id": 3
+  "product_id": 3
 }
-````
+```
 
 Response (201 Created):
 
@@ -577,12 +578,13 @@ Response (201 Created):
 PATCH http://localhost:3000/api/v1/cart/:cart_id
 
 Request Body:
-````json
+
+```json
 {
   "product_id": 3,
   "quantity": 1
 }
-````
+```
 
 Response (200 OK):
 
@@ -601,5 +603,226 @@ Response (200 OK):
 ```JSON
 {
     "message": "Cart item deleted successfully"
+}
+```
+
+#### Create Order (Buyer)
+
+POST http://localhost:3000/api/v1/orders
+
+Request Body (multipart/form-data):
+shop_id (number, required)
+recipient (string, required - Nama penerima)
+telephone (string, required - No. HP penerima)
+address (string, required - Alamat pengiriman)
+note (string, opsional)
+proof_payment (file, required - Maks 1MB, format: .png, .jpg, .jpeg, .webp)
+cart_ids[] (array of numbers, required - ID dari item di keranjang. Contoh: cart_ids[]=1&cart_ids[]=2)
+
+Response (201 Created):
+
+```JSON
+{
+  "message": "Order created successfully",
+  "order_id": 1
+}
+```
+
+##### Get All Active Orders (Buyer)
+
+GET http://localhost:3000/api/v1/orders
+
+Response (200 OK):
+
+```JSON
+[
+  {
+        "order_id": 1,
+        "shop_id": 5,
+        "shop_name": "HalalMart",
+        "shop_phone": "081278632253",
+        "created_at": "2025-11-07T16:34:34.178+07:00",
+        "total_price": 900000,
+        "status_shipping": "awaitingPayment",
+        "product_count": 1
+    }
+]
+```
+
+#### Get Order History (Buyer)
+
+GET http://localhost:3000/api/v1/orders/history 
+
+Response (200 OK):
+```JSON
+
+{
+"status": "success",
+"orders": [
+{
+"order_id": 9,
+"shop_id": 5,
+"shop_name": "HalalMart",
+"shop_phone": "081278632253",
+"created_at": "2025-11-03T11:00:00+07:00",
+"total_price": 150000,
+"status_shipping": "delivered",
+"product_count": 1
+}
+]
+}
+```
+
+#### Get Order Detail (Buyer/Seller)
+GET http://localhost:3000/api/v1/orders/10 Keterangan: Membutuhkan token JWT.
+
+Response (200 OK):
+
+```JSON
+
+{
+"order": {
+  "order_id": 10,
+  "shop_id": 5,
+  "shop_name": "HalalMart",
+  "shop_phone": "081278632253",
+  "recipient": "Steven",
+  "telephone": "081234567890",
+  "address": "Jl. Merdeka No. 17, Palembang",
+  "note": "Tolong packing yang aman ya.",
+  "created_at": "2025-11-05T10:30:00+07:00",
+  "status_shipping": "awaitingPayment",
+  "cancel_by": null,
+  "total_price": 400000,
+  "proof_payment": "http://127.0.0.1:3000/assets/payments/1762308600123456700.jpg"
+},
+"order_items": [
+    {
+    "name": "Baju Kemeja Pria",
+    "label": "Best Seller",
+    "quantity": 1,
+    "price": 150000,
+    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg"
+    },
+    {
+    "name": "Celana Jeans",
+    "label": "",
+    "quantity": 1,
+    "price": 250000,
+    "image": "http://127.0.0.1:3000/assets/products/123456790.jpg"
+  }
+  ]
+}
+```
+
+#### Request Order Cancellation (Buyer/Seller)
+PATCH http://localhost:3000/api/v1/orders/:orderID/cancel 
+
+Request Body:
+```JSON
+{
+  "cancel_role": "buyer"
+}
+```
+
+Response (200 OK):
+```JSON
+{
+`"message": "Order cancellation requested"
+}
+```
+
+#### Reject Order Cancellation (Buyer/Seller)
+PATCH http://localhost:3000/api/v1/orders/:orderID/reject-cancel 
+
+Response (200 OK):
+```JSON
+{
+`"message": "Order cancel rejected"
+}
+```
+
+#### Accept Order Cancellation (Buyer/Seller)
+PATCH http://localhost:3000/api/v1/orders/:orderID/accept-cancel 
+
+Response (200 OK):
+
+```JSON
+{
+  "message": "Order cancelled"
+}
+```
+
+#### Get All Sales (Seller)
+GET http://localhost:3000/api/v1/orders/sales/:shopid K
+
+Response (200 OK):
+```JSON
+{
+"status": "success",
+"data": [
+    {
+    "order_id": 10,
+    "shop_id": 5,
+    "recipient": "Steven",
+    "telephone": "081234567890",
+    "created_at": "2025-11-05T10:30:00+07:00",
+    "total_price": 400000,
+    "status_shipping": "awaitingPayment",
+    "product_count": 2
+    },
+    {
+    "order_id": 9,
+    "shop_id": 5,
+    "recipient": "Budi",
+    "telephone": "089876543210",
+    "created_at": "2025-11-03T11:00:00+07:00",
+    "total_price": 150000,
+    "status_shipping": "delivered",
+    "product_count": 1
+    }
+  ]
+}
+```
+
+#### Accept/Reject Payment (Seller)
+PATCH http://localhost:3000/api/v1/orders/:orderID/accept-payment 
+
+Request Body:
+```JSON
+{
+  "status": true
+}
+```
+
+Keterangan Body:
+"status": true - Menerima pembayaran, status order berubah ke "prepared".
+"status": false - Menolak pembayaran, status order berubah ke "cancelled" dan cancel_by "seller".
+
+Response (200 OK):
+```JSON
+{
+  "message": "Payment status updated"
+}
+```
+
+#### Update Shipping Status (Seller)
+PATCH http://localhost:3000/api/v1/orders/:orderID/status 
+
+Request Body:
+```JSON
+{
+  "status_shipping": "shipped"
+}
+```
+
+Keterangan Body:
+status_shipping (string, required) - Nilai yang valid: "prepared", "shipped", "delivered".
+
+Response (200 OK):
+
+```JSON
+{
+  "message": "Status updated"
 }
 ```
