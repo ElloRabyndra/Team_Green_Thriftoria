@@ -101,8 +101,8 @@ func GetAllCart(c *fiber.Ctx) error {
 
 		if _, exists := shopMap[shop.ID]; !exists {
 			shopMap[shop.ID] = fiber.Map{
-				"shop_id":    shop.ID,
-				"shop_name":  shop.ShopName,
+				"shop_id":   shop.ID,
+				"shop_name": shop.ShopName,
 				"cart_items": []fiber.Map{},
 			}
 		}
@@ -116,6 +116,7 @@ func GetAllCart(c *fiber.Ctx) error {
 			"label":      item.Product.Label,
 			"price":      item.Price,
 			"quantity":   item.Quantity,
+			"product_stock": item.Product.Stock, 
 		})
 		shopMap[shop.ID]["cart_items"] = cartArray
 	}

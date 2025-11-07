@@ -13,6 +13,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
+	"gorm.io/gorm"
 )
 
 func GetAllProducts(c *fiber.Ctx) error {
@@ -154,7 +155,6 @@ func AddProduct(c *fiber.Ctx) error {
 	})
 }
 
-
 func DeleteProduct(c *fiber.Ctx) error {
 	userToken := c.Locals("user").(*jwt.Token)
 	claims := userToken.Claims.(jwt.MapClaims)
@@ -166,23 +166,41 @@ func DeleteProduct(c *fiber.Ctx) error {
 
 	id := c.Params("id")
 	var product models.Product
+	
 	if err := database.DB.First(&product, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{"error": "Product not found"})
 	}
 
-	if product.Image != "" && !strings.Contains(product.Image, "pravatar.cc") {
-		oldPath := "." + strings.TrimPrefix(product.Image, "http://127.0.0.1:3000")
-		if err := os.Remove(oldPath); err != nil {
-			fmt.Printf("⚠️ Failed to delete image file: %v\n", err)
+	var orderItemCount int64
+	// Cek apakah ada OrderItem yang merujuk ProductID ini
+	if err := database.DB.Model(&models.OrderItem{}).Where("product_id = ?", id).Count(&orderItemCount).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to check order history"})
+	}
+
+	if orderItemCount > 0 {
+		return c.Status(400).JSON(fiber.Map{"error": "Product cannot be deleted because it is linked to existing orders."})
+	}
+    
+	return database.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("product_id = ?", id).Delete(&models.CartItem{}).Error; err != nil {
+			fmt.Printf("⚠️ Failed to delete associated cart items: %v\n", err)
+			return c.Status(500).JSON(fiber.Map{"error": "Failed to clean up cart items"})
 		}
-	}
 
+		if product.Image != "" && !strings.Contains(product.Image, "pravatar.cc") {
+			oldPath := "." + strings.TrimPrefix(product.Image, "http://127.0.0.1:3000")
+			if err := os.Remove(oldPath); err != nil {
+				fmt.Printf("⚠️ Failed to delete image file: %v\n", err)
+			}
+		}
 
-	if err := database.DB.Delete(&product).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete product"})
-	}
+		if err := tx.Delete(&product).Error; err != nil {
+			fmt.Printf("⚠️ Failed to delete product from DB: %v\n", err)
+			return c.Status(500).JSON(fiber.Map{"error": "Failed to delete product"})
+		}
 
-	return c.JSON(fiber.Map{"status": "success", "message": "Product deleted successfully"})
+		return c.JSON(fiber.Map{"status": "success", "message": "Product deleted successfully"})
+	})
 }
 
 func GetDetailProduct(c *fiber.Ctx) error {

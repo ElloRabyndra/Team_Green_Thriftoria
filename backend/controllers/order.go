@@ -114,10 +114,13 @@ func CreateOrder(c *fiber.Ctx) error {
 		var product models.Product
 		if err := database.DB.First(&product, item.ProductID).Error; err == nil {
 			product.Stock -= item.Quantity
+			
 			if product.Stock <= 0 {
-				database.DB.Delete(&product)
-			} else {
-				database.DB.Save(&product)
+				product.Stock = 0 
+			}
+			
+			if err := database.DB.Save(&product).Error; err != nil {
+				fmt.Println("Error saving product stock:", err)
 			}
 		}
 
@@ -340,6 +343,7 @@ func GetAllSales(c *fiber.Ctx) error {
     query := "SELECT " +
 	"o.id, " +
 	"o.shop_id, " +
+	"o.recipient, " +
 	"o.telephone, " +
 	"o.created_at, " +
 	"o.total_price, " +
