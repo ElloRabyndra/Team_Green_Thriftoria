@@ -12,25 +12,6 @@ The project is a marketplace website for thrifting (second-hand items), built wi
 
 ---
 
-## 📋 Table of Contents
-
-- [About the Project](#about-the-project)
-- [Tech Stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Installation & Setup](#installation--setup)
-  - [1. Clone the Repository](#1-clone-the-repository)
-  - [2. Database Setup](#2-database-setup)
-  - [3. Backend Setup](#3-backend-setup)
-  - [4. Frontend Setup](#4-frontend-setup)
-- [Running the Application](#running-the-application)
-- [Features & User Guide](#features--user-guide)
-  - [Public Pages](#public-pages)
-  - [Buyer Features](#buyer-features)
-  - [Seller Features](#seller-features)
-  - [Admin Features](#admin-features)
-
----
-
 ## 🎯 About the Project
 
 **Thriftoria** is a comprehensive e-commerce platform designed specifically for the thrifting market (second-hand goods). The platform supports three distinct user roles—**Buyer**, **Seller**, and **Admin**—each with tailored features and dashboards to create a complete marketplace ecosystem.
