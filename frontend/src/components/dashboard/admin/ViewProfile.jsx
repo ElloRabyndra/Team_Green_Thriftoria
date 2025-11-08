@@ -88,7 +88,7 @@ export default function ViewProfile() {
               {/* Email & Username */}
               <div className="space-y-4 lg:flex lg:gap-4 lg:space-y-0">
                 {/* Email */}
-                <div className="flex flex-col gap-2 w-full p-4 bg-gray-50 rounded-lg">
+                <div className="flex flex-col gap-2 w-full p-4 bg-card rounded-lg">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Mail className="w-4 h-4" />
                     <span className="text-sm font-medium">Email</span>
@@ -99,7 +99,7 @@ export default function ViewProfile() {
                 </div>
 
                 {/* Username */}
-                <div className="flex flex-col gap-2 w-full p-4 bg-gray-50 rounded-lg">
+                <div className="flex flex-col gap-2 w-full p-4 bg-card rounded-lg">
                   <div className="flex items-center gap-2 text-gray-600">
                     <User className="w-4 h-4" />
                     <span className="text-sm font-medium">Username</span>
@@ -113,7 +113,7 @@ export default function ViewProfile() {
               {/* Telephone & Address */}
               <div className="space-y-4 lg:flex lg:gap-4 lg:space-y-0">
                 {/* Telephone */}
-                <div className="flex flex-col gap-2 w-full p-4 bg-gray-50 rounded-lg">
+                <div className="flex flex-col gap-2 w-full p-4 bg-card rounded-lg">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Phone className="w-4 h-4" />
                     <span className="text-sm font-medium">Phone Number</span>
@@ -124,7 +124,7 @@ export default function ViewProfile() {
                 </div>
 
                 {/* Address */}
-                <div className="flex flex-col gap-2 w-full p-4 bg-gray-50 rounded-lg">
+                <div className="flex flex-col gap-2 w-full p-4 bg-card rounded-lg">
                   <div className="flex items-center gap-2 text-gray-600">
                     <MapPin className="w-4 h-4" />
                     <span className="text-sm font-medium">Address</span>
