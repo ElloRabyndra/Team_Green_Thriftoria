@@ -49,7 +49,7 @@ The entire application structure revolves around protected routes, ensuring only
 | `/cart`                     | `CartList`      | Displays items added to the cart, allowing multi-item selection from a single shop for checkout. |
 | `/checkout`                 | `Checkout`      | Final step for order placement, capturing recipient details, address, and proof of payment.      |
 | `/dashboard/orders`         | `MyOrder`       | List of active orders placed by the user (Buyer's perspective).                                  |
-| `/dashboard/order/:orderId` | `OrderDetail`   | Detailed view and tracking of a specific order.                                                  |
+| `/dashboard/order/:orderId` | `OrderDetail`   | Detailed view, tracking of a specific order, and request cancel                                  |
 | `/dashboard/order-history`  | `OrderHistory`  | List of all delivered or cancelled orders.                                                       |
 
 ### 3. Seller-Specific Pages
