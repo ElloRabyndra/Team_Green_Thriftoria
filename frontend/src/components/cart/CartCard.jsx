@@ -4,6 +4,7 @@ import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 export default function CartCard({
   cartItem,
+  cartLoading,
   isSelected,
   onSelect,
   increaseQuantity,
@@ -73,6 +74,7 @@ export default function CartCard({
             <button
               className="text-muted-foreground hover:text-destructive transition-colors duration-200"
               title="Remove from cart"
+              disabled={cartLoading}
             >
               <X className="h-4 w-4" />
             </button>
@@ -84,6 +86,7 @@ export default function CartCard({
           <button
             onClick={() => decreaseQuantity(cartItem)}
             className="rounded-md p-1 cursor-pointer"
+            disabled={cartLoading}
           >
             <Minus className="h-3 w-3 md:h-4 md:w-4" />
           </button>
@@ -93,6 +96,9 @@ export default function CartCard({
           <button
             onClick={() => increaseQuantity(cartItem)}
             className="rounded-md p-1 cursor-pointer"
+            disabled={
+              cartLoading || cartItem.quantity >= cartItem.product_stock
+            }
           >
             <Plus className="h-3 w-3 md:h-4 md:w-4" />
           </button>

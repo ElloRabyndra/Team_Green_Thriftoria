@@ -28,12 +28,23 @@ export default function SideBar({ isMobileMenuOpen }) {
     if (!isLoading && !user) logout();
   }, [user, isLoading]);
 
-  // Load cart ketika cart berubah
+  // Load cart ketika user terautentikasi
   useEffect(() => {
     if (user?.id) {
-      loadCart(user.id);
+      loadCart();
     }
-  }, [cart, user?.id]);
+  }, [user?.id, loadCart, cart]);
+
+  // Fungsi untuk menghitung total kuantitas semua item di keranjang
+  const totalCartQuantity = cart.reduce((totalShop, shopCart) => {
+    const shopItemTotal = shopCart.cart_items
+      ? shopCart.cart_items.reduce(
+          (totalItem, item) => totalItem + item.quantity,
+          0
+        )
+      : 0;
+    return totalShop + shopItemTotal;
+  }, 0);
 
   return (
     <Card
@@ -81,7 +92,7 @@ export default function SideBar({ isMobileMenuOpen }) {
               <ShoppingCart className="h-5 w-5" />
               <span>Cart</span>
               <span className="absolute -top-1 left-6 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {cart.reduce((total, item) => total + item.quantity, 0)}
+                {totalCartQuantity}
               </span>
             </Link>
           )}

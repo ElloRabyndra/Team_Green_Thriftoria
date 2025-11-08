@@ -9,6 +9,7 @@ export default function ProductCard({
   product,
   onAddToCart = async () => {},
   onRemoveProduct = async () => {},
+  cartLoading,
   role = "buyer",
   shop_id = null,
 }) {
@@ -23,17 +24,18 @@ export default function ProductCard({
   };
 
   const handleAddToCart = async () => {
-    const success = await onAddToCart(product);
-    if (success) {
-      toast.success("Product added to cart!");
+    const response = await onAddToCart(product);
+
+    if (response.success) {
+      toast.success(response.message || "Product added to cart!");
     } else {
-      toast.error("Failed to add product to cart");
+      toast.error(response.message || "Failed to add product to cart");
     }
   };
 
   const handleDeleteProduct = async (product_id) => {
-    const success = await onRemoveProduct(product_id);
-    if (success) {
+    const response = await onRemoveProduct(product_id);
+    if (response.success) {
       toast.success("Product deleted successfully!");
     } else {
       toast.error("Failed to delete product");
@@ -42,7 +44,6 @@ export default function ProductCard({
 
   return (
     <div className="relative group">
-      {/* Delete/Cancel Button - positioned outside card, only visible on hover */}
       {role === "seller" && product.shop_id === shop_id && (
         <ConfirmDialog
           onConfirm={() => {
@@ -130,6 +131,7 @@ export default function ProductCard({
             <button
               className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 px-1 sm:px-4 rounded-lg transition-all duration-200 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               onClick={() => handleAddToCart()}
+              disabled={cartLoading || product.stock === 0}
             >
               <ShoppingCart className="h-4 w-4" />
               <span className="text-xs sm:text-sm font-medium">
@@ -143,7 +145,9 @@ export default function ProductCard({
                 className="flex-1 flex items-center justify-center gap-2 bg-primary text-primary-foreground py-2 pxpx-4 rounded-lg transition-all duration-200"
               >
                 <Eye className="h-4 w-4" />
-                <span className="text-xs sm:text-sm font-medium">View Details</span>
+                <span className="text-xs sm:text-sm font-medium">
+                  View Details
+                </span>
               </Link>
             </div>
           )}

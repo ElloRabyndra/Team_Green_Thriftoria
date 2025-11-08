@@ -71,7 +71,7 @@ const LandingPage = () => {
               <StaggeredFadeIn delay={0.5} staggerDelay={0.1}>
                 <div className="text-center lg:text-left">
                   <div className="text-2xl md:text-3xl font-bold text-primary">
-                    10K+
+                    5K+
                   </div>
                   <div className="text-sm text-muted-foreground">Products</div>
                 </div>
@@ -80,7 +80,7 @@ const LandingPage = () => {
               <StaggeredFadeIn delay={0.5} staggerDelay={0.1}>
                 <div className="text-center lg:text-left">
                   <div className="text-2xl md:text-3xl font-bold text-primary">
-                    5K+
+                    1K+
                   </div>
                   <div className="text-sm text-muted-foreground">Customers</div>
                 </div>

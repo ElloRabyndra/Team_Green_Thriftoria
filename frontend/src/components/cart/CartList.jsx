@@ -14,6 +14,7 @@ export default function CartList() {
   const {
     cart,
     loading,
+    cartLoading,
     loadCart,
     increaseQuantity,
     decreaseQuantity,
@@ -23,6 +24,15 @@ export default function CartList() {
   // State untuk track items yang dipilih (array of cart IDs)
   const [selectedCartIds, setSelectedCartIds] = useState([]);
 
+  // Gabungkan semua CartItem dari semua toko menjadi satu array datar
+  const flatCartItems = cart.flatMap((shopCart) =>
+    shopCart.cart_items.map((item) => ({
+      ...item,
+      shop_id: shopCart.shop_id,
+      shop_name: shopCart.shop_name,
+    }))
+  );
+
   // Redirect jika bukan buyer atau seller
   useEffect(() => {
     if (!isLoading && user && user.role !== "buyer" && user.role !== "seller") {
@@ -30,10 +40,10 @@ export default function CartList() {
     }
   }, [isLoading, user, navigate]);
 
-  // Load cart when user is available
+  // Load cart ketika user terautentikasi
   useEffect(() => {
     if (user?.id) {
-      loadCart(user.id);
+      loadCart();
     }
   }, [user?.id]);
 
@@ -46,73 +56,76 @@ export default function CartList() {
     }
   }, [cart.length]);
 
+  // Set default selection ke item pertama saat component mount atau flatCartItems berubah
+  useEffect(() => {
+    if (flatCartItems.length > 0) {
+      if (
+        selectedCartIds.length === 0 ||
+        !flatCartItems.some((item) => selectedCartIds.includes(item.id))
+      ) {
+        setSelectedCartIds([flatCartItems[0].id]);
+      }
+    } else {
+      setSelectedCartIds([]);
+    }
+  }, [flatCartItems.length]);
+
   // Fungsi untuk handle selection
   const handleSelectCart = (cartId) => {
-    const clickedItem = cart.find((item) => item.id === cartId);
+    const clickedItem = flatCartItems.find((item) => item.id === cartId);
 
-    // Jika belum ada yang dipilih, pilih item ini
-    if (selectedCartIds.length === 0) {
-      setSelectedCartIds([cartId]);
-      return;
-    }
+    if (!clickedItem) return;
 
-    // Cek shop_id dari item yang sudah dipilih
-    const firstSelectedItem = cart.find(
+    const firstSelectedItem = flatCartItems.find(
       (item) => item.id === selectedCartIds[0]
     );
 
-    // Jika item sudah dipilih, unselect
     if (selectedCartIds.includes(cartId)) {
       const newSelected = selectedCartIds.filter((id) => id !== cartId);
-      // Jika tidak ada yang tersisa, pilih item pertama dari cart
-      setSelectedCartIds(newSelected.length > 0 ? newSelected : [cart[0].id]);
+      setSelectedCartIds(newSelected);
       return;
     }
 
-    // Jika shop_id berbeda, ganti semua selection dengan item yang baru diklik
-    if (clickedItem.shop_id !== firstSelectedItem.shop_id) {
+    if (
+      firstSelectedItem &&
+      clickedItem.shop_id !== firstSelectedItem.shop_id
+    ) {
       setSelectedCartIds([cartId]);
       return;
     }
 
-    // Jika shop_id sama, tambahkan ke selection
     setSelectedCartIds([...selectedCartIds, cartId]);
   };
 
-  // Wrapper functions dengan user_id
+  // Wrapper functions (tanpa user_id)
   const handleIncreaseQuantity = async (cartItem) => {
-    if (!user?.id) return;
-    await increaseQuantity(user.id, cartItem);
+    await increaseQuantity(cartItem);
   };
 
   const handleDecreaseQuantity = async (cartItem) => {
-    if (!user?.id) return;
-    await decreaseQuantity(user.id, cartItem);
+    await decreaseQuantity(cartItem);
   };
 
   const handleRemoveFromCart = async (cartId) => {
-    if (!user?.id) return;
-    await removeFromCart(user.id, cartId);
+    await removeFromCart(cartId);
   };
 
-  // Dapatkan data items yang terpilih untuk CartDetail
-  const selectedCartItems = cart.filter((item) =>
+  const selectedCartItems = flatCartItems.filter((item) =>
     selectedCartIds.includes(item.id)
   );
 
-  // Hitung total harga dari semua item yang dipilih
   const selectedItemsPrice = selectedCartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 
-  if (loading || isLoading) {
+  if (loading || isLoading || (!cart && cartLoading)) {
     return <Loading />;
   }
 
   return (
     <section className="px-4">
-      {cart.length === 0 ? (
+      {(flatCartItems.length === 0 && !cartLoading) ? (
         <Empty>Your cart is empty</Empty>
       ) : (
         <div className="md:-mt-2">
@@ -120,7 +133,7 @@ export default function CartList() {
           <div className="flex flex-col xl:flex-row gap-6">
             <main className="w-full xl:w-1/2">
               <ul className="mt-4 space-y-4">
-                {cart.map((cartItem, index) => (
+                {flatCartItems.map((cartItem, index) => (
                   <SlideIn
                     key={cartItem.id}
                     direction="up"
@@ -129,6 +142,7 @@ export default function CartList() {
                     <li>
                       <CartCard
                         cartItem={cartItem}
+                        cartLoading={cartLoading}
                         isSelected={selectedCartIds.includes(cartItem.id)}
                         onSelect={handleSelectCart}
                         increaseQuantity={handleIncreaseQuantity}
@@ -145,6 +159,7 @@ export default function CartList() {
                 <CartDetail
                   selectedItems={selectedCartItems}
                   selectedItemsPrice={selectedItemsPrice}
+                  cartLoading={cartLoading}
                 />
               </SlideIn>
             </aside>

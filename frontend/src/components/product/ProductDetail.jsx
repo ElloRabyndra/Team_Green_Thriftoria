@@ -16,6 +16,7 @@ export default function ProductDetail() {
     productDetail,
     getProductDetail,
     loading: productLoading,
+    cartLoading,
     addToCart,
   } = useProducts();
 
@@ -34,11 +35,12 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = async () => {
-    const success = await addToCart(user.id, productDetail);
-    if (success) {
-      toast.success("Product added to cart!");
+    const response = await addToCart(productDetail.id);
+
+    if (response.success) {
+      toast.success(response.message || "Product added to cart!");
     } else {
-      toast.error("Failed to add product to cart");
+      toast.error(response.message || "Failed to add product to cart");
     }
   };
 
@@ -149,8 +151,9 @@ export default function ProductDetail() {
               user.Shop?.id !== productDetail.shop_id)) && (
             <div className="space-y-3 mt-5">
               <Button
-                onClick={() => handleAddToCart()}
+                onClick={handleAddToCart}
                 className="w-full flex items-center justify-center gap-2 h-12 text-base cursor-pointer"
+                disabled={cartLoading || productDetail.stock === 0}
               >
                 <ShoppingCart className="h-5 w-5" />
                 Add to Cart
