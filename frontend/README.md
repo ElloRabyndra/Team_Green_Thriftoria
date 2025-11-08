@@ -43,7 +43,8 @@ The entire application structure revolves around protected routes, ensuring only
 
 | Route                       | Component       | Description                                                                                      |
 | :-------------------------- | :-------------- | :----------------------------------------------------------------------------------------------- |
-| `/`                         | `ProductList`   | Home page displaying all products (filterable by category: **Fashion** and **Others**).          |
+| `/products/:category?`      | `ProductList`   | Home page displaying all products (filterable by category: **Fashion** and **Others**).          |
+| `/products/search/:query`   | `ProductList`   | Home page displaying all products by search query.                                               |
 | `/product/:id`              | `ProductDetail` | Detailed view of a product.                                                                      |
 | `/cart`                     | `CartList`      | Displays items added to the cart, allowing multi-item selection from a single shop for checkout. |
 | `/checkout`                 | `Checkout`      | Final step for order placement, capturing recipient details, address, and proof of payment.      |
