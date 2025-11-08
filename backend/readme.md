@@ -1,828 +1,295 @@
-#### DOKUMENTASI APLIKASI
+# Thriftoria - Backend
 
-#### BASE URL
+Ini adalah dokumentasi API untuk layanan backend **Thriftoria**, sebuah platform e-commerce yang berfokus pada *thrifting* (barang bekas). Aplikasi ini menangani manajemen pengguna, toko (shop), produk, keranjang (cart), dan pesanan (order).
 
-http://localhost:3000/api/v1/
+Dibuat menggunakan **Golang** dengan framework **Fiber** dan **Gorm**.
 
-#### 1. Jalankan Aplikasi
+## 🚀 Tech Stack
 
-go run main.go
+Server backend ini dibangun menggunakan ekosistem Go yang modern dan efisien.
 
-#### 2. Dokumentasi API
+| Teknologi | Tujuan |
+| :--- | :--- |
+| **Go (Golang)** | Bahasa pemrograman inti untuk membangun API. |
+| **Fiber** | Framework web *expressive* dan cepat, terinspirasi dari Express.js. |
+| **Gorm** | *Object-Relational Mapper* (ORM) untuk interaksi database yang mudah. |
+| **Gorm (MySQL Driver)** | Driver spesifik untuk menghubungkan Gorm dengan database MySQL. |
+| **JWT (golang-jwt)** | Implementasi JSON Web Tokens untuk autentikasi *stateless*. |
+| **go-dotenv** | Memuat variabel lingkungan (environment variables) dari file `.env`. |
+| **bcrypt (x/crypto)** | *Hashing* password yang aman untuk disimpan di database. |
+
+## ✨ Fitur Inti & Peran Pengguna
+
+Aplikasi ini mendukung tiga peran pengguna utama, masing-masing dengan kapabilitas yang diatur oleh API:
+
+| Peran | Kapabilitas API |
+| :--- | :--- |
+| **Buyer** | Melihat produk, mencari/filter, menambah ke keranjang, checkout, melihat histori pesanan, dan mendaftar untuk menjadi *Seller*. |
+| **Seller** | Mengelola profil toko, CRUD produk (Create, Read, Update, Delete), melihat penjualan, dan memperbarui status pengiriman pesanan. |
+| **Admin** | Mengelola akun pengguna (Daftar Buyer), mengelola aplikasi toko (Setujui/Tolak Toko), dan mengelola toko yang sudah terdaftar. |
+
+## 🛠️ Instalasi & Konfigurasi
+
+Untuk menjalankan server backend ini secara lokal:
+
+1.  **Kloning Repositori**
+    Masuk ke folder `backend`:
+
+    ```bash
+    git clone https://github.com/ElloRabyndra/Team_Green_Thriftoria.git
+    cd Team_Green_Thriftoria/backend
+    ```
+
+2.  **Instalasi Dependensi**
+    Unduh semua *package* Go yang diperlukan:
+
+    ```bash
+    go mod tidy
+    ```
+
+3.  **Konfigurasi Environment**
+    Salin file `.env.example` (jika ada) menjadi `.env`.
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Sesuaikan isi file `.env` dengan konfigurasi lokal Anda:
+
+    ```.env
+    # Konfigurasi Database
+    DB_HOST=nama_host_anda
+    DB_PORT=db_port_anda
+    DB_USER=db_user_anda
+    DB_PASSWORD=db_password_anda
+    DB_NAME=nama_db_anda
+
+    # Konfigurasi Server
+    BASE_URL=http://127.0.0.1:3000
+
+    # JWT
+    JWT_SECRET=RAHASIA_ANDA_YANG_SANGAT_AMAN
+    ```
+
+4.  **Jalankan Aplikasi**
+
+    ```bash
+    go run main.go
+    ```
+
+    Server akan berjalan di `http://localhost:3000`.
+
+## 🗺️ Referensi API Endpoints
+
+**Base URL**: `http://localhost:3000/api/v1`
+
+-----
+
+### 1\. 🔐 Autentikasi (Authentication)
+
+Endpoint untuk registrasi, login, dan logout.
+
+| Endpoint | Metode | Otorisasi | Deskripsi |
+| :--- | :--- | :--- | :--- |
+| `/register` | `POST` | (Public) | Registrasi pengguna baru. |
+| `/login` | `POST` | (Public) | Login dan mendapatkan cookie JWT. |
+| `/logout` | `POST` | (Public) | Logout dan menghapus cookie JWT. |
 
 #### Register
 
-POST http://localhost:3000/api/v1/register
-Request Body:
-`json
-      {
-        "username": "steven",
-        "email": "steven@gmail.com",
-        "password": "123456"
-      }
-      `
-
-    Response (201 Created):
-      ```json
-      {
-        "message": "Register success",
-        "user": {
-          "id": 1,
-          "username": "steven",
-          "email": "steven@gmail.com",
-          "address": "",
-          "telephone": "",
-          "role": "buyer",
-          "profile_picture": "https://i.pravatar.cc/150",
-          "shop": null
-        }
-      }
-      ```
+  * **Request Body**:
+    ```json
+    {
+      "username": "steven",
+      "email": "steven@gmail.com",
+      "password": "123456"
+    }
+    ```
+  * **Response (201 Created)**:
+    ```json
+    {
+      "message": "Register success",
+      "user": { ... }
+    }
+    ```
 
 #### Login
 
-POST http://localhost:3000/api/v1/login
-Request Body:
-`json
-      {
-        "email": "steven@gmail.com",
-        "password": "123456"
-      } 
-      `
-
-    Response (200 OK):
-      ```json
-      {
-        "message": "Login success",
-        "user": {
-          "id": 1,
-          "username": "steven",
-          "email": "steven@gmail.com",
-          "role": "buyer",
-          "profile_picture": "https://i.pravatar.cc/150",
-          "shop": null
-        }
-      }
-      ```
-
-Token JWT akan disimpan otomatis di cookie bernama token.
-
-#### Logout
-
-POST http://localhost:3000/api/v1/logout
-Response:
-{
-"message": "Logout success"
-}
-
-#### Get All User
-
-GET http://localhost:3000/api/v1/user
-Response (200 OK):
-
-```json
-{
-  "data": [
+  * **Request Body**:
+    ```json
     {
-      "id": 1,
-      "username": "steven",
       "email": "steven@gmail.com",
-      "address": "",
-      "telephone": "",
-      "role": "seller",
-      "profile_picture": "https://i.pravatar.cc/150",
-      "Shop": null
-    },
-    {
-      "id": 3,
-      "username": "steven2",
-      "email": "steven2@gmail.com",
-      "address": "",
-      "telephone": "",
-      "role": "seller",
-      "profile_picture": "https://i.pravatar.cc/150",
-      "Shop": null
+      "password": "123456"
     }
-  ],
-  "status": "success"
-}
-```
+    ```
+  * **Response (200 OK)**:
+    ```json
+    {
+      "message": "Login success",
+      "user": { ... }
+    }
+    ```
 
-#### Get Profile
+-----
 
-GET http://localhost:3000/api/v1/user/profile
-Response (200 OK):
+### 2\. 👤 Pengguna (User)
 
-```json
- {
-"data": {
-"id": 1,
-"username": "steven",
-"email": "steven@gmail.com",
-"address": "",
-"telephone": "",
-"role": "seller",
-"profile_picture": "https://i.pravatar.cc/150",
-"Shop": null
-},
-"status": "success"
-}
+Endpoint untuk mengelola data pengguna. Membutuhkan otentikasi JWT.
+
+| Endpoint | Metode | Otorisasi | Deskripsi |
+| :--- | :--- | :--- | :--- |
+| `/user` | `GET` | Admin | Mendapatkan semua data pengguna. |
+| `/user/profile` | `GET` | Buyer, Seller, Admin | Mendapatkan profil pengguna yang sedang login. |
+| `/user/profile` | `PATCH` | Buyer, Seller, Admin | Memperbarui profil pengguna yang sedang login. |
 
 #### Update Profile
 
-Patch http://localhost:3000/api/v1/user/profile
-Request Body (multipart/form-data):
-username (string, opsional)
-email (string, opsional)
-address (string, opsional)
-telephone (string, opsional)
-password (string, opsional - jika ingin mengganti password)
-profile_picture (file, opsional - Maks 1MB, format: .png, .jpg, .jpeg)
-
-    Response (200 OK):
-      {
-          "data": {
-              "id": 7,
-              "username": "steven2",
-              "email": "steven2@gmail.com",
-              "address": "plaju",
-              "telephone": "08123123123",
-              "role": "pembeli",
-              "profile_picture": "http://127.0.0.1:3000/assets/1761885237869533800.jpg",
-              "Shop": null
-          },
-          "message": "Profile updated successfully",
-          "status": "success"
-      }
-
-#### Create SHOP
-Post http://localhost:3000/api/v1/shop (buyer)
-
-Request Body (multipart/form-data):
-shop_name (string)
-shop_telephone (string, opsional)
-shop_address (string)
-account_number (string, opsional)
-qris_picture (string, (.png, .jpg, .jpeg, .webp, max 1MB))
-
-Response (200 OK):
-{
-    "data": {
-        "id": 5,
-        "user_id": 1,
-        "shop_name": "HalalMart",
-        "shop_telephone": "081278632253",
-        "shop_address": "Plaju no 15",
-        "account_number": "12312312312",
-        "qris_picture": "http://127.0.0.1:3000/assets/qris/1_1762096113955846000.png",
-        "status_admin": "pending",
-        "created_at": "2025-11-02T22:08:33.959+07:00"
-    },
-    "message": "Shop created successfully, waiting for admin approval",
-    "status": "success"
-}
-
-
-#### Get Detail SHOP
-Get http://localhost:3000/api/v1/shop/:id (buyer, seller, admin)
-
-Response (200 OK):
-{
-    "data": {
-        "account_number": "12312312312",
-        "created_at": "2025-11-02T22:08:33.959+07:00",
-        "email": "steven@gmail.com",
-        "id": 5,
-        "qris_picture": "http://127.0.0.1:3000/assets/qris/1_1762096113955846000.png",
-        "shop_address": "Plaju no 15",
-        "shop_name": "HalalMart",
-        "shop_telephone": "081278632253",
-        "status_admin": "pending",
-        "user_id": 1,
-        "username": "steven"
-    },
-    "message": "Shop details retrieved successfully",
-    "status": "success"
-}
-
-#### Edit SHOP
-Patch http://localhost:3000/api/v1/shop/:id (seller, admin)
-
-Request Body (multipart/form-data):
-shop_name (string, opsional)
-shop_telephone (string, opsional)
-shop_address (string, opsional)
-account_number (string, opsional)
-qris_picture (string, opsional, (.png, .jpg, .jpeg, .webp, max 1MB))
-
-Response (200 OK):
-{
-    "data": {
-        "id": 5,
-        "user_id": 1,
-        "shop_name": "HalalMart",
-        "shop_telephone": "081278632253",
-        "shop_address": "Plaju no 15",
-        "account_number": "12312312312",
-        "qris_picture": "http://127.0.0.1:3000/assets/qris/1_1762109769226320600.jpg",
-        "status_admin": "pending",
-        "created_at": "2025-11-02T22:08:33.959+07:00"
-    },
-    "message": "Shop updated successfully",
-    "status": "success"
-}
-```
-
-#### Get All Shop Approve (admin)
-
-GET http://localhost:3000/api/v1/shop/approve
-Response (200 OK):
-
-```json
-{
-  "data": [
+  * **Request Body**: `multipart/form-data`
+      * `username` (string, opsional)
+      * `email` (string, opsional)
+      * `address` (string, opsional)
+      * `telephone` (string, opsional)
+      * `password` (string, opsional - jika ingin ganti)
+      * `profile_picture` (file, opsional - Maks 1MB, .png, .jpg, .jpeg)
+  * **Response (200 OK)**:
+    ```json
     {
-      "id": 5,
-      "user_id": 1,
-      "shop_name": "HalalMart",
-      "shop_telephone": "081278632253",
-      "shop_address": "Plaju no 15",
-      "account_number": "12312312312",
-      "qris_picture": "http://127.0.0.1:3000/assets/qris/1_1762109769226320600.jpg",
-      "status_admin": "approve",
-      "created_at": "2025-11-02T22:08:33.959+07:00"
-    },
-    {
-      "id": 8,
-      "user_id": 3,
-      "shop_name": "toko 2",
-      "shop_telephone": "081278632253",
-      "shop_address": "Plaju no 15",
-      "account_number": "12312312312",
-      "qris_picture": "http://127.0.0.1:3000/assets/qris/3_1762161995987024700.jpg",
-      "status_admin": "approve",
-      "created_at": "2025-11-03T16:26:35.989+07:00"
+      "data": { ... },
+      "message": "Profile updated successfully",
+      "status": "success"
     }
-  ],
-  "status": "success"
-}
-```
+    ```
 
-#### Get All Shop Pending (admin)
+-----
 
-GET http://localhost:3000/api/v1/shop/pending
-Response (200 OK):
+### 3\. 🏪 Toko (Shop)
 
-```json
-{
-  "data": [
+Endpoint untuk pendaftaran dan manajemen toko.
+
+| Endpoint | Metode | Otorisasi | Deskripsi |
+| :--- | :--- | :--- | :--- |
+| `/shop` | `POST` | Buyer | Mendaftarkan toko baru (status `pending`). |
+| `/shop/:id` | `GET` | Buyer, Seller, Admin | Mendapatkan detail toko berdasarkan ID. |
+| `/shop/:id` | `PATCH` | Seller, Admin | Memperbarui detail toko. |
+| `/shop/approve` | `GET` | Admin | Mendapatkan semua toko yang berstatus `approve`. |
+| `/shop/pending` | `GET` | Admin | Mendapatkan semua toko yang berstatus `pending`. |
+| `/shop/accept` | `PATCH` | Admin | Menerima (approve) atau menolak (reject) pendaftaran toko. |
+
+#### Accept/Reject Request Shop
+
+  * **Request Body**:
+    ```json
     {
-      "id": 8,
-      "user_id": 3,
-      "shop_name": "toko 2",
-      "shop_telephone": "081278632253",
-      "shop_address": "Plaju no 15",
-      "account_number": "12312312312",
-      "qris_picture": "http://127.0.0.1:3000/assets/qris/3_1762161995987024700.jpg",
-      "status_admin": "pending",
-      "created_at": "2025-11-03T16:26:35.989+07:00"
+      "shop_id": 8,
+      "status": true
     }
-  ],
-  "status": "success"
-}
-```
-
-#### Accpet Request Shop (admin)
-
-GET http://localhost:3000/api/v1/shop/accept
-Request Body:
-
-```json
-{
-  "shop_id": 8,
-  "status": true
-}
-```
-
-Response (200 Created):
-
-```json
-{
-  "data": {
-    "role": "seller",
-    "shop_id": 8,
-    "user_id": 3
-  },
-  "message": "Shop has been accepted and user role updated to seller",
-  "status": "success"
-}
-```
-
-#### Get All Products (Public)
-
-GET http://localhost:3000/api/v1/products
-
-Response (200 OK):
-
-```JSON
-{
-"status": "success",
-"data": [
+    ```
+  * **Keterangan**: `status: true` untuk menerima, `status: false` untuk menolak.
+  * **Response (200 OK)**:
+    ```json
     {
-    "id": 1,
-    "shop_id": 5,
-    "name": "Baju Kemeja Pria",
-    "category": "Fashion",
-    "label": "Best Seller",
-    "description": "Baju kemeja lengan panjang bahan katun.",
-    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg",
-    "price": 150000,
-    "stock": 50,
-    "created_at": "2025-11-04T15:00:00+07:00",
-    "updated_at": "2025-11-04T15:00:00+07:00"
-    },
-    {
-    "id": 2,
-    "shop_id": 5,
-    "name": "Celana Jeans",
-    "category": "Fashion",
-    "label": "",
-    "description": "Celana jeans pria.",
-    "image": "http://127.0.0.1:3000/assets/products/123456790.jpg",
-    "price": 250000,
-    "stock": 30,
-    "created_at": "2025-11-04T15:01:00+07:00",
-    "updated_at": "2025-11-04T15:01:00+07:00"
+      "data": { ... },
+      "message": "Shop has been accepted and user role updated to seller",
+      "status": "success"
     }
-  ]
-}
-```
+    ```
 
-#### Get Product By Category (Public)
+-----
 
-GET http://localhost:3000/api/v1/products/category/:category
-Keterangan: Ganti :category dengan Fashion atau Others.
+### 4\. 🛍️ Produk (Product)
 
-Response (200 OK):
+Endpoint untuk melihat dan mengelola produk.
 
-```JSON
-{
-"status": "success",
-"data": [
+| Endpoint | Metode | Otorisasi | Deskripsi |
+| :--- | :--- | :--- | :--- |
+| `/products` | `GET` | (Public) | Mendapatkan semua produk (bisa difilter). |
+| `/products/category/:category` | `GET` | (Public) | Mendapatkan produk berdasarkan kategori (`Fashion` / `Others`). |
+| `/products/search` | `GET` | (Public) | Mencari produk berdasarkan nama (`?q=kemeja`). |
+| `/products/:id` | `GET` | (Public) | Mendapatkan detail produk berdasarkan ID. |
+| `/products` | `POST` | Seller | Menambahkan produk baru ke toko. |
+| `/products/:id` | `PATCH` | Seller | Memperbarui detail produk. |
+| `/products/:id` | `DELETE` | Seller | Menghapus produk dari toko. |
+
+#### Add Product
+
+  * **Request Body**: `multipart/form-data`
+      * `name` (string, required)
+      * `category` (string, required - "Fashion" atau "Others")
+      * `price` (number, required)
+      * `stock` (number, required)
+      * `image` (file, required - Maks 1MB)
+      * `label` (string, opsional)
+      * `description` (string, opsional)
+  * **Response (201 Created)**:
+    ```json
     {
-    "id": 1,
-    "shop_id": 5,
-    "name": "Baju Kemeja Pria",
-    "category": "Fashion",
-    "label": "Best Seller",
-    "description": "Baju kemeja lengan panjang bahan katun.",
-    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg",
-    "price": 150000,
-    "stock": 50,
-    "created_at": "2025-11-04T15:00:00+07:00",
-    "updated_at": "2025-11-04T15:00:00+07:00"
+      "status": "success",
+      "message": "Product added successfully",
+      "data": { ... }
     }
-  ]
-}
-```
+    ```
 
-##### Search Product (Public)
+-----
 
-GET http://localhost:3000/api/v1/products/search?q=kemeja
-Keterangan: Menggunakan query param q untuk mencari berdasarkan nama produk.
+### 5\. 🛒 Keranjang (Cart)
 
-Response (200 OK):
+Endpoint untuk mengelola keranjang belanja pengguna. Membutuhkan otentikasi JWT.
 
-```JSON
-{
-"status": "success",
-"data": [
+| Endpoint | Metode | Otorisasi | Deskripsi |
+| :--- | :--- | :--- | :--- |
+| `/cart` | `GET` | Buyer | Melihat semua item di keranjang, dikelompokkan per toko. |
+| `/cart` | `POST` | Buyer | Menambahkan produk ke keranjang. |
+| `/cart/:cart_id` | `PATCH` | Buyer | Memperbarui kuantitas item di keranjang. |
+| `/cart/:cart_id` | `DELETE` | Buyer | Menghapus item dari keranjang. |
+
+#### Add to Cart
+
+  * **Request Body**:
+    ```json
     {
-    "id": 1,
-    "shop_id": 5,
-    "name": "Baju Kemeja Pria",
-    "category": "Fashion",
-    "label": "Best Seller",
-    "description": "Baju kemeja lengan panjang bahan katun.",
-    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg",
-    "price": 150000,
-    "stock": 50,
-    "created_at": "2025-11-04T15:00:00+07:00",
-    "updated_at": "2025-11-04T15:00:00+07:00"
+      "product_id": 3
     }
-  ]
-}
-```
-
-#### Get Detail Product (Public)
-
-GET http://localhost:3000/api/v1/products/1
-
-Response (200 OK):
-
-```JSON
-{
-  "status": "success",
-  "data": {
-    "id": 1,
-    "shop_id": 5,
-    "name": "Baju Kemeja Pria",
-    "category": "Fashion",
-    "label": "Best Seller",
-    "description": "Baju kemeja lengan panjang bahan katun.",
-    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg",
-    "price": 150000,
-    "stock": 50,
-    "created_at": "2025-11-04T15:00:00+07:00",
-    "updated_at": "2025-11-04T15:00:00+07:00"
-  }
-}
-```
-
-#### Add Product (Seller)
-
-POST http://localhost:3000/api/v1/products
-
-Request Body (multipart/form-data):
-name (string, required)
-category (string, required - "Fashion" atau "Others")
-price (number, required)
-stock (number, required)
-label (string, opsional)
-description (string, opsional)
-image (file, required - Maks 1MB, format: .png, .jpg, .jpeg, .webp)
-
-Response (201 Created):
-
-```JSON
-
-{
-  "status": "success",
-  "message": "Product added successfully",
-  "data": {
-    "id": 1,
-    "shop_id": 5,
-    "name": "Baju Kemeja Pria",
-    "category": "Fashion",
-    "label": "Best Seller",
-    "description": "Baju kemeja lengan panjang bahan katun.",
-    "image": "http://127.0.0.1:3000/assets/products/1762234033104689200.jpg",
-    "price": 150000,
-    "stock": 50,
-    "created_at": "2025-11-04T15:07:13.104+07:00",
-    "updated_at": "2025-11-04T15:07:13.104+07:00"
-  }
-}
-```
-
-#### Edit Product (Seller)
-
-PATCH http://localhost:3000/api/v1/products/:id
-
-Request Body (multipart/form-data):
-name (string, opsional)
-category (string, opsional - "Fashion" atau "Others")
-price (number, opsional)
-stock (number, opsional)
-label (string, opsional)
-description (string, opsional)
-image (file, opsional - Maks 1MB, format: .png, .jpg, .jpeg, .webp)
-
-Response (200 OK):
-
-```JSON
-{
-  "status": "success",
-  "message": "Product updated successfully",
-  "data": {
-    "id": 1,
-    "shop_id": 5,
-    "name": "Baju Kemeja Pria (Edited)",
-    "category": "Fashion",
-    "label": "New",
-    "description": "Baju kemeja lengan panjang bahan katun premium.",
-    "image": "http://127.0.0.1:3000/assets/products/1_1762234200123456700.jpg",
-    "price": 155000,
-    "stock": 45,
-    "created_at": "2025-11-04T15:07:13.104+07:00",
-    "updated_at": "2025-11-04T15:10:00.123+07:00"
-  }
-}
-```
-
-#### Delete Product (Seller)
-
-DELETE http://localhost:3000/api/v1/products/1
-
-Response (200 OK):
-
-```JSON
-
-{
-  "status": "success",
-  "message": "Product deleted successfully"
-}
-```
-
-#### Get ALL CART
-
-GET http://localhost:3000/api/v1/cart
-
-Response (200 OK):
-
-```JSON
-{
-    "data": [
-        {
-            "cart_items": [
-                {
-                    "id": 2,
-                    "image": "http://127.0.0.1:3000/assets/products/1_1762244289995726800.webp",
-                    "label": "mens-shirts",
-                    "name": "Blue & Black Check Shirt",
-                    "price": 450000,
-                    "product_id": 3,
-                    "quantity": 1
-                }
-            ],
-            "shop_id": 5,
-            "shop_name": "HalalMart"
-        }
-    ],
-    "status": "success"
-}
-```
-
-#### Add Product (Seller)
-
-POST http://localhost:3000/api/v1/cart
-
-Request Body:
-
-```json
-{
-  "product_id": 3
-}
-```
-
-Response (201 Created):
-
-```JSON
-{
-    "message": "Product added to cart"
-}
-```
-
-#### Edit Product (Seller)
-
-PATCH http://localhost:3000/api/v1/cart/:cart_id
-
-Request Body:
-
-```json
-{
-  "product_id": 3,
-  "quantity": 1
-}
-```
-
-Response (200 OK):
-
-```JSON
-{
-    "message": "Cart updated successfully"
-}
-```
-
-#### Delete Product
-
-DELETE http://localhost:3000/api/v1/cart/:cart_id
-
-Response (200 OK):
-
-```JSON
-{
-    "message": "Cart item deleted successfully"
-}
-```
-
-#### Create Order (Buyer)
-
-POST http://localhost:3000/api/v1/orders
-
-Request Body (multipart/form-data):
-shop_id (number, required)
-recipient (string, required - Nama penerima)
-telephone (string, required - No. HP penerima)
-address (string, required - Alamat pengiriman)
-note (string, opsional)
-proof_payment (file, required - Maks 1MB, format: .png, .jpg, .jpeg, .webp)
-cart_ids[] (array of numbers, required - ID dari item di keranjang. Contoh: cart_ids[]=1&cart_ids[]=2)
-
-Response (201 Created):
-
-```JSON
-{
-  "message": "Order created successfully",
-  "order_id": 1
-}
-```
-
-##### Get All Active Orders (Buyer)
-
-GET http://localhost:3000/api/v1/orders
-
-Response (200 OK):
-
-```JSON
-[
-  {
-        "order_id": 1,
-        "shop_id": 5,
-        "shop_name": "HalalMart",
-        "shop_phone": "081278632253",
-        "created_at": "2025-11-07T16:34:34.178+07:00",
-        "total_price": 900000,
-        "status_shipping": "awaitingPayment",
-        "product_count": 1
+    ```
+  * **Response (201 Created)**:
+    ```json
+    {
+      "message": "Product added to cart"
     }
-]
-```
+    ```
 
-#### Get Order History (Buyer)
+-----
 
-GET http://localhost:3000/api/v1/orders/history 
+### 6\. 📦 Pesanan (Order)
 
-Response (200 OK):
-```JSON
+Endpoint untuk proses checkout dan manajemen pesanan. Membutuhkan otentikasi JWT.
 
-{
-"status": "success",
-"orders": [
-{
-"order_id": 9,
-"shop_id": 5,
-"shop_name": "HalalMart",
-"shop_phone": "081278632253",
-"created_at": "2025-11-03T11:00:00+07:00",
-"total_price": 150000,
-"status_shipping": "delivered",
-"product_count": 1
-}
-]
-}
-```
+| Endpoint | Metode | Otorisasi | Deskripsi |
+| :--- | :--- | :--- | :--- |
+| `/orders` | `POST` | Buyer | Membuat pesanan baru (checkout). |
+| `/orders` | `GET` | Buyer | Mendapatkan daftar pesanan aktif (milik buyer). |
+| `/orders/history` | `GET` | Buyer | Mendapatkan riwayat pesanan (selesai/batal). |
+| `/orders/:id` | `GET` | Buyer, Seller | Mendapatkan detail spesifik pesanan. |
+| `/orders/sales/:shopid` | `GET` | Seller | Mendapatkan daftar penjualan (pesanan masuk ke toko). |
+| `/orders/:orderID/accept-payment` | `PATCH` | Seller | Menerima/Menolak bukti pembayaran dari buyer. |
+| `/orders/:orderID/status` | `PATCH` | Seller | Memperbarui status pengiriman (`prepared`, `shipped`, `delivered`). |
+| `/orders/:orderID/cancel` | `PATCH` | Buyer, Seller | Mengajukan pembatalan pesanan. |
+| `/orders/:orderID/reject-cancel` | `PATCH` | Buyer, Seller | Menolak pengajuan pembatalan. |
+| `/orders/:orderID/accept-cancel` | `PATCH` | Buyer, Seller | Menerima pengajuan pembatalan (order dibatalkan). |
 
-#### Get Order Detail (Buyer/Seller)
-GET http://localhost:3000/api/v1/orders/10 Keterangan: Membutuhkan token JWT.
+#### Create Order
 
-Response (200 OK):
-
-```JSON
-
-{
-"order": {
-  "order_id": 10,
-  "shop_id": 5,
-  "shop_name": "HalalMart",
-  "shop_phone": "081278632253",
-  "recipient": "Steven",
-  "telephone": "081234567890",
-  "address": "Jl. Merdeka No. 17, Palembang",
-  "note": "Tolong packing yang aman ya.",
-  "created_at": "2025-11-05T10:30:00+07:00",
-  "status_shipping": "awaitingPayment",
-  "cancel_by": null,
-  "total_price": 400000,
-  "proof_payment": "http://127.0.0.1:3000/assets/payments/1762308600123456700.jpg"
-},
-"order_items": [
+  * **Request Body**: `multipart/form-data`
+      * `shop_id` (number, required)
+      * `recipient` (string, required)
+      * `telephone` (string, required)
+      * `address` (string, required)
+      * `proof_payment` (file, required - Maks 1MB)
+      * `cart_ids[]` (array of numbers, required - misal: `cart_ids[]=1&cart_ids[]=2`)
+      * `note` (string, opsional)
+  * **Response (201 Created)**:
+    ```json
     {
-    "name": "Baju Kemeja Pria",
-    "label": "Best Seller",
-    "quantity": 1,
-    "price": 150000,
-    "image": "http://127.0.0.1:3000/assets/products/123456789.jpg"
-    },
-    {
-    "name": "Celana Jeans",
-    "label": "",
-    "quantity": 1,
-    "price": 250000,
-    "image": "http://127.0.0.1:3000/assets/products/123456790.jpg"
-  }
-  ]
-}
-```
-
-#### Request Order Cancellation (Buyer/Seller)
-PATCH http://localhost:3000/api/v1/orders/:orderID/cancel 
-
-Request Body:
-```JSON
-{
-  "cancel_role": "buyer"
-}
-```
-
-Response (200 OK):
-```JSON
-{
-`"message": "Order cancellation requested"
-}
-```
-
-#### Reject Order Cancellation (Buyer/Seller)
-PATCH http://localhost:3000/api/v1/orders/:orderID/reject-cancel 
-
-Response (200 OK):
-```JSON
-{
-`"message": "Order cancel rejected"
-}
-```
-
-#### Accept Order Cancellation (Buyer/Seller)
-PATCH http://localhost:3000/api/v1/orders/:orderID/accept-cancel 
-
-Response (200 OK):
-
-```JSON
-{
-  "message": "Order cancelled"
-}
-```
-
-#### Get All Sales (Seller)
-GET http://localhost:3000/api/v1/orders/sales/:shopid K
-
-Response (200 OK):
-```JSON
-{
-"status": "success",
-"data": [
-    {
-    "order_id": 10,
-    "shop_id": 5,
-    "recipient": "Steven",
-    "telephone": "081234567890",
-    "created_at": "2025-11-05T10:30:00+07:00",
-    "total_price": 400000,
-    "status_shipping": "awaitingPayment",
-    "product_count": 2
-    },
-    {
-    "order_id": 9,
-    "shop_id": 5,
-    "recipient": "Budi",
-    "telephone": "089876543210",
-    "created_at": "2025-11-03T11:00:00+07:00",
-    "total_price": 150000,
-    "status_shipping": "delivered",
-    "product_count": 1
+      "message": "Order created successfully",
+      "order_id": 1
     }
-  ]
-}
-```
-
-#### Accept/Reject Payment (Seller)
-PATCH http://localhost:3000/api/v1/orders/:orderID/accept-payment 
-
-Request Body:
-```JSON
-{
-  "status": true
-}
-```
-
-Keterangan Body:
-"status": true - Menerima pembayaran, status order berubah ke "prepared".
-"status": false - Menolak pembayaran, status order berubah ke "cancelled" dan cancel_by "seller".
-
-Response (200 OK):
-```JSON
-{
-  "message": "Payment status updated"
-}
-```
-
-#### Update Shipping Status (Seller)
-PATCH http://localhost:3000/api/v1/orders/:orderID/status 
-
-Request Body:
-```JSON
-{
-  "status_shipping": "shipped"
-}
-```
-
-Keterangan Body:
-status_shipping (string, required) - Nilai yang valid: "prepared", "shipped", "delivered".
-
-Response (200 OK):
-
-```JSON
-{
-  "message": "Status updated"
-}
-```
+    ```
