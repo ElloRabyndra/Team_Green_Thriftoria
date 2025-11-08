@@ -240,9 +240,25 @@ npm run dev
 
 The web application will be available at `http://localhost:5173`
 
-### Default Admin Account
+### 🔑 Test Accounts
 
-To access admin features, you may need to manually create an admin user in the database or use the provided seed data. Check with your team for admin credentials.
+To explore different features based on user roles, you can use these pre-configured accounts:
+
+#### Admin Account
+
+- **Email**: `admin@gmail.com`
+- **Password**: `123456`
+- **Access**: Full platform management (user management, shop approvals)
+
+#### Seller Account
+
+- **Email**: `ello@gmail.com`
+- **Password**: `123456`
+- **Access**: Shop management, product listings, sales tracking, and buyer features
+
+#### Buyer Account
+
+You can register a new buyer account through the registration pages
 
 ---
 
@@ -250,7 +266,7 @@ To access admin features, you may need to manually create an admin user in the d
 
 ### Public Pages
 
-#### 🏠 Home / Product Listings (`/`)
+#### 🏠 Home / Product Listings (`/products/:category?`, `/products/search/:query`)
 
 - **Description**: Landing page displaying all available products from various shops
 - **Features**:
