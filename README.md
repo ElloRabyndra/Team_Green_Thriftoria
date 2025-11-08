@@ -198,7 +198,7 @@ Or if you use pnpm:
 pnpm install
 ```
 
-#### Step 3: Configure Environment Variables (if needed)
+#### Step 3: Configure Environment Variables 
 
 If the frontend requires environment configuration, create a `.env` file in the `frontend` directory:
 
