@@ -88,7 +88,7 @@ CREATE DATABASE thriftoria_db;
 
 #### Step 2: Import Database Schema
 
-If a SQL file (`finprobackend.sql`) is provided in the root directory:
+The SQL file (`finprobackend.sql`) is provided in the root directory:
 
 ```bash
 mysql -u your_username -p thriftoria_db < finprobackend.sql
@@ -198,12 +198,12 @@ Or if you use pnpm:
 pnpm install
 ```
 
-#### Step 3: Configure Environment Variables 
+#### Step 3: Configure Environment Variables
 
-If the frontend requires environment configuration, create a `.env` file in the `frontend` directory:
+create a `.env` file in the `frontend` directory:
 
 ```env
-VITE_API_BASE_URL=http://localhost:3000/api/v1
+VITE_API_URL=http://localhost:3000/api/v1
 ```
 
 #### Step 4: Verify Frontend Setup
@@ -300,11 +300,9 @@ You can register a new buyer account through the registration pages
 - **Features**:
   - View shop information (name, description, QRIS payment)
   - See all products offered by this shop
-  - View shop owner's contact information
 - **How to Use**:
   1. Browse all products from this specific shop
   2. Click on any product to view details
-  3. Note the QRIS code for payment during checkout
 
 #### 🔐 Login & Registration (`/login`, `/register`)
 
