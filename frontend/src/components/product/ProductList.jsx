@@ -42,14 +42,18 @@ export default function ProductList() {
     }
 
     setProductList(
-      products.filter((product) => product.shop_id !== user.Shop?.id)
+      products.filter((product) => product.shop_id !== user?.Shop?.id)
     );
-  }, [products, user.Shop?.id]);
+  }, [products, user?.Shop?.id]);
 
   // Wrapper function untuk addToCart dengan user_id
   const handleAddToCart = async (product) => {
     return await addToCart(product.id);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   if (loading && !ProductList) {
     return null;
@@ -60,14 +64,14 @@ export default function ProductList() {
         <Empty>No products found</Empty>
       ) : (
         <div className="-mt-1 sm:px-6 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-center">
-          {ProductList.map((product, index) => (
-            <SlideIn key={product.id} direction="up" delay={index * 0.09}>
+          {ProductList.map((product) => (
+            <SlideIn key={product.id} direction="up">
               <ProductCard
                 product={product}
                 onAddToCart={handleAddToCart}
                 cartLoading={cartLoading}
-                role={user.role}
-                shop_id={user.Shop?.id || user.id} // nanti ganti ke user.Shop.id
+                role={user?.role}
+                shop_id={user?.Shop?.id || user?.id} // nanti ganti ke user.Shop.id
               />
             </SlideIn>
           ))}

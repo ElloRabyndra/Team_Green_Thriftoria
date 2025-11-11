@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { Card } from "./ui/card";
 import {
   ShoppingCart,
@@ -7,12 +7,14 @@ import {
   Box,
   LayoutGrid,
   ShoppingBag,
+  LogIn,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useEffect } from "react";
 
 export default function SideBar({ isMobileMenuOpen }) {
+  const navigate = useNavigate();
   const { user, logout, isLoading } = useAuth();
   const { cart, loadCart } = useProducts();
   const location = useLocation();
@@ -23,10 +25,6 @@ export default function SideBar({ isMobileMenuOpen }) {
     location.pathname === "/checkout" ||
     location.pathname.startsWith("/dashboard") ||
     location.pathname.startsWith("/shop");
-
-  useEffect(() => {
-    if (!isLoading && !user) logout();
-  }, [user, isLoading]);
 
   // Load cart ketika user terautentikasi
   useEffect(() => {
@@ -141,19 +139,33 @@ export default function SideBar({ isMobileMenuOpen }) {
             </Link>
           </div>
         </div>
-
-        <div className="space-y-3">
-          <h3 className="text-xs uppercase font-semibold mb-4 text-gray-500">
-            Preference
-          </h3>
-          <button
-            onClick={logout}
-            className="w-full flex items-center gap-3 p-3 rounded-lg text-white bg-red-500 hover:bg-red-600 transition-all duration-200 cursor-pointer"
-          >
-            <i className="bx bx-log-out text-2xl"></i>
-            <span>Logout</span>
-          </button>
-        </div>
+        {user ? (
+          <div className="space-y-3">
+            <h3 className="text-xs uppercase font-semibold mb-4 text-gray-500">
+              Preference
+            </h3>
+            <button
+              onClick={logout}
+              className="w-full flex items-center gap-3 p-3 rounded-lg text-white bg-red-500 hover:bg-red-600 transition-all duration-200 cursor-pointer"
+            >
+              <i className="bx bx-log-out text-2xl"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <h3 className="text-xs uppercase font-semibold mb-4 text-gray-500">
+              Preference
+            </h3>
+            <button
+              onClick={() => navigate("/login")}
+              className="w-full flex items-center gap-3 p-3 rounded-lg text-white bg-primary transition-all duration-200 cursor-pointer"
+            >
+              <LogIn className="h-5 w-5" />
+              <span>User Login</span>
+            </button>
+          </div>
+        )}
       </div>
     </Card>
   );

@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import {
+  getAllProduct,
+  getProductByCategory,
+  searchProduct,
+  getDetailProduct,
+} from "@/service/dummyApi";
+import {
   getAllCartApi,
   addToCartApi,
   updateCartQuantityApi,
@@ -21,7 +27,6 @@ export const othersCategory = ["Others"];
 export const useProducts = () => {
   const [products, setProducts] = useState([]);
   const [productDetail, setProductDetail] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [cartLoading, setCartLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -43,9 +48,9 @@ export const useProducts = () => {
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setProducts([]);
-    try {
-      let response;
+    let response; // <-- dipindah ke luar agar bisa diakses di try dan catch
 
+    try {
       if (selectedCategory === "all") {
         response = await getAllProductsApi();
       } else {
@@ -57,19 +62,26 @@ export const useProducts = () => {
       }
     } catch (error) {
       console.error("Error fetching products:", error);
-      setProducts([]);
+      if (selectedCategory === "all") {
+        response = await getAllProduct();
+      } else {
+        response = await getProductByCategory(selectedCategory);
+      }
+      if (response.success) {
+        setProducts(response.data || []);
+      }
     } finally {
       setLoading(false);
     }
   }, [selectedCategory]);
 
   const searchProducts = async (query) => {
-    if (!query.trim()) {
-      fetchProducts();
+    if (!query || !query.trim()) {
       return;
     }
 
     setLoading(true);
+    setProducts([]);
     try {
       const response = await searchProductApi(query);
       if (response.status === 200) {
@@ -77,7 +89,10 @@ export const useProducts = () => {
       }
     } catch (error) {
       console.error("Error searching products:", error);
-      setProducts([]);
+      const response = await searchProduct(query);
+      if (response.success) {
+        setProducts(response.data || []);
+      }
     } finally {
       setLoading(false);
     }
@@ -92,7 +107,8 @@ export const useProducts = () => {
       }
     } catch (error) {
       console.error("Error fetching product detail:", error);
-      setProductDetail(null);
+      const response = await getDetailProduct(Number(id));
+      setProductDetail(response.data || null);
     } finally {
       setLoading(false);
     }
@@ -227,14 +243,19 @@ export const useProducts = () => {
 
   const changeCategory = (category) => {
     setSelectedCategory(category);
-    setSearchQuery("");
   };
 
   // Fetch products saat component mount atau kategori berubah
   useEffect(() => {
-    fetchProducts();
+    if (selectedCategory) {
+      fetchProducts();
+    }
+  }, [selectedCategory, fetchProducts]);
+
+  // Load cart saat mount
+  useEffect(() => {
     loadCart();
-  }, [selectedCategory, fetchProducts, loadCart]);
+  }, [loadCart]);
 
   return {
     products,
@@ -245,8 +266,6 @@ export const useProducts = () => {
     loading,
     cartLoading,
     selectedCategory,
-    searchQuery,
-    setSearchQuery,
     allCategories,
     fashionCategory,
     othersCategory,

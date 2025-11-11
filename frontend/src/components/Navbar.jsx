@@ -4,15 +4,18 @@ import ToggleButton from "./theme/ToggleButton";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Link, useNavigate } from "react-router";
-import { useProducts } from "@/hooks/useProducts";
 
 export default function NavBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
   const navigate = useNavigate();
-  const { searchQuery, setSearchQuery, changeCategory } = useProducts();
+  // Gunakan local state untuk search input
+  const [searchInput, setSearchInput] = useState("");
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    searchQuery.trim() && navigate(`products/search/${searchQuery}`);
+    if (searchInput.trim()) {
+      navigate(`/products/search/${searchInput.trim()}`);
+      setSearchInput("");
+    }
     isMobileMenuOpen && setIsMobileMenuOpen(false);
   };
 
@@ -36,8 +39,8 @@ export default function NavBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
                 </div>
                 <form onSubmit={handleSearchSubmit}>
                   <Input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                     className="pl-10"
                     placeholder="Search for thrift products..."
                   />
@@ -79,8 +82,8 @@ export default function NavBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
               </div>
               <form onSubmit={handleSearchSubmit}>
                 <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   className="pl-10"
                   placeholder="Search for thrift products..."
                 />

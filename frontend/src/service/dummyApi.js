@@ -14,7 +14,7 @@ const api = axios.create({
 });
 
 // Delay helper untuk simulasi network request
-const delay = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // ==================== AUTH ENDPOINTS ====================
 export const register = async (email, username, password) => {
@@ -108,7 +108,7 @@ export const getProductByCategory = async (category) => {
   if (USE_DUMMY) {
     await delay();
     const filtered = dummyStore.products.filter(
-      (p) => p.category.toLowerCase() === category
+      (p) => p.category.toLowerCase() === category.toLowerCase()
     );
     return { success: true, data: filtered };
   }

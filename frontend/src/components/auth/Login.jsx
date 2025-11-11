@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { ArrowLeft } from "lucide-react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "./Schema";
 import { Link, useNavigate, useLocation } from "react-router";
@@ -73,7 +75,13 @@ export default function Login() {
   return (
     <Card className="w-full min-w-80 md:min-w-lg">
       <CardHeader className={"flex items-center justify-between gap-2"}>
-        <CardTitle>Login to your account</CardTitle>
+        <div className="flex items-center gap-2">
+          <ArrowLeft
+            onClick={() => navigate(-1)}
+            className="h-4 w-4 hover:text-primary cursor-pointer"
+          />
+          <CardTitle>Login to your account</CardTitle>
+        </div>
         <CardAction>
           <Button variant="link">
             <Link to="/register">Register</Link>
