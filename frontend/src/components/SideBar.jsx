@@ -159,10 +159,10 @@ export default function SideBar({ isMobileMenuOpen }) {
             </h3>
             <button
               onClick={() => navigate("/login")}
-              className="w-full flex items-center gap-3 p-3 rounded-lg text-white bg-primary transition-all duration-200 cursor-pointer"
+              className="w-full flex items-center gap-3 p-3 rounded-lg text-white bg-primary hover:bg-primary/90 transition-all duration-200 cursor-pointer"
             >
               <LogIn className="h-5 w-5" />
-              <span>User Login</span>
+              <span>Login</span>
             </button>
           </div>
         )}

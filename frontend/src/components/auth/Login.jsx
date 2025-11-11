@@ -77,7 +77,7 @@ export default function Login() {
       <CardHeader className={"flex items-center justify-between gap-2"}>
         <div className="flex items-center gap-2">
           <ArrowLeft
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/", { replace: true })}
             className="h-4 w-4 hover:text-primary cursor-pointer"
           />
           <CardTitle>Login to your account</CardTitle>
