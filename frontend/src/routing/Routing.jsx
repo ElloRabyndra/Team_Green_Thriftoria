@@ -196,30 +196,9 @@ const Routing = () => {
               }
             />
           </Route>
-          <Route
-            path="/products/:category?"
-            element={
-              <ProtectedRoute>
-                <ProductList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/products/search/:query"
-            element={
-              <ProtectedRoute>
-                <ProductList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/product/:id"
-            element={
-              <ProtectedRoute>
-                <ProductDetail />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/products/:category?" element={<ProductList />} />
+          <Route path="/products/search/:query" element={<ProductList />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
           <Route
             path="/cart"
             element={

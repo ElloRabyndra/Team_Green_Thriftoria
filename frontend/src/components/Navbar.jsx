@@ -14,7 +14,7 @@ export default function NavBar({ isMobileMenuOpen, setIsMobileMenuOpen }) {
     e.preventDefault();
     if (searchInput.trim()) {
       navigate(`/products/search/${searchInput.trim()}`);
-      setSearchInput(""); // Reset input setelah search
+      setSearchInput("");
     }
     isMobileMenuOpen && setIsMobileMenuOpen(false);
   };

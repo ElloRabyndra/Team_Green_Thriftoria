@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import {
+  getAllProduct,
+  getProductByCategory,
+  searchProduct,
+  getDetailProduct,
+} from "@/service/dummyApi";
+import {
   getAllCartApi,
   addToCartApi,
   updateCartQuantityApi,
@@ -42,9 +48,9 @@ export const useProducts = () => {
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setProducts([]);
-    try {
-      let response;
+    let response; // <-- dipindah ke luar agar bisa diakses di try dan catch
 
+    try {
       if (selectedCategory === "all") {
         response = await getAllProductsApi();
       } else if (selectedCategory) {
@@ -56,7 +62,14 @@ export const useProducts = () => {
       }
     } catch (error) {
       console.error("Error fetching products:", error);
-      setProducts([]);
+      if (selectedCategory === "all") {
+        response = await getAllProduct();
+      } else {
+        response = await getProductByCategory(selectedCategory);
+      }
+      if (response.success) {
+        setProducts(response.data || []);
+      }
     } finally {
       setLoading(false);
     }
@@ -76,7 +89,10 @@ export const useProducts = () => {
       }
     } catch (error) {
       console.error("Error searching products:", error);
-      setProducts([]);
+      const response = await searchProduct(query);
+      if (response.success) {
+        setProducts(response.data || []);
+      }
     } finally {
       setLoading(false);
     }
@@ -91,7 +107,8 @@ export const useProducts = () => {
       }
     } catch (error) {
       console.error("Error fetching product detail:", error);
-      setProductDetail(null);
+      const response = await getDetailProduct(Number(id));
+      setProductDetail(response.data || null);
     } finally {
       setLoading(false);
     }

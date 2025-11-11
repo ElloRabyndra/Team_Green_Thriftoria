@@ -146,9 +146,9 @@ export default function ProductDetail() {
           </div>
 
           {/* Action Buttons */}
-          {(user.role === "buyer" ||
-            (user.role === "seller" &&
-              user.Shop?.id !== productDetail.shop_id)) && (
+          {(user?.role === "buyer" ||
+            (user?.role === "seller" &&
+              user?.Shop?.id !== productDetail.shop_id)) && (
             <div className="space-y-3 mt-5">
               <Button
                 onClick={handleAddToCart}

@@ -12,7 +12,7 @@ export default function ProtectedRoute({ children }) {
 
   // Redirect ke halaman landing page 
   if (!isAuthenticated) {
-    return <Navigate to="/" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // Jika sudah login, tampilkan children

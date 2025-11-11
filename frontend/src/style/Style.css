@@ -7,11 +7,6 @@
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
-html {
-  scroll-behavior: smooth;
-  background-color: var(--background);
-}
-
 :root {
   --background: oklch(0.9751 0.0127 244.2507);
   --foreground: oklch(0.3729 0.0306 259.7328);
@@ -282,6 +277,11 @@ html {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--background);
 }
 
 .sidebar {
