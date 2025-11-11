@@ -88,23 +88,23 @@ export default function ViewProfile() {
               {/* Email & Username */}
               <div className="space-y-4 lg:flex lg:gap-4 lg:space-y-0">
                 {/* Email */}
-                <div className="flex flex-col gap-2 w-full p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div className="flex flex-col gap-2 w-full p-4 bg-card rounded-lg">
+                  <div className="flex items-center gap-2 text-foreground">
                     <Mail className="w-4 h-4" />
                     <span className="text-sm font-medium">Email</span>
                   </div>
-                  <p className="text-base font-medium text-gray-900 ml-6">
+                  <p className="text-base font-medium text-foreground ml-6">
                     {userDetail.email || "-"}
                   </p>
                 </div>
 
                 {/* Username */}
-                <div className="flex flex-col gap-2 w-full p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div className="flex flex-col gap-2 w-full p-4 bg-card rounded-lg">
+                  <div className="flex items-center gap-2 text-foreground">
                     <User className="w-4 h-4" />
                     <span className="text-sm font-medium">Username</span>
                   </div>
-                  <p className="text-base font-medium text-gray-900 ml-6">
+                  <p className="text-base font-medium text-foreground ml-6">
                     {userDetail.username || "-"}
                   </p>
                 </div>
@@ -113,23 +113,23 @@ export default function ViewProfile() {
               {/* Telephone & Address */}
               <div className="space-y-4 lg:flex lg:gap-4 lg:space-y-0">
                 {/* Telephone */}
-                <div className="flex flex-col gap-2 w-full p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div className="flex flex-col gap-2 w-full p-4 bg-card rounded-lg">
+                  <div className="flex items-center gap-2 text-foreground">
                     <Phone className="w-4 h-4" />
                     <span className="text-sm font-medium">Phone Number</span>
                   </div>
-                  <p className="text-base font-medium text-gray-900 ml-6">
+                  <p className="text-base font-medium text-foreground ml-6">
                     {userDetail.telephone || "-"}
                   </p>
                 </div>
 
                 {/* Address */}
-                <div className="flex flex-col gap-2 w-full p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div className="flex flex-col gap-2 w-full p-4 bg-card rounded-lg">
+                  <div className="flex items-center gap-2 text-foreground">
                     <MapPin className="w-4 h-4" />
                     <span className="text-sm font-medium">Address</span>
                   </div>
-                  <p className="text-base font-medium text-gray-900 ml-6">
+                  <p className="text-base font-medium text-foreground ml-6">
                     {userDetail.address || "-"}
                   </p>
                 </div>

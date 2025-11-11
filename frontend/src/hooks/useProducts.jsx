@@ -53,11 +53,11 @@ export const useProducts = () => {
     try {
       if (selectedCategory === "all") {
         response = await getAllProductsApi();
-      } else {
+      } else if (selectedCategory) {
         response = await getProductByCategoryApi(selectedCategory);
       }
 
-      if (response.status === 200) {
+      if (response?.status === 200) {
         setProducts(response.data.data || []);
       }
     } catch (error) {

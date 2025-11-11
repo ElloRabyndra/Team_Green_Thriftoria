@@ -6,14 +6,14 @@ This directory contains the entire client-side application for **Thriftoria**, a
 
 The frontend application is built using modern JavaScript technologies and utility-first styling:
 
-| Technology                | Purpose                                                                                                                                             |
-| :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **React**                 | Core JavaScript library for building the user interface.                                                                                            |
-| **Vite**                  | Fast build tool providing a lightning-fast development experience.                                                                                  |
-| **Tailwind CSS**          | Utility-first CSS framework for rapid and consistent styling.                                                                                       |
-| **Shadcn UI**             | Reusable UI components built on Radix UI and Tailwind CSS.                                                                                          |
-| **React Router**          | Declarative routing for navigation between pages.                                                                                                   |
-| **React Hook Form / Zod** | Robust state management and schema validation for forms.                                                                                            |
+| Technology                | Purpose                                                                                                                                 |
+| :------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------- |
+| **React**                 | Core JavaScript library for building the user interface.                                                                                |
+| **Vite**                  | Fast build tool providing a lightning-fast development experience.                                                                      |
+| **Tailwind CSS**          | Utility-first CSS framework for rapid and consistent styling.                                                                           |
+| **Shadcn UI**             | Reusable UI components built on Radix UI and Tailwind CSS.                                                                              |
+| **React Router**          | Declarative routing for navigation between pages.                                                                                       |
+| **React Hook Form / Zod** | Robust state management and schema validation for forms.                                                                                |
 | **Custom Hooks/Contexts** | Centralized state management for app logic (`useAuth`, `useShop`, `useProducts`, `useOrders`, `useAdmin`) and Theming (`ThemeContext`). |
 
 ## ✨ Core Features & User Roles
@@ -43,12 +43,13 @@ The entire application structure revolves around protected routes, ensuring only
 
 | Route                       | Component       | Description                                                                                      |
 | :-------------------------- | :-------------- | :----------------------------------------------------------------------------------------------- |
-| `/`                         | `ProductList`   | Home page displaying all products (filterable by category: **Fashion** and **Others**).          |
+| `/products/:category?`      | `ProductList`   | Home page displaying all products (filterable by category: **Fashion** and **Others**).          |
+| `/products/search/:query`   | `ProductList`   | Home page displaying all products by search query.                                               |
 | `/product/:id`              | `ProductDetail` | Detailed view of a product.                                                                      |
 | `/cart`                     | `CartList`      | Displays items added to the cart, allowing multi-item selection from a single shop for checkout. |
 | `/checkout`                 | `Checkout`      | Final step for order placement, capturing recipient details, address, and proof of payment.      |
 | `/dashboard/orders`         | `MyOrder`       | List of active orders placed by the user (Buyer's perspective).                                  |
-| `/dashboard/order/:orderId` | `OrderDetail`   | Detailed view and tracking of a specific order.                                                  |
+| `/dashboard/order/:orderId` | `OrderDetail`   | Detailed view, tracking of a specific order, and request cancel                                  |
 | `/dashboard/order-history`  | `OrderHistory`  | List of all delivered or cancelled orders.                                                       |
 
 ### 3. Seller-Specific Pages
@@ -67,6 +68,7 @@ The entire application structure revolves around protected routes, ensuring only
 | Route                      | Component     | Description                                                     |
 | :------------------------- | :------------ | :-------------------------------------------------------------- |
 | `/dashboard/buyers`        | `BuyerList`   | List of all registered users (Buyers/Sellers).                  |
+| `/dashboard/user/:userId`  | `BuyerList`   | view of a specific user.                                        |
 | `/dashboard/shops`         | `ShopsList`   | List of all accepted (active) shops.                            |
 | `/dashboard/shops/pending` | `PendingList` | List of new shop registration requests awaiting Admin approval. |
 
